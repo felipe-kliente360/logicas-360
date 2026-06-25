@@ -1239,3 +1239,58 @@ button.act {
   display: block;
   animation: confpop 0.5s ease both;
 }
+
+/* ===== barra de ação com ícones (Direção A refinada) ===== */
+.act.sq {
+  flex: 0 0 auto;
+  width: 54px;
+  padding-left: 0;
+  padding-right: 0;
+  display: inline-grid;
+  place-items: center;
+  color: var(--ink-dim);
+}
+.act.verificar {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+}
+.act.help {
+  justify-content: center;
+}
+
+/* folha "como ler as posições" — régua início → fim */
+.readbar {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 6px;
+  margin: 2px 0 14px;
+}
+.readbar-row {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+}
+.readpos {
+  font-family: var(--font-mono), monospace;
+  font-weight: 700;
+  font-size: 12px;
+  color: var(--ink);
+  background: var(--card);
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  padding: 6px 9px;
+  white-space: nowrap;
+}
+.readarrow {
+  color: var(--glow);
+  display: inline-flex;
+}
+.info-text {
+  font-size: 13.5px;
+  line-height: 1.5;
+  color: var(--ink-dim);
+  margin: 0;
+}

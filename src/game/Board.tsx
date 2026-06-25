@@ -18,6 +18,7 @@ import {
   type Settings,
 } from "./storage";
 import { chime, winChime, buzz } from "./feedback";
+import { IconRefresh, IconCheck, IconBulb, IconCompass, IconArrowRight } from "../ds/components/icons";
 
 type Board = Record<string, (string | null)[]>;
 
@@ -78,8 +79,7 @@ export function Board({ puzzle, settings, onBack, onSolved, onOpenSettings }: Pr
   const [toast, setToast] = useState<string | null>(null);
   const [won, setWon] = useState(false);
   const [shake, setShake] = useState(false);
-  const [hintOpen, setHintOpen] = useState(false);
-  const hintRef = useRef<HTMLDivElement>(null);
+  const [infoOpen, setInfoOpen] = useState(false);
   const litTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
   const toastTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
   const shakeTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
@@ -274,16 +274,8 @@ export function Board({ puzzle, settings, onBack, onSolved, onOpenSettings }: Pr
     []
   );
 
-  useEffect(() => {
-    if (!hintOpen) return;
-    const onDown = (e: MouseEvent) => {
-      if (hintRef.current && !hintRef.current.contains(e.target as Node)) setHintOpen(false);
-    };
-    document.addEventListener("pointerdown", onDown);
-    return () => document.removeEventListener("pointerdown", onDown);
-  }, [hintOpen]);
-
   const source = (puzzle.source ?? "desafio").toUpperCase();
+  const showComoLer = puzzle.spine.ordered && !!puzzle.spine.referential;
 
   return (
     <div className="app screen-in">
@@ -333,20 +325,6 @@ export function Board({ puzzle, settings, onBack, onSolved, onOpenSettings }: Pr
         </div>
       </section>
 
-      {/* referencial da spine — hint clicável */}
-      {puzzle.spine.ordered && puzzle.spine.referential && (
-        <div className="hint-wrap" ref={hintRef}>
-          <button
-            className={"hint-chip" + (hintOpen ? " open" : "")}
-            onClick={() => setHintOpen((o) => !o)}
-            aria-expanded={hintOpen}
-          >
-            🧭 Como ler as posições
-          </button>
-          {hintOpen && <div className="hint-pop">{puzzle.spine.referential}</div>}
-        </div>
-      )}
-
       {/* fila / seats */}
       <section className={"queue" + (puzzle.spine.ordered ? " ordered" : "") + (shake ? " shake" : "")}>
         {Array.from({ length: puzzle.size }, (_, p) => (
@@ -377,25 +355,62 @@ export function Board({ puzzle, settings, onBack, onSolved, onOpenSettings }: Pr
         ))}
       </section>
 
-      {/* barra de ação: Limpar · Verificar · Ajuda (contador) */}
+      {/* barra de ação: Limpar · Como ler · Verificar · Ajuda (contador) */}
       <div className="bar">
         <div className="bar-inner">
-          <button className="act ghost limpar" onClick={reset} aria-label="Limpar e reiniciar">
-            ↺
+          <button className="act ghost sq" onClick={reset} aria-label="Limpar e reiniciar" title="Limpar">
+            <IconRefresh />
           </button>
-          <button className="act primary" onClick={check}>
-            Verificar
+          {showComoLer && (
+            <button
+              className="act ghost sq"
+              onClick={() => setInfoOpen(true)}
+              aria-label="Como ler as posições"
+              title="Como ler as posições"
+            >
+              <IconCompass />
+            </button>
+          )}
+          <button className="act primary verificar" onClick={check}>
+            <IconCheck /> Verificar
           </button>
           <button
             className="act help"
             onClick={hint}
             disabled={hintsLeft <= 0}
-            aria-label={`Ajuda (${hintsLeft} restantes)`}
+            aria-label={`Ajuda — ${hintsLeft} restantes`}
+            title="Ajuda: revela uma posição"
           >
-            ? <span className="help-n">{hintsLeft}</span>
+            <IconBulb />
+            <span className="help-n">{hintsLeft}</span>
           </button>
         </div>
       </div>
+
+      {/* folha "como ler as posições" */}
+      {showComoLer && (
+        <>
+          <div className={"scrim" + (infoOpen ? " show" : "")} onClick={() => setInfoOpen(false)} />
+          <div className={"sheet" + (infoOpen ? " show" : "")} role="dialog" aria-modal="true">
+            <div className="grab" />
+            <h3>Como ler as posições</h3>
+            <div className="ctx">{puzzle.spine.label}</div>
+            <div className="readbar">
+              {puzzle.spine.labels.map((l, i) => (
+                <span className="readbar-row" key={i}>
+                  <span className="readpos">{l}</span>
+                  {i < puzzle.size - 1 && (
+                    <span className="readarrow">
+                      <IconArrowRight size={14} />
+                    </span>
+                  )}
+                </span>
+              ))}
+            </div>
+            <p className="info-text">{puzzle.spine.referential}</p>
+          </div>
+        </>
+      )}
 
       {/* bottom sheet */}
       <BottomSheet
