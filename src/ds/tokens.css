@@ -426,6 +426,22 @@ h1.board-h1 {
   border-color: var(--glow);
   box-shadow: 0 0 0 3px var(--glow-soft);
 }
+/* slot cravado pela ajuda — não editável */
+.slot.locked {
+  border-style: solid;
+  border-color: var(--glow);
+  background: var(--glow-soft);
+  cursor: default;
+}
+.slot.locked .sval {
+  color: var(--ink);
+}
+.lock {
+  flex: 0 0 auto;
+  font-size: 12px;
+  opacity: 0.85;
+  margin-left: 4px;
+}
 .dot {
   flex: 0 0 auto;
   width: 22px;

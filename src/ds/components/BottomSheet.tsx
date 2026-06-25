@@ -12,11 +12,12 @@ interface Props {
   target: SheetTarget | null;
   spineLabel: string; // ex.: "Posição 3 da fila"
   column: (string | null)[]; // estado atual da coluna (categoryId) por posição
+  lockedPos?: Set<number>; // posições cravadas por ajuda nesta categoria
   onPick: (valueId: string, movedFrom: number) => void;
   onClose: () => void;
 }
 
-export function BottomSheet({ target, spineLabel, column, onPick, onClose }: Props) {
+export function BottomSheet({ target, spineLabel, column, lockedPos, onPick, onClose }: Props) {
   const open = target !== null;
   const current = target ? column[target.pos] : null;
 
@@ -32,16 +33,22 @@ export function BottomSheet({ target, spineLabel, column, onPick, onClose }: Pro
             const usedAt = column.indexOf(v.id);
             const usedElsewhere = usedAt !== -1 && usedAt !== target.pos;
             const isCurrent = v.id === current;
+            const lockedElsewhere = usedElsewhere && !!lockedPos?.has(usedAt); // cravado pela ajuda
             return (
               <div
                 key={v.id}
-                className={"opt" + (isCurrent ? " current" : "")}
-                onClick={() => onPick(v.id, usedElsewhere ? usedAt : -1)}
+                className={"opt" + (isCurrent ? " current" : "") + (lockedElsewhere ? " locked" : "")}
+                onClick={() => {
+                  if (lockedElsewhere) return; // não move um valor cravado
+                  onPick(v.id, usedElsewhere ? usedAt : -1);
+                }}
               >
                 <Swatch value={v} />
                 <span className="name">{v.label}</span>
                 {isCurrent ? (
                   <span className="used clear-x">remover ✕</span>
+                ) : lockedElsewhere ? (
+                  <span className="used">🔒 fixo</span>
                 ) : usedElsewhere ? (
                   <span className="used">em uso → move</span>
                 ) : null}

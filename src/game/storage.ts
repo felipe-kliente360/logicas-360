@@ -117,6 +117,34 @@ export function clearInProgress(id: string): void {
   }
 }
 
+/* ---------- ajudas por fase (orçamento gasto + posições cravadas) ---------- */
+export interface PhaseHints {
+  used: number; // quantas ajudas já foram gastas nesta fase
+  cells: { cat: string; pos: number }[]; // posições reveladas (cravadas)
+}
+const HINTS_KEY = "logicas360.hints.v1";
+
+function loadAllHints(): Record<string, PhaseHints> {
+  const r = read<Record<string, PhaseHints>>(HINTS_KEY, {});
+  return r && typeof r === "object" ? r : {};
+}
+export function loadHints(id: string): PhaseHints {
+  const h = loadAllHints()[id];
+  return h && Array.isArray(h.cells) ? { used: h.used || h.cells.length, cells: h.cells } : { used: 0, cells: [] };
+}
+export function saveHints(id: string, h: PhaseHints): void {
+  const all = loadAllHints();
+  all[id] = h;
+  write(HINTS_KEY, all);
+}
+export function clearHints(id: string): void {
+  const all = loadAllHints();
+  if (id in all) {
+    delete all[id];
+    write(HINTS_KEY, all);
+  }
+}
+
 /** mm:ss a partir de ms. */
 export function formatTime(ms: number): string {
   const total = Math.floor(ms / 1000);

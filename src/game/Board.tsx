@@ -11,6 +11,9 @@ import {
   loadInProgress,
   saveInProgress,
   clearInProgress,
+  loadHints,
+  saveHints,
+  clearHints,
   type InProgress,
   type Settings,
 } from "./storage";
@@ -40,6 +43,16 @@ const seatMatches = (b: Board, puzzle: Puzzle, pos: number) =>
   puzzle.categories.every((c) => b[c.id][pos] && b[c.id][pos] === puzzle.solution[c.id][pos]);
 
 const MAX_HINTS = 3;
+const cellKey = (cat: string, pos: number) => `${cat}:${pos}`;
+
+// força os valores corretos nas posições cravadas pela ajuda
+function applyLocks(board: Board, puzzle: Puzzle, locks: { cat: string; pos: number }[]): Board {
+  if (!locks.length) return board;
+  const next: Board = {};
+  for (const c of puzzle.categories) next[c.id] = [...board[c.id]];
+  for (const { cat, pos } of locks) if (next[cat]) next[cat][pos] = puzzle.solution[cat][pos];
+  return next;
+}
 
 interface Props {
   puzzle: Puzzle;
@@ -51,15 +64,20 @@ interface Props {
 
 export function Board({ puzzle, settings, onBack, onSolved, onOpenSettings }: Props) {
   const saved = useMemo(() => loadInProgress(puzzle.id), [puzzle.id]);
+  const savedHints = useMemo(() => loadHints(puzzle.id), [puzzle.id]);
 
-  const [board, setBoard] = useState<Board>(() => restoreBoard(puzzle, saved));
+  // posições cravadas pela ajuda (persistem ao Limpar; só zeram ao concluir)
+  const [locks, setLocks] = useState<{ cat: string; pos: number }[]>(() => savedHints.cells);
+  const [hintsLeft, setHintsLeft] = useState(() => Math.max(0, MAX_HINTS - savedHints.used));
+  const lockedSet = useMemo(() => new Set(locks.map((l) => cellKey(l.cat, l.pos))), [locks]);
+
+  const [board, setBoard] = useState<Board>(() => applyLocks(restoreBoard(puzzle, saved), puzzle, savedHints.cells));
   const [openClues, setOpenClues] = useState(true);
   const [litClue, setLitClue] = useState<string | null>(null);
   const [sheet, setSheet] = useState<SheetTarget | null>(null);
   const [toast, setToast] = useState<string | null>(null);
   const [won, setWon] = useState(false);
   const [shake, setShake] = useState(false);
-  const [hintsLeft, setHintsLeft] = useState(MAX_HINTS);
   const [hintOpen, setHintOpen] = useState(false);
   const hintRef = useRef<HTMLDivElement>(null);
   const litTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
@@ -156,27 +174,31 @@ export function Board({ puzzle, settings, onBack, onSolved, onOpenSettings }: Pr
     setSheet(null);
   }
 
-  // dica: corrige um slot ALEATÓRIO ainda errado (vazio ou preenchido errado).
-  // Máximo MAX_HINTS por tela.
+  // dica: revela um slot ALEATÓRIO ainda errado (vazio ou preenchido errado) e o
+  // CRAVA. Orçamento gasto de verdade — persiste ao Limpar; só zera ao concluir.
   function hint() {
     if (hintsLeft <= 0) return;
     const wrong: { cat: string; pos: number }[] = [];
     for (const c of puzzle.categories)
-      for (let p = 0; p < puzzle.size; p++) if (board[c.id][p] !== puzzle.solution[c.id][p]) wrong.push({ cat: c.id, pos: p });
+      for (let p = 0; p < puzzle.size; p++)
+        if (board[c.id][p] !== puzzle.solution[c.id][p]) wrong.push({ cat: c.id, pos: p });
     if (wrong.length === 0) {
       showToast("Tudo já preenchido — toque em Verificar.");
       return;
     }
-    const { cat, pos } = wrong[Math.floor(Math.random() * wrong.length)];
-    const val = puzzle.solution[cat][pos];
-    const col = [...board[cat]];
+    const pick = wrong[Math.floor(Math.random() * wrong.length)];
+    const val = puzzle.solution[pick.cat][pick.pos];
+    const col = [...board[pick.cat]];
     const dup = col.indexOf(val); // mantém permutação: tira o valor de onde estava
     if (dup !== -1) col[dup] = null;
-    col[pos] = val;
-    const next: Board = { ...board, [cat]: col };
-    maybeCelebrateSeat(next, pos, seatMatches(board, puzzle, pos));
+    col[pick.pos] = val;
+    const next: Board = { ...board, [pick.cat]: col };
+    const nextLocks = [...locks, pick];
+    maybeCelebrateSeat(next, pick.pos, seatMatches(board, puzzle, pick.pos));
     setBoard(next);
+    setLocks(nextLocks);
     setHintsLeft((n) => n - 1);
+    saveHints(puzzle.id, { used: nextLocks.length, cells: nextLocks });
   }
 
   function lightClue(id: string) {
@@ -213,6 +235,7 @@ export function Board({ puzzle, settings, onBack, onSolved, onOpenSettings }: Pr
       wonRef.current = true;
       setWon(true);
       clearInProgress(puzzle.id);
+      clearHints(puzzle.id); // fase concluída: ajudas voltam ao máximo num próximo jogo
       winChime(settings.som);
       buzz(settings.vib, [18, 40, 18]);
       onSolved();
@@ -225,12 +248,18 @@ export function Board({ puzzle, settings, onBack, onSolved, onOpenSettings }: Pr
     }
   }
 
+  // Limpar/reiniciar: zera o tabuleiro MAS mantém as posições cravadas pela ajuda
+  // (e o orçamento já gasto). Após uma vitória, os travados já foram descartados.
   function reset() {
     clearInProgress(puzzle.id);
-    setBoard(emptyBoard(puzzle));
+    const fresh = won ? [] : locks; // se veio da vitória, recomeça limpo
+    if (won) {
+      setLocks([]);
+      setHintsLeft(MAX_HINTS);
+    }
+    setBoard(applyLocks(emptyBoard(puzzle), puzzle, fresh));
     setWon(false);
     setResult(null);
-    setHintsLeft(MAX_HINTS);
     startRef.current = Date.now();
     setElapsed(0);
     setRunning(true);
@@ -326,17 +355,20 @@ export function Board({ puzzle, settings, onBack, onSolved, onOpenSettings }: Pr
             <div className="slots">
               {puzzle.categories.map((cat) => {
                 const v = valueOf(cat.id, board[cat.id][p]);
+                const locked = lockedSet.has(cellKey(cat.id, p));
                 return (
                   <button
                     key={cat.id}
-                    className={"slot" + (v ? " filled" : "") + (isLit(cat.id, p) ? " lit" : "")}
-                    onClick={() => setSheet({ cat, pos: p })}
+                    className={"slot" + (v ? " filled" : "") + (isLit(cat.id, p) ? " lit" : "") + (locked ? " locked" : "")}
+                    onClick={locked ? undefined : () => setSheet({ cat, pos: p })}
+                    aria-disabled={locked}
                   >
                     <Swatch value={v} />
                     <span className="scol">
                       <span className="slabel">{cat.label}</span>
                       <span className="sval">{v ? v.label : "tocar para escolher"}</span>
                     </span>
+                    {locked && <span className="lock" aria-label="fixado pela ajuda">🔒</span>}
                   </button>
                 );
               })}
@@ -370,6 +402,11 @@ export function Board({ puzzle, settings, onBack, onSolved, onOpenSettings }: Pr
         target={sheet}
         spineLabel={sheet ? `${puzzle.spine.label} · ${puzzle.spine.labels[sheet.pos]}` : ""}
         column={sheet ? board[sheet.cat.id] : []}
+        lockedPos={
+          sheet
+            ? new Set(locks.filter((l) => l.cat === sheet.cat.id).map((l) => l.pos))
+            : undefined
+        }
         onPick={pick}
         onClose={() => setSheet(null)}
       />
