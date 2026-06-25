@@ -137,6 +137,11 @@ h1.title {
   align-items: center;
   gap: 10px;
 }
+.brand {
+  display: flex;
+  align-items: center;
+  gap: 11px;
+}
 .iconbtn {
   flex: 0 0 auto;
   width: 38px;

@@ -2,6 +2,7 @@
 import { useMemo, useState } from "react";
 import type { Puzzle } from "../engine/types";
 import { getRecord, formatTime, hasInProgress, type Progress } from "./storage";
+import { Logo } from "../ds/components/Logo";
 
 const diffWord = (d: number) => (d <= 2 ? "Fácil" : d <= 6 ? "Médio" : d <= 8 ? "Difícil" : "Expert");
 
@@ -40,7 +41,12 @@ export function Home({
       <div className="rain" />
       <div className="home-hero">
         <div className="topbar">
-          <p className="eyebrow">Desafios de lógica</p>
+          <div className="brand">
+            <Logo size={40} />
+            <p className="eyebrow" style={{ margin: 0 }}>
+              Desafios de lógica
+            </p>
+          </div>
           <button className="iconbtn" onClick={onOpenSettings} aria-label="Configurações">
             ⚙
           </button>
