@@ -7,8 +7,9 @@ import { difficultyRaw } from "../engine/difficulty";
 import { noPonto } from "./no-ponto";
 import { einstein } from "./einstein";
 import { GENIOL } from "./geniol"; // acervo Geniol (auto-gerado)
+import { GENERATED } from "./generated"; // fases do gerador determinístico
 
-const RAW: Puzzle[] = [noPonto, einstein, ...GENIOL];
+const RAW: Puzzle[] = [noPonto, einstein, ...GENIOL, ...GENERATED];
 
 // --- calibração ancorada (níveis-referência definidos pelo produto) ---
 const LOW_IDS = ["basico-1", "basico-2", "meninas-na-escola"]; // -> nível 1
