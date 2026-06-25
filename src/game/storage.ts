@@ -1,29 +1,94 @@
-// Progresso no MVP: localStorage. Quando quiser login/sync/ranking, troca por Supabase
-// atrás desta mesma interface (não acoplar cedo).
-const KEY = "logicas360.progress.v1";
+// Persistência no MVP: localStorage. Quando quiser login/sync/ranking, troca por
+// Supabase atrás destas mesmas funções (não acoplar cedo).
+const PROGRESS_KEY = "logicas360.progress.v1";
+const SETTINGS_KEY = "logicas360.settings.v1";
+const RECORDS_KEY = "logicas360.records.v1";
 
+const read = <T>(key: string, fallback: T): T => {
+  try {
+    const raw = localStorage.getItem(key);
+    return raw ? (JSON.parse(raw) as T) : fallback;
+  } catch {
+    return fallback;
+  }
+};
+const write = (key: string, value: unknown) => {
+  try {
+    localStorage.setItem(key, JSON.stringify(value));
+  } catch {
+    /* storage cheio/indisponível — segue sem persistir */
+  }
+};
+
+/* ---------- progresso ---------- */
 export interface Progress {
   completed: string[]; // ids de puzzles resolvidos
 }
 
 export function loadProgress(): Progress {
-  try {
-    const raw = localStorage.getItem(KEY);
-    if (!raw) return { completed: [] };
-    const p = JSON.parse(raw) as Progress;
-    return { completed: Array.isArray(p.completed) ? p.completed : [] };
-  } catch {
-    return { completed: [] };
-  }
+  const p = read<Progress>(PROGRESS_KEY, { completed: [] });
+  return { completed: Array.isArray(p.completed) ? p.completed : [] };
 }
 
 export function markCompleted(id: string): Progress {
   const p = loadProgress();
   if (!p.completed.includes(id)) p.completed.push(id);
-  try {
-    localStorage.setItem(KEY, JSON.stringify(p));
-  } catch {
-    /* storage cheio/indisponível — segue sem persistir */
-  }
+  write(PROGRESS_KEY, p);
   return p;
+}
+
+export function resetProgress(): Progress {
+  const empty = { completed: [] };
+  write(PROGRESS_KEY, empty);
+  return empty;
+}
+
+/* ---------- configurações ---------- */
+export type ThemeMode = "dark" | "light";
+export interface Settings {
+  realtimeFeedback: boolean; // acende o cartão quando os atributos batem (antes de Verificar)
+  theme: ThemeMode;
+}
+const DEFAULT_SETTINGS: Settings = { realtimeFeedback: false, theme: "dark" };
+
+export function loadSettings(): Settings {
+  return { ...DEFAULT_SETTINGS, ...read<Partial<Settings>>(SETTINGS_KEY, {}) };
+}
+export function saveSettings(s: Settings): Settings {
+  write(SETTINGS_KEY, s);
+  return s;
+}
+
+/* ---------- recordes de tempo (ms por puzzle) ---------- */
+export type Records = Record<string, number>;
+
+export function loadRecords(): Records {
+  const r = read<Records>(RECORDS_KEY, {});
+  return r && typeof r === "object" ? r : {};
+}
+export function getRecord(id: string): number | undefined {
+  return loadRecords()[id];
+}
+/** Grava se for o melhor tempo. Retorna o melhor atual e se houve recorde novo. */
+export function submitTime(id: string, ms: number): { best: number; isNew: boolean } {
+  const records = loadRecords();
+  const prev = records[id];
+  if (prev == null || ms < prev) {
+    records[id] = ms;
+    write(RECORDS_KEY, records);
+    return { best: ms, isNew: true };
+  }
+  return { best: prev, isNew: false };
+}
+export function resetRecords(): Records {
+  write(RECORDS_KEY, {});
+  return {};
+}
+
+/** mm:ss a partir de ms. */
+export function formatTime(ms: number): string {
+  const total = Math.floor(ms / 1000);
+  const m = Math.floor(total / 60);
+  const s = total % 60;
+  return `${m}:${String(s).padStart(2, "0")}`;
 }

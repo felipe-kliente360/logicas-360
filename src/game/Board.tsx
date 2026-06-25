@@ -1,9 +1,11 @@
 // Tela da fase — tabuleiro de atribuição (o coração do jogo). Consome o Puzzle
-// genérico; tema vem do data-theme no <body>. Inclui botão "voltar pra home".
+// genérico; tema vem do data-theme no <body>. Cronômetro inicia ao abrir; grava
+// recorde ao concluir; zera ao limpar. Feedback em tempo real é opcional.
 import { useEffect, useMemo, useRef, useState } from "react";
 import type { Puzzle } from "../engine/types";
 import { Swatch } from "../ds/components/Swatch";
 import { BottomSheet, type SheetTarget } from "../ds/components/BottomSheet";
+import { getRecord, submitTime, formatTime } from "./storage";
 
 type Board = Record<string, (string | null)[]>;
 
@@ -13,7 +15,15 @@ function emptyBoard(puzzle: Puzzle): Board {
   return b;
 }
 
-export function Board({ puzzle, onBack, onSolved }: { puzzle: Puzzle; onBack: () => void; onSolved: () => void }) {
+interface Props {
+  puzzle: Puzzle;
+  realtimeFeedback: boolean;
+  onBack: () => void;
+  onSolved: () => void;
+  onOpenSettings: () => void;
+}
+
+export function Board({ puzzle, realtimeFeedback, onBack, onSolved, onOpenSettings }: Props) {
   const [board, setBoard] = useState<Board>(() => emptyBoard(puzzle));
   const [openClues, setOpenClues] = useState(false);
   const [litClue, setLitClue] = useState<string | null>(null);
@@ -25,6 +35,13 @@ export function Board({ puzzle, onBack, onSolved }: { puzzle: Puzzle; onBack: ()
   const litTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
   const toastTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
 
+  // cronômetro
+  const startRef = useRef<number>(Date.now());
+  const [elapsed, setElapsed] = useState(0);
+  const [running, setRunning] = useState(true);
+  const [record, setRecord] = useState<number | undefined>(() => getRecord(puzzle.id));
+  const [result, setResult] = useState<{ ms: number; isNew: boolean } | null>(null);
+
   const totalSlots = puzzle.size * puzzle.categories.length;
   const valueOf = useMemo(() => {
     const m = new Map<string, Map<string, (typeof puzzle.categories)[0]["values"][0]>>();
@@ -33,6 +50,13 @@ export function Board({ puzzle, onBack, onSolved }: { puzzle: Puzzle; onBack: ()
   }, [puzzle]);
 
   const filled = puzzle.categories.reduce((a, c) => a + board[c.id].filter(Boolean).length, 0);
+
+  // tique do cronômetro enquanto rodando
+  useEffect(() => {
+    if (!running) return;
+    const id = setInterval(() => setElapsed(Date.now() - startRef.current), 500);
+    return () => clearInterval(id);
+  }, [running]);
 
   function showToast(msg: string) {
     setToast(msg);
@@ -70,7 +94,9 @@ export function Board({ puzzle, onBack, onSolved }: { puzzle: Puzzle; onBack: ()
     return clue.highlights.some((h) => h.cat === catId && (h.pos === undefined || h.pos === pos));
   }
 
+  // só destaca o cartão certo se o feedback em tempo real estiver ligado (ou já venceu)
   function seatSolved(pos: number): boolean {
+    if (!realtimeFeedback && !won) return false;
     return puzzle.categories.every((c) => board[c.id][pos] && board[c.id][pos] === puzzle.solution[c.id][pos]);
   }
 
@@ -84,6 +110,12 @@ export function Board({ puzzle, onBack, onSolved }: { puzzle: Puzzle; onBack: ()
       for (let p = 0; p < puzzle.size; p++) if (board[c.id][p] !== puzzle.solution[c.id][p]) wrong++;
     });
     if (wrong === 0) {
+      const ms = Date.now() - startRef.current;
+      setElapsed(ms);
+      setRunning(false);
+      const { best, isNew } = submitTime(puzzle.id, ms);
+      setRecord(best);
+      setResult({ ms, isNew });
       setWon(true);
       onSolved();
     } else {
@@ -94,12 +126,16 @@ export function Board({ puzzle, onBack, onSolved }: { puzzle: Puzzle; onBack: ()
     }
   }
 
+  // limpar/recomeçar: zera tabuleiro E cronômetro
   function reset() {
     setBoard(emptyBoard(puzzle));
     setWon(false);
+    setResult(null);
+    startRef.current = Date.now();
+    setElapsed(0);
+    setRunning(true);
   }
 
-  // limpa timers ao desmontar
   useEffect(
     () => () => {
       if (litTimer.current) clearTimeout(litTimer.current);
@@ -108,7 +144,6 @@ export function Board({ puzzle, onBack, onSolved }: { puzzle: Puzzle; onBack: ()
     []
   );
 
-  // fecha o hint do referencial ao clicar fora
   useEffect(() => {
     if (!hintOpen) return;
     const onDown = (e: MouseEvent) => {
@@ -124,14 +159,25 @@ export function Board({ puzzle, onBack, onSolved }: { puzzle: Puzzle; onBack: ()
   return (
     <div className="app">
       <header>
-        <button className="backbtn" onClick={onBack} aria-label="Voltar para a home">
-          ← Início
-        </button>
+        <div className="topbar">
+          <button className="backbtn" onClick={onBack} aria-label="Voltar para a home">
+            ← Início
+          </button>
+          <div className="topbar-right">
+            <span className="timer" aria-label="tempo">
+              ⏱ {formatTime(elapsed)}
+            </span>
+            <button className="iconbtn" onClick={onOpenSettings} aria-label="Configurações">
+              ⚙
+            </button>
+          </div>
+        </div>
         <p className="eyebrow" style={{ marginTop: 14 }}>
           Desafio de lógica · {diffLabel} · nível {puzzle.difficulty}
         </p>
         <h1 className="title">{puzzle.title}</h1>
         <p className="sub">{puzzle.story}</p>
+        {record != null && <p className="record-line">🏆 Seu recorde: {formatTime(record)}</p>}
         <div className="progress">
           <div className="pbar">
             <div className="pfill" style={{ width: `${(filled / totalSlots) * 100}%` }} />
@@ -151,11 +197,7 @@ export function Board({ puzzle, onBack, onSolved }: { puzzle: Puzzle; onBack: ()
         </div>
         <div className="clue-list">
           {puzzle.clues.map((c, i) => (
-            <div
-              key={c.id}
-              className={"clue" + (litClue === c.id ? " lit" : "")}
-              onClick={() => lightClue(c.id)}
-            >
+            <div key={c.id} className={"clue" + (litClue === c.id ? " lit" : "")} onClick={() => lightClue(c.id)}>
               <span className="n">{i + 1}</span>
               <p>{c.text}</p>
             </div>
@@ -163,7 +205,7 @@ export function Board({ puzzle, onBack, onSolved }: { puzzle: Puzzle; onBack: ()
         </div>
       </section>
 
-      {/* referencial da spine (regra de ouro das pistas de ordem) — hint clicável */}
+      {/* referencial da spine — hint clicável */}
       {puzzle.spine.ordered && puzzle.spine.referential && (
         <div className="hint-wrap" ref={hintRef}>
           <button
@@ -231,9 +273,13 @@ export function Board({ puzzle, onBack, onSolved }: { puzzle: Puzzle; onBack: ()
       {/* win */}
       <div className={"win" + (won ? " show" : "")}>
         <div className="win-card">
-          <div className="badge-win">🎉</div>
-          <div className="big">Resolvido!</div>
-          <p>Você deduziu todas as {puzzle.size} entidades de {puzzle.title}.</p>
+          <div className="badge-win">{result?.isNew ? "🏆" : "🎉"}</div>
+          <div className="big">{result?.isNew ? "Novo recorde!" : "Resolvido!"}</div>
+          <p>
+            Você deduziu todas as {puzzle.size} entidades de {puzzle.title} em{" "}
+            <strong>{formatTime(result?.ms ?? elapsed)}</strong>.
+            {result && !result.isNew && record != null && <> Seu recorde: {formatTime(record)}.</>}
+          </p>
           <button className="act primary" style={{ width: "100%", marginBottom: 10 }} onClick={onBack}>
             Voltar pras fases
           </button>

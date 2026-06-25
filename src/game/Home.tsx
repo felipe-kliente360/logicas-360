@@ -1,10 +1,9 @@
-// Tela de entrada — seletor de fases. Lê o catálogo e o progresso salvo.
+// Tela de entrada — seletor de fases. Lê o catálogo, o progresso e os recordes.
 import { useMemo, useState } from "react";
 import type { Puzzle } from "../engine/types";
-import type { Progress } from "./storage";
+import { getRecord, formatTime, type Progress } from "./storage";
 
-const diffWord = (d: number) =>
-  d <= 2 ? "Fácil" : d <= 6 ? "Médio" : d <= 8 ? "Difícil" : "Expert";
+const diffWord = (d: number) => (d <= 2 ? "Fácil" : d <= 6 ? "Médio" : d <= 8 ? "Difícil" : "Expert");
 
 // bandas de dificuldade para o filtro (nossa escala 1..10)
 const BANDS = [
@@ -19,17 +18,18 @@ export function Home({
   puzzles,
   progress,
   onPick,
+  onOpenSettings,
 }: {
   puzzles: Puzzle[];
   progress: Progress;
   onPick: (id: string) => void;
+  onOpenSettings: () => void;
 }) {
   const doneCount = puzzles.filter((p) => progress.completed.includes(p.id)).length;
   const [band, setBand] = useState<(typeof BANDS)[number]["id"]>("todos");
 
   const active = BANDS.find((b) => b.id === band)!;
   const visible = useMemo(() => puzzles.filter((p) => active.test(p.difficulty)), [puzzles, active]);
-  // contagem por banda, pra esconder filtros vazios
   const counts = useMemo(
     () => BANDS.map((b) => ({ b, n: puzzles.filter((p) => b.test(p.difficulty)).length })),
     [puzzles]
@@ -39,7 +39,12 @@ export function Home({
     <div className="home">
       <div className="rain" />
       <div className="home-hero">
-        <p className="eyebrow">Desafios de lógica</p>
+        <div className="topbar">
+          <p className="eyebrow">Desafios de lógica</p>
+          <button className="iconbtn" onClick={onOpenSettings} aria-label="Configurações">
+            ⚙
+          </button>
+        </div>
         <h1>Lógicas 360</h1>
         <p className="sub">
           {puzzles.length} puzzles de dedução em grade, do mais fácil ao mais difícil. Use as pistas pra descobrir quem é
@@ -50,11 +55,7 @@ export function Home({
       <div className="filters">
         {counts.map(({ b, n }) =>
           n === 0 && b.id !== "todos" ? null : (
-            <button
-              key={b.id}
-              className={"chip" + (band === b.id ? " on" : "")}
-              onClick={() => setBand(b.id)}
-            >
+            <button key={b.id} className={"chip" + (band === b.id ? " on" : "")} onClick={() => setBand(b.id)}>
               {b.label}
               <span className="chip-n">{b.id === "todos" ? puzzles.length : n}</span>
             </button>
@@ -63,19 +64,21 @@ export function Home({
       </div>
 
       <div className="levels">
-        {visible.map((p, i) => {
+        {visible.map((p) => {
           const done = progress.completed.includes(p.id);
+          const rec = getRecord(p.id);
           return (
             <button key={p.id} className={"level-card" + (done ? " done" : "")} onClick={() => onPick(p.id)}>
-              <div className="level-num">{done ? "✓" : i + 1}</div>
+              <div className="level-num">{p.difficulty}</div>
               <div className="level-body">
-                <h3>{p.title}</h3>
+                <h3>
+                  {p.title}
+                  {done && <span className="done-tick"> ✓</span>}
+                </h3>
                 <p className="level-meta">
-                  {p.size} entidades · {p.categories.length} categorias
+                  {diffWord(p.difficulty)} · nível {p.difficulty} · {p.size}×{p.categories.length}
                 </p>
-                <span className="level-diff">
-                  {diffWord(p.difficulty)} · nível {p.difficulty}
-                </span>
+                {rec != null && <span className="level-diff">🏆 recorde {formatTime(rec)}</span>}
               </div>
               <span className="level-chev">›</span>
             </button>

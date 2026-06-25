@@ -63,3 +63,40 @@
     animation: none;
   }
 }
+
+/* ================= MODO CLARO (data-mode="light") ================= */
+[data-mode="light"][data-theme="home"],
+[data-mode="light"][data-theme="ponto-de-onibus"] {
+  --bg: #eef6f5;
+  --bg2: #e3efee;
+  --card: #ffffff;
+  --card2: #f1f8f7;
+  --line: #c5dad8;
+  --ink: #0d2a30;
+  --ink-dim: #3d5b60;
+  --ink-faint: #6b878a;
+  --glow: #0e9c88;
+  --glow-soft: rgba(14, 156, 136, 0.14);
+  --on-glow: #ffffff;
+}
+[data-mode="light"][data-theme="casas-classico"] {
+  --bg: #f6efe2;
+  --bg2: #efe6d4;
+  --card: #fffaf0;
+  --card2: #f3ead8;
+  --line: #d8c9ad;
+  --ink: #2b2417;
+  --ink-dim: #5e5238;
+  --ink-faint: #8a7c60;
+  --glow: #c0791a;
+  --glow-soft: rgba(192, 121, 26, 0.16);
+  --on-glow: #ffffff;
+}
+/* no claro, o texto fica melhor sem o smoothing agressivo p/ fundo escuro */
+body[data-mode="light"] {
+  -webkit-font-smoothing: auto;
+}
+/* a chuva é um motif "neon na chuva" — só faz sentido no escuro */
+body[data-mode="light"] .rain {
+  display: none;
+}
