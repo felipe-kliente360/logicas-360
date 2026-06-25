@@ -7,8 +7,8 @@ export const puzzle: Puzzle = {
   id: "tarde-no-zoologico",
   source: "geniol",
   themeId: "casas-classico",
-  difficulty: 0, // preenchido pelo engine/relatório
-  sourceDifficulty: 0, // preenchido pela leitura dos ícones
+  difficulty: 0, // derivada pelo engine
+  sourceDifficulty: 2, // ícones de cérebro do PDF: ●●○○○
   size: 4,
   title: "Tarde no zoológico",
   story:
