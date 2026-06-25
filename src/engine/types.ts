@@ -69,5 +69,9 @@ export interface Puzzle {
   categories: Category[];
   clues: Clue[];
   solution: Record<string /*categoryId*/, string[] /*valueId por índice de posição*/>;
-  difficulty: number; // 1..10
+  difficulty: number; // 1..10 (nossa escala, do engine/difficulty)
+  /** Dificuldade declarada pela fonte original (geniol: ícones de cérebro, 1..5). */
+  sourceDifficulty?: number;
+  /** Origem do puzzle, p/ crédito (ex.: "geniol"). */
+  source?: string;
 }

@@ -604,11 +604,47 @@ button.act {
 .home-hero .sub {
   margin-top: 10px;
 }
+.filters {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-top: 20px;
+}
+.chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  background: var(--card);
+  border: 1px solid var(--line);
+  color: var(--ink-dim);
+  border-radius: 99px;
+  padding: 8px 13px;
+  font-size: 13px;
+  font-weight: 600;
+  font-family: var(--font-body), sans-serif;
+  cursor: pointer;
+  transition: background 0.12s, border-color 0.12s, color 0.12s;
+}
+.chip:active {
+  background: var(--card2);
+}
+.chip.on {
+  background: var(--glow);
+  border-color: var(--glow);
+  color: var(--on-glow, #06231f);
+}
+.chip-n {
+  font-family: var(--font-mono), monospace;
+  font-size: 11px;
+  font-weight: 700;
+  opacity: 0.75;
+}
+
 .levels {
   display: flex;
   flex-direction: column;
   gap: 12px;
-  margin-top: 22px;
+  margin-top: 16px;
 }
 .level-card {
   display: flex;
