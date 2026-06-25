@@ -20,6 +20,8 @@ export function Board({ puzzle, onBack, onSolved }: { puzzle: Puzzle; onBack: ()
   const [sheet, setSheet] = useState<SheetTarget | null>(null);
   const [toast, setToast] = useState<string | null>(null);
   const [won, setWon] = useState(false);
+  const [hintOpen, setHintOpen] = useState(false);
+  const hintRef = useRef<HTMLDivElement>(null);
   const litTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
   const toastTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
 
@@ -106,6 +108,16 @@ export function Board({ puzzle, onBack, onSolved }: { puzzle: Puzzle; onBack: ()
     []
   );
 
+  // fecha o hint do referencial ao clicar fora
+  useEffect(() => {
+    if (!hintOpen) return;
+    const onDown = (e: MouseEvent) => {
+      if (hintRef.current && !hintRef.current.contains(e.target as Node)) setHintOpen(false);
+    };
+    document.addEventListener("pointerdown", onDown);
+    return () => document.removeEventListener("pointerdown", onDown);
+  }, [hintOpen]);
+
   const diffLabel =
     puzzle.difficulty <= 2 ? "fácil" : puzzle.difficulty <= 6 ? "médio" : puzzle.difficulty <= 8 ? "difícil" : "expert";
 
@@ -151,11 +163,18 @@ export function Board({ puzzle, onBack, onSolved }: { puzzle: Puzzle; onBack: ()
         </div>
       </section>
 
-      {/* referencial da spine (regra de ouro das pistas de ordem) */}
+      {/* referencial da spine (regra de ouro das pistas de ordem) — hint clicável */}
       {puzzle.spine.ordered && puzzle.spine.referential && (
-        <p className="sub" style={{ marginTop: 12, fontSize: 12 }}>
-          🧭 {puzzle.spine.referential}
-        </p>
+        <div className="hint-wrap" ref={hintRef}>
+          <button
+            className={"hint-chip" + (hintOpen ? " open" : "")}
+            onClick={() => setHintOpen((o) => !o)}
+            aria-expanded={hintOpen}
+          >
+            🧭 Como ler as posições
+          </button>
+          {hintOpen && <div className="hint-pop">{puzzle.spine.referential}</div>}
+        </div>
       )}
 
       {/* fila / seats */}

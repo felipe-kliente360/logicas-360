@@ -17,11 +17,11 @@
   --card: #1d242c;
   --card2: #232c35;
   --line: #2f3a44;
-  --ink: #eef3f5;
-  --ink-dim: #9fb0bb;
-  --ink-faint: #6b7d88;
-  --glow: #6fd6c4;
-  --glow-soft: rgba(111, 214, 196, 0.16);
+  --ink: #f3f7f9;
+  --ink-dim: #c5d2da;
+  --ink-faint: #95a6b0;
+  --glow: #7fe3d1;
+  --glow-soft: rgba(127, 227, 209, 0.18);
 }
 
 * {
@@ -39,6 +39,10 @@ body {
   font-family: var(--font-body), system-ui, sans-serif;
   min-height: 100dvh;
   overflow-x: hidden;
+  /* texto mais nítido sobre fundo escuro */
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  text-rendering: optimizeLegibility;
 }
 
 .app {
@@ -71,10 +75,10 @@ h1.title {
 }
 .sub {
   color: var(--ink-dim);
-  font-size: 13.5px;
+  font-size: 14.5px;
+  font-weight: 500;
   margin: 8px 0 0;
-  max-width: 34ch;
-  line-height: 1.45;
+  line-height: 1.5;
 }
 .progress {
   display: flex;
@@ -189,9 +193,63 @@ h1.title {
 }
 .clue p {
   margin: 0;
-  font-size: 13.5px;
-  line-height: 1.45;
+  font-size: 14.5px;
+  font-weight: 500;
+  line-height: 1.5;
   color: var(--ink);
+}
+
+/* ---- hint do referencial (abre rápido, fecha ao clicar fora) ---- */
+.hint-wrap {
+  position: relative;
+  margin-top: 12px;
+}
+.hint-chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  background: var(--card);
+  border: 1px solid var(--line);
+  color: var(--ink-dim);
+  border-radius: 99px;
+  padding: 7px 13px;
+  font-size: 12.5px;
+  font-weight: 600;
+  font-family: var(--font-body), sans-serif;
+  cursor: pointer;
+}
+.hint-chip:active {
+  background: var(--card2);
+}
+.hint-chip.open {
+  border-color: var(--glow);
+  color: var(--ink);
+}
+.hint-pop {
+  position: absolute;
+  z-index: 8;
+  top: calc(100% + 8px);
+  left: 0;
+  right: 0;
+  background: var(--bg2);
+  border: 1px solid var(--glow);
+  box-shadow: 0 14px 40px -18px rgba(0, 0, 0, 0.7);
+  border-radius: 14px;
+  padding: 13px 15px;
+  font-size: 13.5px;
+  line-height: 1.5;
+  color: var(--ink);
+  animation: hintIn 0.15s ease;
+}
+@keyframes hintIn {
+  from {
+    opacity: 0;
+    transform: translateY(-4px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
 }
 
 /* ---- fila (seats) ---- */
@@ -301,9 +359,10 @@ h1.title {
 .slabel {
   font-size: 10px;
   font-family: var(--font-mono), monospace;
+  font-weight: 700;
   letter-spacing: 0.08em;
   text-transform: uppercase;
-  color: var(--ink-faint);
+  color: var(--ink-dim);
   display: block;
   line-height: 1;
 }
