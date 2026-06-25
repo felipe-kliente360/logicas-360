@@ -53,9 +53,20 @@ export function Home({
         </div>
         <h1>Lógicas 360</h1>
         <p className="sub">
-          {puzzles.length} puzzles de dedução em grade, do mais fácil ao mais difícil. Use as pistas pra descobrir quem é
+          {puzzles.length} puzzles de dedução em grade, do mais fácil ao expert. Use as pistas pra descobrir quem é
           quem.
         </p>
+        <div className="progress" style={{ marginTop: 16 }}>
+          <div className="pbar">
+            <div
+              className="pfill home-grow"
+              style={{ width: `${puzzles.length ? (doneCount / puzzles.length) * 100 : 0}%` }}
+            />
+          </div>
+          <span className="pnum">
+            {doneCount}/{puzzles.length}
+          </span>
+        </div>
       </div>
 
       <div className="filters">

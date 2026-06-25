@@ -3,6 +3,7 @@ import { PUZZLES, getPuzzle } from "./puzzles";
 import { Home } from "./game/Home";
 import { Board } from "./game/Board";
 import { Settings } from "./game/Settings";
+import { Splash } from "./game/Splash";
 import {
   loadProgress,
   markCompleted,
@@ -16,6 +17,7 @@ import {
 
 // Navegação leve (home ↔ fase) por estado. Tema do mundo no data-theme; claro/escuro no data-mode.
 export default function App() {
+  const [splash, setSplash] = useState(true);
   const [activeId, setActiveId] = useState<string | null>(null);
   const [progress, setProgress] = useState<Progress>(() => loadProgress());
   const [settings, setSettings] = useState<SettingsT>(() => loadSettings());
@@ -49,6 +51,10 @@ export default function App() {
     />
   );
 
+  if (splash) {
+    return <Splash onEnter={() => setSplash(false)} />;
+  }
+
   if (!active) {
     return (
       <>
@@ -69,7 +75,7 @@ export default function App() {
       <Board
         key={active.id}
         puzzle={active}
-        realtimeFeedback={settings.realtimeFeedback}
+        settings={settings}
         onBack={() => setActiveId(null)}
         onSolved={() => setProgress(markCompleted(active.id))}
         onOpenSettings={() => setShowSettings(true)}

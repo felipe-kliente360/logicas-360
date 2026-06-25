@@ -41,14 +41,26 @@ export function Settings({ settings, completed, total, onChange, onResetProgress
 
         <div className="set-group">
           <Toggle
+            label="Som"
+            hint="Efeitos sonoros ao acertar."
+            on={settings.som}
+            onClick={() => onChange({ ...settings, som: !settings.som })}
+          />
+          <Toggle
+            label="Vibração"
+            hint="Feedback tátil ao acertar e ao verificar."
+            on={settings.vib}
+            onClick={() => onChange({ ...settings, vib: !settings.vib })}
+          />
+          <Toggle
             label="Feedback em tempo real"
-            hint="Acende o cartão quando todos os atributos dele batem. Desligado, você só descobre ao Verificar."
+            hint="Acende o cartão (e toca o efeito) quando todos os atributos dele batem. Desligado, você só descobre ao Verificar."
             on={settings.realtimeFeedback}
             onClick={() => onChange({ ...settings, realtimeFeedback: !settings.realtimeFeedback })}
           />
           <Toggle
             label="Tema claro"
-            hint="Alterna entre o tema escuro (padrão) e o claro."
+            hint={settings.theme === "light" ? "Ativado" : "Desativado"}
             on={settings.theme === "light"}
             onClick={() => onChange({ ...settings, theme: settings.theme === "light" ? "dark" : "light" })}
           />

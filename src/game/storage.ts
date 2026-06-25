@@ -48,8 +48,10 @@ export type ThemeMode = "dark" | "light";
 export interface Settings {
   realtimeFeedback: boolean; // acende o cartão quando os atributos batem (antes de Verificar)
   theme: ThemeMode;
+  som: boolean; // efeitos sonoros ao acertar
+  vib: boolean; // feedback tátil (vibração)
 }
-const DEFAULT_SETTINGS: Settings = { realtimeFeedback: false, theme: "dark" };
+const DEFAULT_SETTINGS: Settings = { realtimeFeedback: false, theme: "dark", som: true, vib: true };
 
 export function loadSettings(): Settings {
   return { ...DEFAULT_SETTINGS, ...read<Partial<Settings>>(SETTINGS_KEY, {}) };

@@ -21,7 +21,33 @@
   --ink-dim: #c5d2da;
   --ink-faint: #95a6b0;
   --glow: #7fe3d1;
+  --glow2: #9defd9;
   --glow-soft: rgba(127, 227, 209, 0.18);
+}
+
+/* ---- animações do redesign (Direção A) — easing base (.2,.8,.2,1) ---- */
+@keyframes screenIn { from { opacity: 0; transform: translateX(14px); } to { opacity: 1; transform: translateX(0); } }
+@keyframes floaty { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-5px); } }
+@keyframes loadbar { 0% { width: 8%; } 60% { width: 78%; } 100% { width: 96%; } }
+@keyframes growbar { from { transform: scaleX(0); } to { transform: scaleX(1); } }
+@keyframes dotpop { 0% { transform: scale(0.4); } 65% { transform: scale(1.18); } 100% { transform: scale(1); } }
+@keyframes pop { 0% { transform: scale(0.6); opacity: 0; } 70% { transform: scale(1.08); } 100% { transform: scale(1); opacity: 1; } }
+@keyframes shake {
+  10%, 90% { transform: translateX(-1px); }
+  20%, 80% { transform: translateX(2px); }
+  30%, 50%, 70% { transform: translateX(-5px); }
+  40%, 60% { transform: translateX(5px); }
+}
+@keyframes confpop {
+  0% { transform: scale(0) rotate(0); opacity: 0; }
+  60% { transform: scale(1.15) rotate(18deg); opacity: 1; }
+  100% { transform: scale(1) rotate(8deg); opacity: 1; }
+}
+.screen-in { animation: screenIn 0.28s ease; }
+@media (prefers-reduced-motion: reduce) {
+  .screen-in,
+  [class*="anim-"],
+  .floaty { animation: none !important; }
 }
 
 * {
@@ -73,6 +99,13 @@ h1.title {
   margin: 0;
   letter-spacing: -0.02em;
 }
+/* título da fase (board) é menor que o da home */
+h1.board-h1 {
+  font-size: 27px;
+  line-height: 1;
+  letter-spacing: -0.01em;
+  margin-top: 4px;
+}
 .sub {
   color: var(--ink-dim);
   font-size: 14.5px;
@@ -95,7 +128,7 @@ h1.title {
 }
 .pfill {
   height: 100%;
-  background: linear-gradient(90deg, var(--glow), #9defd9);
+  background: linear-gradient(90deg, var(--glow), var(--glow2));
   border-radius: 99px;
   transition: width 0.35s ease;
 }
@@ -408,6 +441,9 @@ h1.title {
 .slot.filled .dot.color {
   border-color: rgba(0, 0, 0, 0.2);
 }
+.slot.filled .dot {
+  animation: dotpop 0.26s cubic-bezier(0.2, 0.8, 0.2, 1);
+}
 .scol {
   flex: 1;
   min-width: 0;
@@ -467,7 +503,8 @@ button.act {
   color: var(--on-glow, #06231f);
 }
 .primary:active {
-  filter: brightness(0.92);
+  filter: brightness(0.9);
+  transform: scale(0.98);
 }
 .ghost {
   flex: 0 0 auto;
@@ -660,11 +697,15 @@ button.act {
 .home-hero .sub {
   margin-top: 10px;
 }
+.home-grow {
+  transform-origin: left;
+  animation: growbar 0.8s cubic-bezier(0.2, 0.8, 0.2, 1) both;
+}
 .filters {
   display: flex;
   flex-wrap: wrap;
   gap: 8px;
-  margin-top: 20px;
+  margin-top: 18px;
 }
 .chip {
   display: inline-flex;
@@ -716,7 +757,8 @@ button.act {
   transition: border-color 0.2s, box-shadow 0.2s, transform 0.05s;
 }
 .level-card:active {
-  transform: scale(0.99);
+  transform: scale(0.985);
+  border-color: var(--glow);
 }
 .level-card.done {
   border-color: var(--glow);
@@ -956,4 +998,195 @@ button.act {
   text-align: center;
   font-size: 11px;
   color: var(--ink-faint);
+}
+
+/* ================= Redesign Direção A: splash, vitória, shake ================= */
+.queue.shake { animation: shake 0.5s ease; }
+
+/* splash */
+.splash {
+  position: fixed;
+  inset: 0;
+  z-index: 50;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 26px;
+  padding: 0 36px;
+  background: radial-gradient(120% 70% at 50% 12%, var(--glow-soft), transparent 60%);
+  animation: screenIn 0.3s ease;
+}
+.splash-icon {
+  width: 112px;
+  height: 112px;
+  border-radius: 28px;
+  background: linear-gradient(160deg, #123a42, #081d22);
+  box-shadow: 0 0 0 1px rgba(127, 227, 209, 0.22), 0 22px 50px -14px var(--glow);
+  display: grid;
+  place-items: center;
+  animation: floaty 4s ease-in-out infinite;
+}
+.splash-mark {
+  width: 66px;
+  height: 66px;
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 7px;
+}
+.splash-mark span {
+  border-radius: 7px;
+  background: #143840;
+  border: 1px solid var(--line);
+}
+.splash-mark span.on {
+  background: linear-gradient(135deg, var(--glow), var(--glow2));
+  box-shadow: 0 0 12px var(--glow);
+  border: none;
+}
+.splash-word {
+  font-family: var(--font-display), sans-serif;
+  font-weight: 800;
+  font-size: 38px;
+  line-height: 0.95;
+  letter-spacing: -0.02em;
+  color: var(--ink);
+  text-align: center;
+}
+.splash-eyebrow {
+  font-family: var(--font-mono), monospace;
+  font-weight: 700;
+  font-size: 11px;
+  letter-spacing: 0.28em;
+  text-transform: uppercase;
+  color: var(--glow);
+  margin-top: 13px;
+  text-align: center;
+}
+.loadtrack {
+  width: 160px;
+  height: 5px;
+  border-radius: 99px;
+  background: var(--card);
+  overflow: hidden;
+}
+.loadfill {
+  height: 100%;
+  border-radius: 99px;
+  background: linear-gradient(90deg, var(--glow), var(--glow2));
+  animation: loadbar 2.1s ease-in-out forwards;
+}
+.splash-foot {
+  position: absolute;
+  bottom: 46px;
+  font-family: var(--font-mono), monospace;
+  font-weight: 500;
+  font-size: 11px;
+  letter-spacing: 0.12em;
+  color: var(--ink-faint);
+}
+
+/* vitória redesenhada */
+.winscreen {
+  position: fixed;
+  inset: 0;
+  z-index: 30;
+  display: none;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 24px 28px calc(24px + env(safe-area-inset-bottom));
+  background: radial-gradient(120% 75% at 50% 0%, var(--glow-soft), transparent 60%), var(--bg);
+  animation: screenIn 0.3s ease;
+}
+.winscreen.show { display: flex; }
+.win-medal {
+  width: 88px;
+  height: 88px;
+  border-radius: 50%;
+  background: var(--glow);
+  color: var(--on-glow);
+  display: grid;
+  place-items: center;
+  font-size: 44px;
+  box-shadow: 0 0 0 9px var(--glow-soft), 0 20px 54px -16px var(--glow);
+  animation: pop 0.4s cubic-bezier(0.2, 0.8, 0.2, 1), floaty 3.4s ease-in-out 0.4s infinite;
+}
+.win-eyebrow {
+  font-family: var(--font-mono), monospace;
+  font-weight: 700;
+  font-size: 11px;
+  letter-spacing: 0.24em;
+  text-transform: uppercase;
+  color: var(--glow);
+  margin: 24px 0 6px;
+}
+.win-title {
+  font-family: var(--font-display), sans-serif;
+  font-weight: 800;
+  font-size: 32px;
+  line-height: 1;
+  color: var(--ink);
+  text-align: center;
+}
+.win-sub {
+  font-size: 13.5px;
+  font-weight: 500;
+  line-height: 1.5;
+  color: var(--ink-dim);
+  margin: 9px 0 0;
+  text-align: center;
+}
+.win-stats {
+  display: flex;
+  gap: 10px;
+  margin: 24px 0 0;
+  width: 100%;
+  max-width: 360px;
+}
+.win-stat {
+  flex: 1;
+  background: var(--card);
+  border: 1px solid var(--line);
+  border-radius: 14px;
+  padding: 13px;
+  text-align: center;
+}
+.win-stat.rec {
+  border-color: var(--glow);
+}
+.win-stat .k {
+  font-family: var(--font-mono), monospace;
+  font-weight: 700;
+  font-size: 9px;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--ink-faint);
+}
+.win-stat.rec .k {
+  color: var(--glow);
+}
+.win-stat .v {
+  font-family: var(--font-mono), monospace;
+  font-weight: 800;
+  font-size: 18px;
+  color: var(--ink);
+  margin-top: 5px;
+}
+.win-stat.rec .v {
+  color: var(--glow);
+}
+.win-actions {
+  width: 100%;
+  max-width: 360px;
+  margin-top: 24px;
+}
+.win-actions .act {
+  width: 100%;
+  display: block;
+}
+.confetti i {
+  position: absolute;
+  display: block;
+  animation: confpop 0.5s ease both;
 }

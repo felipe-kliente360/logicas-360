@@ -1,6 +1,5 @@
-// Tela da fase — tabuleiro de atribuição (o coração do jogo). Consome o Puzzle
-// genérico; tema vem do data-theme no <body>. Cronômetro inicia ao abrir; grava
-// recorde ao concluir; zera ao limpar. Feedback em tempo real é opcional.
+// Tela da fase — tabuleiro de atribuição (o coração do jogo). Redesign Direção A.
+// Cronômetro inicia ao abrir; grava recorde ao concluir; retoma fase abandonada.
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import type { Puzzle } from "../engine/types";
 import { Swatch } from "../ds/components/Swatch";
@@ -13,7 +12,9 @@ import {
   saveInProgress,
   clearInProgress,
   type InProgress,
+  type Settings,
 } from "./storage";
+import { chime, winChime, buzz } from "./feedback";
 
 type Board = Record<string, (string | null)[]>;
 
@@ -35,28 +36,32 @@ function restoreBoard(puzzle: Puzzle, saved?: InProgress): Board {
   return b;
 }
 
+const seatMatches = (b: Board, puzzle: Puzzle, pos: number) =>
+  puzzle.categories.every((c) => b[c.id][pos] && b[c.id][pos] === puzzle.solution[c.id][pos]);
+
 interface Props {
   puzzle: Puzzle;
-  realtimeFeedback: boolean;
+  settings: Settings;
   onBack: () => void;
   onSolved: () => void;
   onOpenSettings: () => void;
 }
 
-export function Board({ puzzle, realtimeFeedback, onBack, onSolved, onOpenSettings }: Props) {
-  // estado salvo da fase (abandonada): preenchimentos + tempo decorrido
+export function Board({ puzzle, settings, onBack, onSolved, onOpenSettings }: Props) {
   const saved = useMemo(() => loadInProgress(puzzle.id), [puzzle.id]);
 
   const [board, setBoard] = useState<Board>(() => restoreBoard(puzzle, saved));
-  const [openClues, setOpenClues] = useState(false);
+  const [openClues, setOpenClues] = useState(true);
   const [litClue, setLitClue] = useState<string | null>(null);
   const [sheet, setSheet] = useState<SheetTarget | null>(null);
   const [toast, setToast] = useState<string | null>(null);
   const [won, setWon] = useState(false);
+  const [shake, setShake] = useState(false);
   const [hintOpen, setHintOpen] = useState(false);
   const hintRef = useRef<HTMLDivElement>(null);
   const litTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
   const toastTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const shakeTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
 
   // cronômetro — retoma de onde parou (startRef recuado pelo tempo já decorrido)
   const startRef = useRef<number>(Date.now() - (saved?.elapsedMs ?? 0));
@@ -84,28 +89,24 @@ export function Board({ puzzle, realtimeFeedback, onBack, onSolved, onOpenSettin
   const wonRef = useRef(won);
   wonRef.current = won;
 
-  // grava (ou limpa) o estado em andamento desta fase
   const persist = useCallback(() => {
-    if (wonRef.current) return; // concluída: nada a retomar
+    if (wonRef.current) return;
     const ms = runningRef.current ? Date.now() - startRef.current : elapsedRef.current;
     const filledNow = puzzle.categories.reduce((a, c) => a + boardRef.current[c.id].filter(Boolean).length, 0);
     if (filledNow === 0) clearInProgress(puzzle.id);
     else saveInProgress(puzzle.id, { board: boardRef.current, elapsedMs: ms });
   }, [puzzle]);
 
-  // tique do cronômetro enquanto rodando
   useEffect(() => {
     if (!running) return;
     const id = setInterval(() => setElapsed(Date.now() - startRef.current), 500);
     return () => clearInterval(id);
   }, [running]);
 
-  // salva preenchimentos a cada mudança do tabuleiro
   useEffect(() => {
     persist();
   }, [board, persist]);
 
-  // salva ao fechar/ocultar o app e ao sair da fase (desmontar)
   useEffect(() => {
     const onHide = () => persist();
     const onVis = () => {
@@ -126,27 +127,55 @@ export function Board({ puzzle, realtimeFeedback, onBack, onSolved, onOpenSettin
     toastTimer.current = setTimeout(() => setToast(null), 2400);
   }
 
+  // efeito de acerto (som+vibração) ao resolver uma posição — alinhado ao feedback visual
+  function maybeCelebrateSeat(next: Board, pos: number, was: boolean) {
+    if (!settings.realtimeFeedback) return;
+    if (!was && seatMatches(next, puzzle, pos)) {
+      chime(settings.som);
+      buzz(settings.vib);
+    }
+  }
+
   function pick(valueId: string, movedFrom: number) {
     if (!sheet) return;
     const cat = sheet.cat.id;
     const pos = sheet.pos;
-    setBoard((prev) => {
-      const next: Board = { ...prev, [cat]: [...prev[cat]] };
-      if (next[cat][pos] === valueId) {
-        next[cat][pos] = null; // toggle off
-      } else {
-        if (movedFrom !== -1) next[cat][movedFrom] = null; // mantém permutação: move
-        next[cat][pos] = valueId;
-      }
-      return next;
-    });
+    const was = seatMatches(board, puzzle, pos);
+    const col = [...board[cat]];
+    if (col[pos] === valueId) col[pos] = null; // toggle off
+    else {
+      if (movedFrom !== -1) col[movedFrom] = null; // mantém permutação: move
+      col[pos] = valueId;
+    }
+    const next: Board = { ...board, [cat]: col };
+    maybeCelebrateSeat(next, pos, was);
+    setBoard(next);
     setSheet(null);
   }
 
+  // dica: preenche o primeiro slot vazio (ordem posição → categoria) com o valor correto
+  function hint() {
+    for (let p = 0; p < puzzle.size; p++) {
+      for (const c of puzzle.categories) {
+        if (!board[c.id][p]) {
+          const val = puzzle.solution[c.id][p];
+          const col = [...board[c.id]];
+          const dup = col.indexOf(val);
+          if (dup !== -1) col[dup] = null;
+          col[p] = val;
+          const next: Board = { ...board, [c.id]: col };
+          maybeCelebrateSeat(next, p, seatMatches(board, puzzle, p));
+          setBoard(next);
+          return;
+        }
+      }
+    }
+  }
+
   function lightClue(id: string) {
-    setLitClue(id);
+    setLitClue((cur) => (cur === id ? null : id));
     if (litTimer.current) clearTimeout(litTimer.current);
-    litTimer.current = setTimeout(() => setLitClue(null), 2600);
+    litTimer.current = setTimeout(() => setLitClue(null), 4000);
   }
 
   function isLit(catId: string, pos: number): boolean {
@@ -156,41 +185,39 @@ export function Board({ puzzle, realtimeFeedback, onBack, onSolved, onOpenSettin
     return clue.highlights.some((h) => h.cat === catId && (h.pos === undefined || h.pos === pos));
   }
 
-  // só destaca o cartão certo se o feedback em tempo real estiver ligado (ou já venceu)
   function seatSolved(pos: number): boolean {
-    if (!realtimeFeedback && !won) return false;
-    return puzzle.categories.every((c) => board[c.id][pos] && board[c.id][pos] === puzzle.solution[c.id][pos]);
+    if (!settings.realtimeFeedback && !won) return false;
+    return seatMatches(board, puzzle, pos);
   }
 
   function check() {
     if (filled < totalSlots) {
-      showToast(`Faltam ${totalSlots - filled} espaços. Continue!`);
+      showToast("Preencha todas as posições.");
       return;
     }
-    let wrong = 0;
-    puzzle.categories.forEach((c) => {
-      for (let p = 0; p < puzzle.size; p++) if (board[c.id][p] !== puzzle.solution[c.id][p]) wrong++;
-    });
-    if (wrong === 0) {
+    const ok = puzzle.categories.every((c) => board[c.id].every((v, p) => v === puzzle.solution[c.id][p]));
+    if (ok) {
       const ms = Date.now() - startRef.current;
       setElapsed(ms);
       setRunning(false);
       const { best, isNew } = submitTime(puzzle.id, ms);
       setRecord(best);
       setResult({ ms, isNew });
-      wonRef.current = true; // garante que persist() não regrave
+      wonRef.current = true;
       setWon(true);
-      clearInProgress(puzzle.id); // concluída: descarta o estado em andamento
+      clearInProgress(puzzle.id);
+      winChime(settings.som);
+      buzz(settings.vib, [18, 40, 18]);
       onSolved();
     } else {
-      const okSeats = Array.from({ length: puzzle.size }, (_, p) => p).filter((p) =>
-        puzzle.categories.every((c) => board[c.id][p] === puzzle.solution[c.id][p])
-      ).length;
-      showToast(`${okSeats} de ${puzzle.size} certas. Reveja as pistas.`);
+      showToast("Ainda não — revise as pistas.");
+      buzz(settings.vib, 40);
+      setShake(true);
+      if (shakeTimer.current) clearTimeout(shakeTimer.current);
+      shakeTimer.current = setTimeout(() => setShake(false), 500);
     }
   }
 
-  // limpar/recomeçar: zera tabuleiro, cronômetro e o estado salvo
   function reset() {
     clearInProgress(puzzle.id);
     setBoard(emptyBoard(puzzle));
@@ -205,6 +232,7 @@ export function Board({ puzzle, realtimeFeedback, onBack, onSolved, onOpenSettin
     () => () => {
       if (litTimer.current) clearTimeout(litTimer.current);
       if (toastTimer.current) clearTimeout(toastTimer.current);
+      if (shakeTimer.current) clearTimeout(shakeTimer.current);
     },
     []
   );
@@ -218,30 +246,28 @@ export function Board({ puzzle, realtimeFeedback, onBack, onSolved, onOpenSettin
     return () => document.removeEventListener("pointerdown", onDown);
   }, [hintOpen]);
 
-  const diffLabel =
-    puzzle.difficulty <= 2 ? "fácil" : puzzle.difficulty <= 6 ? "médio" : puzzle.difficulty <= 8 ? "difícil" : "expert";
+  const source = (puzzle.source ?? "desafio").toUpperCase();
 
   return (
-    <div className="app">
+    <div className="app screen-in">
       <header>
         <div className="topbar">
-          <button className="backbtn" onClick={onBack} aria-label="Voltar para a home">
-            ← Início
+          <button className="backbtn" onClick={onBack} aria-label="Voltar para as fases">
+            ‹ Fases
           </button>
           <div className="topbar-right">
             <span className="timer" aria-label="tempo">
-              ⏱ {formatTime(elapsed)}
+              {formatTime(elapsed)}
             </span>
             <button className="iconbtn" onClick={onOpenSettings} aria-label="Configurações">
               ⚙
             </button>
           </div>
         </div>
-        <p className="eyebrow" style={{ marginTop: 14 }}>
-          Desafio de lógica · {diffLabel} · nível {puzzle.difficulty}
+        <p className="eyebrow" style={{ marginTop: 16 }}>
+          {source} · nível {puzzle.difficulty}
         </p>
-        <h1 className="title">{puzzle.title}</h1>
-        <p className="sub">{puzzle.story}</p>
+        <h1 className="title board-h1">{puzzle.title}</h1>
         {record != null && <p className="record-line">🏆 Seu recorde: {formatTime(record)}</p>}
         <div className="progress">
           <div className="pbar">
@@ -257,8 +283,8 @@ export function Board({ puzzle, realtimeFeedback, onBack, onSolved, onOpenSettin
       <section className={"clues" + (openClues ? " open" : "")}>
         <div className="clues-head" onClick={() => setOpenClues((o) => !o)}>
           <h2>Pistas</h2>
-          <span className="meta">{puzzle.clues.length} · toque para destacar ▾</span>
-          <span className="chev">▾</span>
+          <span className="meta">{puzzle.clues.length} · toque p/ destacar ⌄</span>
+          <span className="chev">⌄</span>
         </div>
         <div className="clue-list">
           {puzzle.clues.map((c, i) => (
@@ -285,7 +311,7 @@ export function Board({ puzzle, realtimeFeedback, onBack, onSolved, onOpenSettin
       )}
 
       {/* fila / seats */}
-      <section className={"queue" + (puzzle.spine.ordered ? " ordered" : "")}>
+      <section className={"queue" + (puzzle.spine.ordered ? " ordered" : "") + (shake ? " shake" : "")}>
         {Array.from({ length: puzzle.size }, (_, p) => (
           <div key={p} className={"seat" + (seatSolved(p) ? " solved" : "")}>
             <div className="badge">{puzzle.spine.labels[p]}</div>
@@ -311,14 +337,14 @@ export function Board({ puzzle, realtimeFeedback, onBack, onSolved, onOpenSettin
         ))}
       </section>
 
-      {/* barra inferior */}
+      {/* barra de ação: Verificar + dica */}
       <div className="bar">
         <div className="bar-inner">
-          <button className="act ghost" onClick={reset}>
-            Limpar
-          </button>
           <button className="act primary" onClick={check}>
             Verificar
+          </button>
+          <button className="act ghost hintbtn" onClick={hint} aria-label="Dica">
+            ?
           </button>
         </div>
       </div>
@@ -335,21 +361,42 @@ export function Board({ puzzle, realtimeFeedback, onBack, onSolved, onOpenSettin
       {/* toast */}
       <div className={"toast" + (toast ? " show" : "")}>{toast}</div>
 
-      {/* win */}
-      <div className={"win" + (won ? " show" : "")}>
-        <div className="win-card">
-          <div className="badge-win">{result?.isNew ? "🏆" : "🎉"}</div>
-          <div className="big">{result?.isNew ? "Novo recorde!" : "Resolvido!"}</div>
-          <p>
-            Você deduziu todas as {puzzle.size} entidades de {puzzle.title} em{" "}
-            <strong>{formatTime(result?.ms ?? elapsed)}</strong>.
-            {result && !result.isNew && record != null && <> Seu recorde: {formatTime(record)}.</>}
-          </p>
-          <button className="act primary" style={{ width: "100%", marginBottom: 10 }} onClick={onBack}>
-            Voltar pras fases
-          </button>
-          <button className="act ghost" style={{ width: "100%" }} onClick={reset}>
+      {/* vitória (redesign) */}
+      <div className={"winscreen" + (won ? " show" : "")}>
+        {won && (
+          <div className="confetti" aria-hidden>
+            <i style={{ top: 120, left: 40, width: 9, height: 9, borderRadius: 2, background: "var(--glow)", transform: "rotate(20deg)" }} />
+            <i style={{ top: 150, right: 48, width: 11, height: 11, borderRadius: 2, background: "var(--glow2)", transform: "rotate(-15deg)", animationDelay: ".1s" }} />
+            <i style={{ top: 230, left: 58, width: 7, height: 7, borderRadius: "50%", background: "var(--glow2)", animationDelay: ".2s" }} />
+            <i style={{ top: 200, right: 64, width: 7, height: 7, borderRadius: 2, background: "var(--glow)", transform: "rotate(35deg)", animationDelay: ".15s" }} />
+          </div>
+        )}
+        <div className="win-medal">✓</div>
+        <div className="win-eyebrow">Puzzle resolvido</div>
+        <div className="win-title">Resolvido!</div>
+        <p className="win-sub">
+          {puzzle.title} · nível {puzzle.difficulty}
+        </p>
+        <div className="win-stats">
+          <div className="win-stat">
+            <div className="k">Tempo</div>
+            <div className="v">{formatTime(result?.ms ?? elapsed)}</div>
+          </div>
+          <div className="win-stat rec">
+            <div className="k">Recorde</div>
+            <div className="v">{result?.isNew ? "★ novo" : formatTime(record ?? result?.ms ?? elapsed)}</div>
+          </div>
+          <div className="win-stat">
+            <div className="k">Pistas</div>
+            <div className="v">{puzzle.clues.length}</div>
+          </div>
+        </div>
+        <div className="win-actions">
+          <button className="act primary" onClick={reset}>
             Jogar de novo
+          </button>
+          <button className="act ghost" style={{ marginTop: 10 }} onClick={onBack}>
+            Voltar às fases
           </button>
         </div>
       </div>
