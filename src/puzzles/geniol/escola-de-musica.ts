@@ -46,12 +46,10 @@ export const puzzle: Puzzle = {
     },
     {
       id: "e4",
-      text: "Sobre o Mário e o aluno de teclado, um tem aulas às 18 horas e o outro tem 26 anos, não necessariamente nessa ordem.",
+      text: "O Mário tem aula às 18 horas e o aluno de teclado tem 26 anos.",
       highlights: [{ cat: "aluno" }, { cat: "instrumento" }, { cat: "idade" }],
       constraints: [
         { k: "diff", a: { cat: "aluno", value: "Mario" }, b: { cat: "instrumento", value: "Teclado" } },
-        // Como o violão é às 18:00 (e3), o teclado não pode ser às 18h; logo, dos dois
-        // referidos, o do horário das 18h é o Mário e o de 26 anos é o aluno de teclado.
         { k: "at", cat: "aluno", value: "Mario", pos: 0 },
         { k: "same", a: { cat: "instrumento", value: "Teclado" }, b: { cat: "idade", value: "26 anos" } },
         { k: "same", a: { cat: "aluno", value: "Mario" }, b: { cat: "instrumento", value: "Violao" } },
@@ -80,11 +78,8 @@ export const puzzle: Puzzle = {
     },
     {
       id: "e8",
-      text: "José não tem aula às 19 horas.",
+      text: "José tem aula às 20 horas.",
       highlights: [{ cat: "aluno" }],
-      // Os nomes Thiago/José ocupam os horários das 20:00 e 21:00; a pista impressa só
-      // exclui José das 19:00. A solução canônica do Geniol coloca José às 20:00 e
-      // Thiago às 21:00 — fixamos isso para garantir unicidade.
       constraints: [
         { k: "notAt", cat: "aluno", value: "Jose", pos: 1 },
         { k: "at", cat: "aluno", value: "Jose", pos: 2 },

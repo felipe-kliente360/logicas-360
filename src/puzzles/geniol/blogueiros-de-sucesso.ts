@@ -34,21 +34,18 @@ export const puzzle: Puzzle = {
     },
     {
       id: "b2",
-      text: "O blog com 5 anos e o blog do Lucas não são sobre humor.",
+      text: "Nem o blog com 5 anos nem o blog do Lucas são sobre humor, e esses são dois blogs diferentes.",
       highlights: [{ cat: "idade" }, { cat: "blogueiro" }, { cat: "assunto" }],
       constraints: [
         { k: "diff", a: { cat: "idade", value: "5 anos" }, b: { cat: "assunto", value: "Humor" } },
         { k: "diff", a: { cat: "blogueiro", value: "Lucas" }, b: { cat: "assunto", value: "Humor" } },
-        // São dois blogs distintos citados na frase: o de 5 anos não é o do Lucas.
         { k: "diff", a: { cat: "idade", value: "5 anos" }, b: { cat: "blogueiro", value: "Lucas" } },
       ],
     },
     {
       id: "b3",
-      text: "O blog de humor tem 2 milhões de visitas ou é de Rubens.",
-      highlights: [{ cat: "assunto" }, { cat: "blogueiro" }],
-      // Rubens é o mais visitado (pos 3) e humor não pode ter 4 milhões (pista 5),
-      // logo humor ≠ Rubens e o ramo restante força humor a ter 2 milhões (pos 1).
+      text: "O blog de humor tem 2 milhões de visitas.",
+      highlights: [{ cat: "assunto" }],
       constraints: [{ k: "at", cat: "assunto", value: "Humor", pos: 1 }],
     },
     {

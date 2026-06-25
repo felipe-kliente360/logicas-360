@@ -54,10 +54,8 @@ export const puzzle: Puzzle = {
     },
     {
       id: "o2",
-      text: "O ovo de 250 g foi comprado por Ana Paula ou Regina.",
+      text: "O ovo de 250 g foi comprado pela Regina.",
       highlights: [{ cat: "mae" }],
-      // 250 g = posição 2; é da Ana Paula ou da Regina. Como a Ana Paula comprou o ovo branco
-      // (pista 1+4) e o branco não é o de 250 g na solução, o ovo de 250 g é da Regina.
       constraints: [
         { k: "notAt", cat: "mae", value: "Cristina", pos: 2 },
         { k: "notAt", cat: "mae", value: "Luciana", pos: 2 },
@@ -66,19 +64,14 @@ export const puzzle: Puzzle = {
     },
     {
       id: "o3",
-      text: "O ovo de 300 g é ao leite ou foi comprado pela mãe de Renato.",
-      highlights: [{ cat: "ovo" }, { cat: "filho" }],
-      // 300 g = posição 3: ou é ao leite, ou é o ovo do Renato. Como nenhum cenário coloca
-      // o ovo "ao leite" em 300 g (demais pistas), o ovo de 300 g é necessariamente do Renato.
+      text: "O ovo de 300 g foi comprado pela mãe do Renato.",
+      highlights: [{ cat: "filho" }],
       constraints: [{ k: "at", cat: "filho", value: "Renato", pos: 3 }],
     },
     {
       id: "o4",
-      text: "Sobre os ovos comprados pela Ana Paula e pela mãe de Adriano, um é ao leite e o outro é branco, não necessariamente nessa ordem.",
+      text: "Ana Paula comprou o ovo de chocolate branco e o Adriano ganhou o ovo ao leite.",
       highlights: [{ cat: "mae" }, { cat: "filho" }, { cat: "ovo" }],
-      // Ana Paula e a mãe do Adriano são pessoas diferentes; ambas têm ovo em {ao leite, branco}.
-      // Pela pista 1 (a mãe do branco e a mãe do Adriano são distintas), o ovo branco é da Ana Paula
-      // e, portanto, o ovo do Adriano é o ao leite.
       constraints: [
         { k: "diff", a: { cat: "mae", value: "AnaPaula" }, b: { cat: "filho", value: "Adriano" } },
         { k: "same", a: { cat: "mae", value: "AnaPaula" }, b: { cat: "ovo", value: "Branco" } },

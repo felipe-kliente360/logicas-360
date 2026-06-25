@@ -34,10 +34,8 @@ export const puzzle: Puzzle = {
     },
     {
       id: "n2",
-      text: "Sobre o casal que vai ao cinema e o casal que namora há 3 anos, um é formado por Gabriel e outro por Tainá, não necessariamente nessa ordem.",
+      text: "O casal que vai ao cinema é formado por Gabriel, e o casal que namora há 3 anos é o da Tainá.",
       highlights: [{ cat: "local" }, { cat: "namorado" }, { cat: "namorada" }],
-      // Rafael namora há 3 anos (n1); Gabriel ≠ Rafael ⇒ o casal de 3 anos não é de Gabriel.
-      // Logo: 3 anos = casal da Tainá; cinema = casal do Gabriel. (Gabriel não namora há 3 anos.)
       constraints: [
         { k: "at", cat: "namorada", value: "Taina", pos: 1 },
         { k: "same", a: { cat: "namorado", value: "Gabriel" }, b: { cat: "local", value: "Cinema" } },
@@ -78,9 +76,8 @@ export const puzzle: Puzzle = {
     },
     {
       id: "n8",
-      text: "O casal que namora há 3 anos vai ao parque ou é o casal da Tainá.",
-      highlights: [{ cat: "namoro" }, { cat: "local" }, { cat: "namorada" }],
-      // n2 já fixa Tainá no casal de 3 anos; o disjunto informativo é o parque ⇒ 3 anos vai ao parque.
+      text: "O casal que namora há 3 anos vai ao parque.",
+      highlights: [{ cat: "namoro" }, { cat: "local" }],
       constraints: [{ k: "at", cat: "local", value: "Parque", pos: 1 }],
     },
   ],

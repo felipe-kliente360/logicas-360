@@ -15,20 +15,20 @@ tamanho e mix de pistas numa escala 1–10 (calibrada: *No ponto* = 6, *Einstein
 | 5 | Café da tarde | 4×2 | ●●○○○ 2/5 | 4 | **4/10** | sim | 23 |
 | 6 | Compras no Mercado | 4×2 | ●●○○○ 2/5 | 4 | **4/10** | sim | 17 |
 | 7 | Concurso de Beleza | 4×2 | ●●○○○ 2/5 | 4 | **4/10** | sim | 18 |
-| 8 | Tarde no zoológico | 4×2 | ○○○○○ 0/5 | 0 | **5/10** | sim | 40 |
-| 9 | Almoço de Natal | 4×2 | ●●○○○ 2/5 | 4 | **5/10** | sim | 21 |
-| 10 | Aulas de reforço | 4×2 | ●●○○○ 2/5 | 4 | **5/10** | sim | 65 |
-| 11 | Caixa Eletrônico | 4×2 | ●●○○○ 2/5 | 4 | **5/10** | sim | 44 |
-| 12 | Cheque Especial | 4×2 | ●●○○○ 2/5 | 4 | **5/10** | sim | 101 |
-| 13 | Competição de Kart | 4×2 | ●●○○○ 2/5 | 4 | **5/10** | sim | 78 |
-| 14 | Conta de Água | 4×2 | ●●○○○ 2/5 | 4 | **5/10** | não | 13 |
-| 15 | Contas para Pagar | 4×2 | ●●○○○ 2/5 | 4 | **5/10** | sim | 45 |
-| 16 | Décimo Terceiro | 5×2 | ●●○○○ 2/5 | 4 | **5/10** | sim | 52 |
-| 17 | Investindo em Ações | 4×2 | ●●○○○ 2/5 | 4 | **5/10** | sim | 74 |
-| 18 | Jogadores de Basquete | 4×2 | ●●○○○ 2/5 | 4 | **5/10** | sim | 50 |
-| 19 | Jogo de Boliche | 4×2 | ●●○○○ 2/5 | 4 | **5/10** | sim | 65 |
-| 20 | Reunião de Professores | 4×2 | ●●○○○ 2/5 | 4 | **5/10** | sim | 13 |
-| 21 | Sanduíches Naturais | 4×2 | ●●○○○ 2/5 | 4 | **5/10** | sim | 126 |
+| 8 | Almoço de Natal | 4×2 | ●●○○○ 2/5 | 4 | **5/10** | sim | 21 |
+| 9 | Aulas de reforço | 4×2 | ●●○○○ 2/5 | 4 | **5/10** | sim | 65 |
+| 10 | Caixa Eletrônico | 4×2 | ●●○○○ 2/5 | 4 | **5/10** | sim | 44 |
+| 11 | Cheque Especial | 4×2 | ●●○○○ 2/5 | 4 | **5/10** | sim | 101 |
+| 12 | Competição de Kart | 4×2 | ●●○○○ 2/5 | 4 | **5/10** | sim | 78 |
+| 13 | Conta de Água | 4×2 | ●●○○○ 2/5 | 4 | **5/10** | não | 13 |
+| 14 | Contas para Pagar | 4×2 | ●●○○○ 2/5 | 4 | **5/10** | sim | 45 |
+| 15 | Décimo Terceiro | 5×2 | ●●○○○ 2/5 | 4 | **5/10** | sim | 52 |
+| 16 | Investindo em Ações | 4×2 | ●●○○○ 2/5 | 4 | **5/10** | sim | 74 |
+| 17 | Jogadores de Basquete | 4×2 | ●●○○○ 2/5 | 4 | **5/10** | sim | 50 |
+| 18 | Jogo de Boliche | 4×2 | ●●○○○ 2/5 | 4 | **5/10** | sim | 65 |
+| 19 | Reunião de Professores | 4×2 | ●●○○○ 2/5 | 4 | **5/10** | sim | 13 |
+| 20 | Sanduíches Naturais | 4×2 | ●●○○○ 2/5 | 4 | **5/10** | sim | 126 |
+| 21 | Tarde no zoológico | 4×2 | ●●○○○ 2/5 | 4 | **5/10** | sim | 40 |
 | 22 | Blogueiros de Sucesso | 4×3 | ●●●○○ 3/5 | 6 | **5/10** | sim | 18 |
 | 23 | Dia dos Namorados | 4×3 | ●●●○○ 3/5 | 6 | **5/10** | sim | 17 |
 | 24 | Self-Service | 4×3 | ●●●○○ 3/5 | 6 | **5/10** | sim | 48 |
@@ -60,7 +60,7 @@ tamanho e mix de pistas numa escala 1–10 (calibrada: *No ponto* = 6, *Einstein
 | 50 | Apresentações de Dança | 4×3 | ●●●○○ 3/5 | 6 | **9/10** | não | 500 |
 | 51 | O enigma de Einstein | 5×5 | — | — | **10/10** | sim | 4194 |
 
-**51 fases.** Correlação (Pearson) entre a fonte (×2) e a nossa escala: **0.65**.
+**51 fases.** Correlação (Pearson) entre a fonte (×2) e a nossa escala: **0.69**.
 
 > Observação: a escala do Geniol satura em 5 e é grosseira; a nossa diferencia melhor
 > os puzzles que exigem hipótese ("e se…") dos que se resolvem por eliminação direta,

@@ -35,11 +35,8 @@ export const puzzle: Puzzle = {
   ],
   clues: [
     {
-      // "É de atum ou custa R$ 11." As duas alternativas só se separam em uma das leituras;
-      // a resposta da fonte é a não-degenerada: o sanduíche da Gabriela custa R$ 11 (pos 2)
-      // e NÃO é de atum (o atum fica com a Natália).
       id: "s1",
-      text: "O sanduíche da Gabriela é de atum ou custa R$ 11.",
+      text: "O sanduíche da Gabriela custa R$ 11 e não é de atum.",
       highlights: [{ cat: "cliente" }, { cat: "sabor" }],
       constraints: [
         { k: "at", cat: "cliente", value: "Gabriela", pos: 2 },
@@ -61,11 +58,9 @@ export const puzzle: Puzzle = {
       constraints: [{ k: "before", a: { cat: "cliente", value: "Daniele" }, b: { cat: "sabor", value: "Atum" } }],
     },
     {
-      // R$ 12 é frango com azeitona ou é o da Natália. Mas salame = Natália+1, logo Natália ≤ R$ 11.
-      // Portanto o de R$ 12 (pos 3) é o frango com azeitona.
       id: "s4",
-      text: "O sanduíche de R$ 12 é de frango com azeitona ou é o sanduíche da Natália.",
-      highlights: [{ cat: "cliente" }, { cat: "sabor" }],
+      text: "O sanduíche de R$ 12 é de frango com azeitona.",
+      highlights: [{ cat: "sabor" }],
       constraints: [{ k: "at", cat: "sabor", value: "Frango", pos: 3 }],
     },
   ],
