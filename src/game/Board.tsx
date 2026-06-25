@@ -39,6 +39,8 @@ function restoreBoard(puzzle: Puzzle, saved?: InProgress): Board {
 const seatMatches = (b: Board, puzzle: Puzzle, pos: number) =>
   puzzle.categories.every((c) => b[c.id][pos] && b[c.id][pos] === puzzle.solution[c.id][pos]);
 
+const MAX_HINTS = 3;
+
 interface Props {
   puzzle: Puzzle;
   settings: Settings;
@@ -57,6 +59,7 @@ export function Board({ puzzle, settings, onBack, onSolved, onOpenSettings }: Pr
   const [toast, setToast] = useState<string | null>(null);
   const [won, setWon] = useState(false);
   const [shake, setShake] = useState(false);
+  const [hintsLeft, setHintsLeft] = useState(MAX_HINTS);
   const [hintOpen, setHintOpen] = useState(false);
   const hintRef = useRef<HTMLDivElement>(null);
   const litTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
@@ -153,23 +156,27 @@ export function Board({ puzzle, settings, onBack, onSolved, onOpenSettings }: Pr
     setSheet(null);
   }
 
-  // dica: preenche o primeiro slot vazio (ordem posição → categoria) com o valor correto
+  // dica: corrige um slot ALEATÓRIO ainda errado (vazio ou preenchido errado).
+  // Máximo MAX_HINTS por tela.
   function hint() {
-    for (let p = 0; p < puzzle.size; p++) {
-      for (const c of puzzle.categories) {
-        if (!board[c.id][p]) {
-          const val = puzzle.solution[c.id][p];
-          const col = [...board[c.id]];
-          const dup = col.indexOf(val);
-          if (dup !== -1) col[dup] = null;
-          col[p] = val;
-          const next: Board = { ...board, [c.id]: col };
-          maybeCelebrateSeat(next, p, seatMatches(board, puzzle, p));
-          setBoard(next);
-          return;
-        }
-      }
+    if (hintsLeft <= 0) return;
+    const wrong: { cat: string; pos: number }[] = [];
+    for (const c of puzzle.categories)
+      for (let p = 0; p < puzzle.size; p++) if (board[c.id][p] !== puzzle.solution[c.id][p]) wrong.push({ cat: c.id, pos: p });
+    if (wrong.length === 0) {
+      showToast("Tudo já preenchido — toque em Verificar.");
+      return;
     }
+    const { cat, pos } = wrong[Math.floor(Math.random() * wrong.length)];
+    const val = puzzle.solution[cat][pos];
+    const col = [...board[cat]];
+    const dup = col.indexOf(val); // mantém permutação: tira o valor de onde estava
+    if (dup !== -1) col[dup] = null;
+    col[pos] = val;
+    const next: Board = { ...board, [cat]: col };
+    maybeCelebrateSeat(next, pos, seatMatches(board, puzzle, pos));
+    setBoard(next);
+    setHintsLeft((n) => n - 1);
   }
 
   function lightClue(id: string) {
@@ -223,6 +230,7 @@ export function Board({ puzzle, settings, onBack, onSolved, onOpenSettings }: Pr
     setBoard(emptyBoard(puzzle));
     setWon(false);
     setResult(null);
+    setHintsLeft(MAX_HINTS);
     startRef.current = Date.now();
     setElapsed(0);
     setRunning(true);
@@ -337,14 +345,22 @@ export function Board({ puzzle, settings, onBack, onSolved, onOpenSettings }: Pr
         ))}
       </section>
 
-      {/* barra de ação: Verificar + dica */}
+      {/* barra de ação: Limpar · Verificar · Ajuda (contador) */}
       <div className="bar">
         <div className="bar-inner">
+          <button className="act ghost limpar" onClick={reset} aria-label="Limpar e reiniciar">
+            ↺
+          </button>
           <button className="act primary" onClick={check}>
             Verificar
           </button>
-          <button className="act ghost hintbtn" onClick={hint} aria-label="Dica">
-            ?
+          <button
+            className="act help"
+            onClick={hint}
+            disabled={hintsLeft <= 0}
+            aria-label={`Ajuda (${hintsLeft} restantes)`}
+          >
+            ? <span className="help-n">{hintsLeft}</span>
           </button>
         </div>
       </div>

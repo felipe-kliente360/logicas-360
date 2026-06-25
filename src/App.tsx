@@ -25,10 +25,10 @@ export default function App() {
 
   const active = activeId ? getPuzzle(activeId) : undefined;
 
-  // tema do mundo conforme a tela
+  // tema único "Neon Petróleo" no app inteiro (sem tema por fase)
   useEffect(() => {
-    document.body.dataset.theme = active ? active.themeId : "home";
-  }, [active]);
+    document.body.dataset.theme = "home";
+  }, []);
 
   // claro/escuro global
   useEffect(() => {
@@ -71,7 +71,6 @@ export default function App() {
 
   return (
     <>
-      {active.themeId === "ponto-de-onibus" && <div className="rain" />}
       <Board
         key={active.id}
         puzzle={active}

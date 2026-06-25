@@ -512,6 +512,39 @@ button.act {
   color: var(--ink-dim);
   border: 1px solid var(--line);
 }
+/* Limpar/reiniciar — ghost com ícone */
+.act.limpar {
+  flex: 0 0 auto;
+  font-size: 19px;
+  padding: 15px 16px;
+}
+/* Ajuda — cor própria (menta tinta) + contador */
+.act.help {
+  flex: 0 0 auto;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  background: var(--glow-soft);
+  border: 1px solid var(--glow);
+  color: var(--glow);
+  padding: 15px 16px;
+}
+.act.help:active {
+  filter: brightness(0.95);
+  transform: scale(0.98);
+}
+.act.help:disabled {
+  opacity: 0.45;
+  background: var(--card);
+  border-color: var(--line);
+  color: var(--ink-faint);
+  cursor: default;
+}
+.help-n {
+  font-family: var(--font-mono), monospace;
+  font-weight: 700;
+  font-size: 12px;
+}
 
 /* ---- bottom sheet ---- */
 .scrim {

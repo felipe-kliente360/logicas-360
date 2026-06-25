@@ -38,7 +38,6 @@ export function Home({
 
   return (
     <div className="home">
-      <div className="rain" />
       <div className="home-hero">
         <div className="topbar">
           <div className="brand">
