@@ -6,16 +6,15 @@ import { solve } from "../engine/solver";
 import { difficultyScore } from "../engine/difficulty";
 import { noPonto } from "./no-ponto";
 import { einstein } from "./einstein";
+import { GENIOL } from "./geniol"; // acervo Geniol (auto-gerado)
 
-// fases do acervo Geniol (codificadas a partir dos PDFs)
-import { puzzle as tardeNoZoologico } from "./geniol/tarde-no-zoologico";
-
-const RAW: Puzzle[] = [noPonto, einstein, tardeNoZoologico];
+const RAW: Puzzle[] = [noPonto, einstein, ...GENIOL];
 
 /** Preenche solução e dificuldade quando não vierem prontas. */
 function hydrate(p: Puzzle): Puzzle {
   const hasSolution = p.solution && Object.keys(p.solution).length > 0;
-  const solution = hasSolution ? p.solution : solve(p);
+  // solve() devolve uma grade completa (sem nulls) p/ puzzles de solução única
+  const solution = hasSolution ? p.solution : (solve(p) as Record<string, string[]> | null);
   if (!solution) {
     // não deveria acontecer (puzzles são validados como solução única no build)
     console.warn(`[puzzles] ${p.id} sem solução — verifique as pistas`);

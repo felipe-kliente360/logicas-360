@@ -324,9 +324,11 @@ export function difficultyScore(puzzle: Puzzle): { score: number; trace: Trace }
   const t = trace(puzzle);
 
   const sizeF = (t.size - 9) * 0.18; // 3×3=9 é o piso
-  const hypothesisF = t.propagationSolved ? 0 : 2.4 + Math.min(2.2, t.residualAmbiguity * 0.12);
-  const searchF = Math.log2(t.searchNodes + 1) * 0.36;
-  const typeF = (t.clueTypeScore / Math.max(1, t.constraints)) * 1.0; // peso médio por pista
+  // exigir hipótese é um sinal, mas o nº de nós de busca já mede o esforço de forma
+  // contínua — então o bônus por "não-propagável" é pequeno (evita saturar 4×3 pequenos).
+  const hypothesisF = t.propagationSolved ? 0 : 0.7 + Math.min(1.0, t.residualAmbiguity * 0.06);
+  const searchF = Math.log2(t.searchNodes + 1) * 0.42; // sinal principal de esforço
+  const typeF = (t.clueTypeScore / Math.max(1, t.constraints)) * 0.8; // peso médio por pista
   const orderF = t.ordered ? 0.4 : 0;
 
   let raw = 1 + sizeF + hypothesisF + searchF + typeF + orderF;
