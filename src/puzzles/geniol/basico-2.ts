@@ -11,7 +11,7 @@ export const puzzle: Puzzle = {
   difficulty: 0,
   sourceDifficulty: 1,
   size: 4,
-  title: "Básico 2",
+  title: "Roteiro pelo Brasil",
   story:
     "Quatro turistas viajaram para conhecer o Brasil, sendo que cada um decidiu viajar para um determinado estado durante certo mês. Descubra para quando e para onde cada um viajou.",
   spine: {

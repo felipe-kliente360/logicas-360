@@ -15,8 +15,8 @@ for (const p of PUZZLES) {
 
 const rows = PUZZLES.map((p) => {
   const sols = countSolutions(p, 2);
-  const { score, trace } = difficultyScore(p);
-  return { p, sols, score, trace };
+  const { trace } = difficultyScore(p);
+  return { p, sols, score: p.difficulty, trace }; // score = nível calibrado
 });
 
 rows.sort((a, b) => a.score - b.score || a.trace.size - b.trace.size);

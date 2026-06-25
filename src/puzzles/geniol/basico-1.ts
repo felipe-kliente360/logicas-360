@@ -10,7 +10,7 @@ export const puzzle: Puzzle = {
   difficulty: 0,
   sourceDifficulty: 1,
   size: 3,
-  title: "Básico 1",
+  title: "Sucos no quintal",
   story:
     "Três crianças estão brincando enquanto a mãe de uma delas prepara três sucos diferentes. Descubra o suco favorito e a idade de cada uma das crianças.",
   spine: {

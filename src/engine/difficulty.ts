@@ -316,22 +316,26 @@ export function trace(puzzle: Puzzle): Trace {
 }
 
 /**
- * Score 1..10. Calibrado para "No ponto" ≈ 6 e "Einstein" ≈ 10.
- * Combina: tamanho, exigência de hipótese (o maior salto), esforço de busca,
- * ambiguidade residual após propagação e o mix de tipos de pista.
+ * Sinal CONTÍNUO de dificuldade (sem arredondar/clampar). É a base do ranking;
+ * a conversão pra escala 1..10 é feita por `calibrate()` (mapeamento ancorado).
  */
-export function difficultyScore(puzzle: Puzzle): { score: number; trace: Trace } {
+export function difficultyRaw(puzzle: Puzzle): number {
   const t = trace(puzzle);
-
   const sizeF = (t.size - 9) * 0.18; // 3×3=9 é o piso
-  // exigir hipótese é um sinal, mas o nº de nós de busca já mede o esforço de forma
-  // contínua — então o bônus por "não-propagável" é pequeno (evita saturar 4×3 pequenos).
   const hypothesisF = t.propagationSolved ? 0 : 0.7 + Math.min(1.0, t.residualAmbiguity * 0.06);
   const searchF = Math.log2(t.searchNodes + 1) * 0.42; // sinal principal de esforço
-  const typeF = (t.clueTypeScore / Math.max(1, t.constraints)) * 0.8; // peso médio por pista
+  const typeF = (t.clueTypeScore / Math.max(1, t.constraints)) * 0.8;
   const orderF = t.ordered ? 0.4 : 0;
+  return 1 + sizeF + hypothesisF + searchF + typeF + orderF;
+}
 
-  let raw = 1 + sizeF + hypothesisF + searchF + typeF + orderF;
+/**
+ * Score 1..10 (referência rápida, calibrado para No ponto≈6, Einstein≈10).
+ * A escala oficial do app vem de `calibrate()` (ver puzzles/index.ts).
+ */
+export function difficultyScore(puzzle: Puzzle): { score: number; raw: number; trace: Trace } {
+  const t = trace(puzzle);
+  const raw = difficultyRaw(puzzle);
   const score = Math.max(1, Math.min(10, Math.round(raw)));
-  return { score, trace: t };
+  return { score, raw, trace: t };
 }

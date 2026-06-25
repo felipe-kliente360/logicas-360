@@ -6,8 +6,8 @@ import { PUZZLES } from "../src/puzzles/index.ts";
 import { difficultyScore } from "../src/engine/difficulty.ts";
 
 const rows = PUZZLES.map((p) => {
-  const { score, trace } = difficultyScore(p);
-  return { p, score, trace };
+  const { trace } = difficultyScore(p);
+  return { p, score: p.difficulty, trace }; // score = nível calibrado (escala oficial)
 }).sort((a, b) => a.score - b.score || (a.p.sourceDifficulty ?? 0) - (b.p.sourceDifficulty ?? 0));
 
 // fonte 1..5 normalizada p/ 1..10 (×2) só pra leitura lado a lado

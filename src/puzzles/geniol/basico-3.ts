@@ -10,7 +10,7 @@ export const puzzle: Puzzle = {
   difficulty: 0,
   sourceDifficulty: 2,
   size: 4,
-  title: "Básico 3",
+  title: "Coleção de miniaturas",
   story:
     "Quatro amigos estão conversando sobre as miniaturas que colecionam e com quantos anos começaram a colecionar. Descubra qual tipo de miniatura cada um deles coleciona.",
   spine: {
