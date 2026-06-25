@@ -85,6 +85,36 @@ export function resetRecords(): Records {
   return {};
 }
 
+/* ---------- estado em andamento (fase abandonada) ---------- */
+export interface InProgress {
+  board: Record<string, (string | null)[]>;
+  elapsedMs: number;
+}
+const INPROGRESS_KEY = "logicas360.inprogress.v1";
+
+function loadAllInProgress(): Record<string, InProgress> {
+  const r = read<Record<string, InProgress>>(INPROGRESS_KEY, {});
+  return r && typeof r === "object" ? r : {};
+}
+export function loadInProgress(id: string): InProgress | undefined {
+  return loadAllInProgress()[id];
+}
+export function hasInProgress(id: string): boolean {
+  return !!loadAllInProgress()[id];
+}
+export function saveInProgress(id: string, ip: InProgress): void {
+  const all = loadAllInProgress();
+  all[id] = ip;
+  write(INPROGRESS_KEY, all);
+}
+export function clearInProgress(id: string): void {
+  const all = loadAllInProgress();
+  if (id in all) {
+    delete all[id];
+    write(INPROGRESS_KEY, all);
+  }
+}
+
 /** mm:ss a partir de ms. */
 export function formatTime(ms: number): string {
   const total = Math.floor(ms / 1000);

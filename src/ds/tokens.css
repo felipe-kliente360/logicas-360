@@ -172,6 +172,9 @@ h1.title {
 .done-tick {
   color: var(--glow);
 }
+.level-diff.resume {
+  color: var(--glow);
+}
 
 /* ---- pistas ---- */
 .clues {

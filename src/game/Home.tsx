@@ -1,7 +1,7 @@
 // Tela de entrada — seletor de fases. Lê o catálogo, o progresso e os recordes.
 import { useMemo, useState } from "react";
 import type { Puzzle } from "../engine/types";
-import { getRecord, formatTime, type Progress } from "./storage";
+import { getRecord, formatTime, hasInProgress, type Progress } from "./storage";
 
 const diffWord = (d: number) => (d <= 2 ? "Fácil" : d <= 6 ? "Médio" : d <= 8 ? "Difícil" : "Expert");
 
@@ -67,6 +67,7 @@ export function Home({
         {visible.map((p) => {
           const done = progress.completed.includes(p.id);
           const rec = getRecord(p.id);
+          const inProgress = !done && hasInProgress(p.id);
           return (
             <button key={p.id} className={"level-card" + (done ? " done" : "")} onClick={() => onPick(p.id)}>
               <div className="level-num">{p.difficulty}</div>
@@ -78,7 +79,11 @@ export function Home({
                 <p className="level-meta">
                   {diffWord(p.difficulty)} · nível {p.difficulty} · {p.size}×{p.categories.length}
                 </p>
-                {rec != null && <span className="level-diff">🏆 recorde {formatTime(rec)}</span>}
+                {rec != null ? (
+                  <span className="level-diff">🏆 recorde {formatTime(rec)}</span>
+                ) : inProgress ? (
+                  <span className="level-diff resume">▸ continuar de onde parou</span>
+                ) : null}
               </div>
               <span className="level-chev">›</span>
             </button>

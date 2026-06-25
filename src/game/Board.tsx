@@ -1,17 +1,37 @@
 // Tela da fase — tabuleiro de atribuição (o coração do jogo). Consome o Puzzle
 // genérico; tema vem do data-theme no <body>. Cronômetro inicia ao abrir; grava
 // recorde ao concluir; zera ao limpar. Feedback em tempo real é opcional.
-import { useEffect, useMemo, useRef, useState } from "react";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import type { Puzzle } from "../engine/types";
 import { Swatch } from "../ds/components/Swatch";
 import { BottomSheet, type SheetTarget } from "../ds/components/BottomSheet";
-import { getRecord, submitTime, formatTime } from "./storage";
+import {
+  getRecord,
+  submitTime,
+  formatTime,
+  loadInProgress,
+  saveInProgress,
+  clearInProgress,
+  type InProgress,
+} from "./storage";
 
 type Board = Record<string, (string | null)[]>;
 
 function emptyBoard(puzzle: Puzzle): Board {
   const b: Board = {};
   puzzle.categories.forEach((c) => (b[c.id] = Array(puzzle.size).fill(null)));
+  return b;
+}
+
+// restaura o tabuleiro salvo, validando o formato contra o puzzle atual
+function restoreBoard(puzzle: Puzzle, saved?: InProgress): Board {
+  const b = emptyBoard(puzzle);
+  if (!saved?.board) return b;
+  for (const c of puzzle.categories) {
+    const col = saved.board[c.id];
+    if (!Array.isArray(col) || col.length !== puzzle.size) return emptyBoard(puzzle); // formato mudou
+    b[c.id] = col.map((v) => (typeof v === "string" ? v : null));
+  }
   return b;
 }
 
@@ -24,7 +44,10 @@ interface Props {
 }
 
 export function Board({ puzzle, realtimeFeedback, onBack, onSolved, onOpenSettings }: Props) {
-  const [board, setBoard] = useState<Board>(() => emptyBoard(puzzle));
+  // estado salvo da fase (abandonada): preenchimentos + tempo decorrido
+  const saved = useMemo(() => loadInProgress(puzzle.id), [puzzle.id]);
+
+  const [board, setBoard] = useState<Board>(() => restoreBoard(puzzle, saved));
   const [openClues, setOpenClues] = useState(false);
   const [litClue, setLitClue] = useState<string | null>(null);
   const [sheet, setSheet] = useState<SheetTarget | null>(null);
@@ -35,9 +58,9 @@ export function Board({ puzzle, realtimeFeedback, onBack, onSolved, onOpenSettin
   const litTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
   const toastTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
 
-  // cronômetro
-  const startRef = useRef<number>(Date.now());
-  const [elapsed, setElapsed] = useState(0);
+  // cronômetro — retoma de onde parou (startRef recuado pelo tempo já decorrido)
+  const startRef = useRef<number>(Date.now() - (saved?.elapsedMs ?? 0));
+  const [elapsed, setElapsed] = useState(saved?.elapsedMs ?? 0);
   const [running, setRunning] = useState(true);
   const [record, setRecord] = useState<number | undefined>(() => getRecord(puzzle.id));
   const [result, setResult] = useState<{ ms: number; isNew: boolean } | null>(null);
@@ -51,12 +74,51 @@ export function Board({ puzzle, realtimeFeedback, onBack, onSolved, onOpenSettin
 
   const filled = puzzle.categories.reduce((a, c) => a + board[c.id].filter(Boolean).length, 0);
 
+  // refs "vivos" para salvar o estado em handlers (fechar app / desmontar)
+  const boardRef = useRef(board);
+  boardRef.current = board;
+  const runningRef = useRef(running);
+  runningRef.current = running;
+  const elapsedRef = useRef(elapsed);
+  elapsedRef.current = elapsed;
+  const wonRef = useRef(won);
+  wonRef.current = won;
+
+  // grava (ou limpa) o estado em andamento desta fase
+  const persist = useCallback(() => {
+    if (wonRef.current) return; // concluída: nada a retomar
+    const ms = runningRef.current ? Date.now() - startRef.current : elapsedRef.current;
+    const filledNow = puzzle.categories.reduce((a, c) => a + boardRef.current[c.id].filter(Boolean).length, 0);
+    if (filledNow === 0) clearInProgress(puzzle.id);
+    else saveInProgress(puzzle.id, { board: boardRef.current, elapsedMs: ms });
+  }, [puzzle]);
+
   // tique do cronômetro enquanto rodando
   useEffect(() => {
     if (!running) return;
     const id = setInterval(() => setElapsed(Date.now() - startRef.current), 500);
     return () => clearInterval(id);
   }, [running]);
+
+  // salva preenchimentos a cada mudança do tabuleiro
+  useEffect(() => {
+    persist();
+  }, [board, persist]);
+
+  // salva ao fechar/ocultar o app e ao sair da fase (desmontar)
+  useEffect(() => {
+    const onHide = () => persist();
+    const onVis = () => {
+      if (document.hidden) persist();
+    };
+    window.addEventListener("pagehide", onHide);
+    document.addEventListener("visibilitychange", onVis);
+    return () => {
+      window.removeEventListener("pagehide", onHide);
+      document.removeEventListener("visibilitychange", onVis);
+      persist();
+    };
+  }, [persist]);
 
   function showToast(msg: string) {
     setToast(msg);
@@ -116,7 +178,9 @@ export function Board({ puzzle, realtimeFeedback, onBack, onSolved, onOpenSettin
       const { best, isNew } = submitTime(puzzle.id, ms);
       setRecord(best);
       setResult({ ms, isNew });
+      wonRef.current = true; // garante que persist() não regrave
       setWon(true);
+      clearInProgress(puzzle.id); // concluída: descarta o estado em andamento
       onSolved();
     } else {
       const okSeats = Array.from({ length: puzzle.size }, (_, p) => p).filter((p) =>
@@ -126,8 +190,9 @@ export function Board({ puzzle, realtimeFeedback, onBack, onSolved, onOpenSettin
     }
   }
 
-  // limpar/recomeçar: zera tabuleiro E cronômetro
+  // limpar/recomeçar: zera tabuleiro, cronômetro e o estado salvo
   function reset() {
+    clearInProgress(puzzle.id);
     setBoard(emptyBoard(puzzle));
     setWon(false);
     setResult(null);

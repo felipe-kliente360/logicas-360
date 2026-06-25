@@ -42,7 +42,7 @@ export function Settings({ settings, completed, total, onChange, onResetProgress
         <div className="set-group">
           <Toggle
             label="Feedback em tempo real"
-            hint="Acende o cartão quando os 3 atributos batem. Desligado, você só descobre ao Verificar."
+            hint="Acende o cartão quando todos os atributos dele batem. Desligado, você só descobre ao Verificar."
             on={settings.realtimeFeedback}
             onClick={() => onChange({ ...settings, realtimeFeedback: !settings.realtimeFeedback })}
           />
