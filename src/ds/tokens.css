@@ -688,22 +688,26 @@ button.act {
   inset: 0;
   display: grid;
   place-items: center;
-  font-size: 14px;
+  font-size: 15px;
   font-weight: 800;
-  color: #fff;
-  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.65);
+  color: #c0392b; /* vermelho escuro */
+  text-shadow: 0 0 3px rgba(255, 255, 255, 0.45);
 }
-/* opção usada em outra posição: aparência quase-desabilitada, mas clicável (move) */
+/* opção usada em outra posição: pouca ênfase (sem borda/fundo), mas clicável (move) */
 .opt.taken {
   opacity: 0.62;
+  background: transparent;
+  border-color: transparent;
 }
 .opt.taken .name {
   color: var(--ink-faint);
 }
-/* opção cravada pela ajuda em outra posição: desabilitada */
+/* opção cravada pela ajuda em outra posição: desabilitada, sem ênfase */
 .opt.locked {
   opacity: 0.5;
   cursor: default;
+  background: transparent;
+  border-color: transparent;
 }
 
 /* ---- toast / win ---- */
