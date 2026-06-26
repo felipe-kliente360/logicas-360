@@ -45,6 +45,7 @@ const seatMatches = (b: Board, puzzle: Puzzle, pos: number) =>
 
 const MAX_HINTS = 3;
 const cellKey = (cat: string, pos: number) => `${cat}:${pos}`;
+const noteKey = (cat: string, pos: number, value: string) => `${cat}:${pos}:${value}`;
 
 // força os valores corretos nas posições cravadas pela ajuda
 function applyLocks(board: Board, puzzle: Puzzle, locks: { cat: string; pos: number }[]): Board {
@@ -76,6 +77,7 @@ export function Board({ puzzle, settings, nextId, allDone, onBack, onNext, onSol
   const lockedSet = useMemo(() => new Set(locks.map((l) => cellKey(l.cat, l.pos))), [locks]);
 
   const [board, setBoard] = useState<Board>(() => applyLocks(restoreBoard(puzzle, saved), puzzle, savedHints.cells));
+  const [notes, setNotes] = useState<Set<string>>(() => new Set(saved?.notes ?? [])); // "não é aqui"
   const [openStory, setOpenStory] = useState(true);
   const [openClues, setOpenClues] = useState(true);
   const [litClue, setLitClue] = useState<string | null>(null);
@@ -114,13 +116,16 @@ export function Board({ puzzle, settings, nextId, allDone, onBack, onNext, onSol
   elapsedRef.current = elapsed;
   const wonRef = useRef(won);
   wonRef.current = won;
+  const notesRef = useRef(notes);
+  notesRef.current = notes;
 
   const persist = useCallback(() => {
     if (wonRef.current) return;
     const ms = runningRef.current ? Date.now() - startRef.current : elapsedRef.current;
     const filledNow = puzzle.categories.reduce((a, c) => a + boardRef.current[c.id].filter(Boolean).length, 0);
-    if (filledNow === 0) clearInProgress(puzzle.id);
-    else saveInProgress(puzzle.id, { board: boardRef.current, elapsedMs: ms });
+    const hasContent = filledNow > 0 || notesRef.current.size > 0;
+    if (!hasContent) clearInProgress(puzzle.id);
+    else saveInProgress(puzzle.id, { board: boardRef.current, elapsedMs: ms, notes: [...notesRef.current] });
   }, [puzzle]);
 
   useEffect(() => {
@@ -131,7 +136,7 @@ export function Board({ puzzle, settings, nextId, allDone, onBack, onNext, onSol
 
   useEffect(() => {
     persist();
-  }, [board, persist]);
+  }, [board, notes, persist]);
 
   useEffect(() => {
     const onHide = () => persist();
@@ -176,7 +181,26 @@ export function Board({ puzzle, settings, nextId, allDone, onBack, onNext, onSol
     const next: Board = { ...board, [cat]: col };
     maybeCelebrateSeat(next, pos, was);
     setBoard(next);
+    // ao escolher um valor, some a marca "não é aqui" dele (decisão oposta)
+    if (col[pos] === valueId) {
+      const k = noteKey(cat, pos, valueId);
+      if (notes.has(k)) {
+        const n = new Set(notes);
+        n.delete(k);
+        setNotes(n);
+      }
+    }
     setSheet(null);
+  }
+
+  // marca/desmarca "este valor NÃO é aqui" (anotação de dedução)
+  function toggleNote(cat: string, pos: number, value: string) {
+    const k = noteKey(cat, pos, value);
+    setNotes((prev) => {
+      const n = new Set(prev);
+      n.has(k) ? n.delete(k) : n.add(k);
+      return n;
+    });
   }
 
   // dica: revela um slot ALEATÓRIO ainda errado (vazio ou preenchido errado) e o
@@ -262,6 +286,7 @@ export function Board({ puzzle, settings, nextId, allDone, onBack, onNext, onSol
       setLocks([]);
       setHintsLeft(MAX_HINTS);
     }
+    setNotes(new Set());
     setBoard(applyLocks(emptyBoard(puzzle), puzzle, fresh));
     setWon(false);
     setResult(null);
@@ -360,6 +385,7 @@ export function Board({ puzzle, settings, nextId, allDone, onBack, onNext, onSol
               {puzzle.categories.map((cat) => {
                 const v = valueOf(cat.id, board[cat.id][p]);
                 const locked = lockedSet.has(cellKey(cat.id, p));
+                const ruledCount = v ? 0 : [...notes].filter((k) => k.startsWith(cellKey(cat.id, p) + ":")).length;
                 return (
                   <button
                     key={cat.id}
@@ -372,11 +398,13 @@ export function Board({ puzzle, settings, nextId, allDone, onBack, onNext, onSol
                       <span className="slabel">{cat.label}</span>
                       <span className="sval">{v ? v.label : "tocar para escolher"}</span>
                     </span>
-                    {locked && (
+                    {locked ? (
                       <span className="lock" aria-label="preenchido pela ajuda">
                         <IconBulb size={14} />
                       </span>
-                    )}
+                    ) : ruledCount > 0 ? (
+                      <span className="ruled-n" aria-label={`${ruledCount} descartados`}>✕{ruledCount}</span>
+                    ) : null}
                   </button>
                 );
               })}
@@ -475,6 +503,16 @@ export function Board({ puzzle, settings, nextId, allDone, onBack, onNext, onSol
             : undefined
         }
         posLabel={(i) => puzzle.spine.labels[i]}
+        ruledOut={
+          sheet
+            ? new Set(
+                [...notes]
+                  .filter((k) => k.startsWith(cellKey(sheet.cat.id, sheet.pos) + ":"))
+                  .map((k) => k.slice((cellKey(sheet.cat.id, sheet.pos) + ":").length))
+              )
+            : undefined
+        }
+        onToggleNote={(valueId) => sheet && toggleNote(sheet.cat.id, sheet.pos, valueId)}
         onPick={pick}
         onClose={() => setSheet(null)}
       />

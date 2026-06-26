@@ -14,11 +14,23 @@ interface Props {
   column: (string | null)[]; // estado atual da coluna (categoryId) por posição
   lockedPos?: Set<number>; // posições cravadas por ajuda nesta categoria
   posLabel?: (i: number) => string; // rótulo da posição i (ex.: "2 anos", "R$ 60")
+  ruledOut?: Set<string>; // valores marcados como "não é aqui" nesta posição
+  onToggleNote?: (valueId: string) => void;
   onPick: (valueId: string, movedFrom: number) => void;
   onClose: () => void;
 }
 
-export function BottomSheet({ target, spineLabel, column, lockedPos, posLabel, onPick, onClose }: Props) {
+export function BottomSheet({
+  target,
+  spineLabel,
+  column,
+  lockedPos,
+  posLabel,
+  ruledOut,
+  onToggleNote,
+  onPick,
+  onClose,
+}: Props) {
   const open = target !== null;
   const current = target ? column[target.pos] : null;
 
@@ -36,12 +48,18 @@ export function BottomSheet({ target, spineLabel, column, lockedPos, posLabel, o
             const isCurrent = v.id === current;
             const lockedElsewhere = usedElsewhere && !!lockedPos?.has(usedAt); // cravado pela ajuda
             const movable = usedElsewhere && !lockedElsewhere; // usado em outra posição, mas pode mover
+            const free = !isCurrent && !usedElsewhere; // livre: pode marcar "não é aqui"
+            const ruled = free && !!ruledOut?.has(v.id);
             const whereLabel = usedAt !== -1 ? posLabel?.(usedAt) ?? `${usedAt + 1}ª` : "";
             return (
               <div
                 key={v.id}
                 className={
-                  "opt" + (isCurrent ? " current" : "") + (lockedElsewhere ? " locked" : "") + (movable ? " taken" : "")
+                  "opt" +
+                  (isCurrent ? " current" : "") +
+                  (lockedElsewhere ? " locked" : "") +
+                  (movable ? " taken" : "") +
+                  (ruled ? " ruled" : "")
                 }
                 onClick={() => {
                   if (lockedElsewhere) return; // não move um valor cravado
@@ -50,7 +68,7 @@ export function BottomSheet({ target, spineLabel, column, lockedPos, posLabel, o
               >
                 <span className="opt-swatch">
                   <Swatch value={v} />
-                  {(movable || lockedElsewhere) && <span className="opt-x" aria-hidden>✕</span>}
+                  {(movable || lockedElsewhere || ruled) && <span className="opt-x" aria-hidden>✕</span>}
                 </span>
                 <span className="name">{v.label}</span>
                 {isCurrent ? (
@@ -59,7 +77,18 @@ export function BottomSheet({ target, spineLabel, column, lockedPos, posLabel, o
                   <span className="used">💡 dica</span>
                 ) : movable ? (
                   <span className="used">em {whereLabel} · mover</span>
-                ) : null}
+                ) : (
+                  <button
+                    className={"note-x" + (ruled ? " on" : "")}
+                    aria-label={ruled ? "desmarcar não é aqui" : "marcar que não é aqui"}
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      onToggleNote?.(v.id);
+                    }}
+                  >
+                    ✕
+                  </button>
+                )}
               </div>
             );
           })}

@@ -91,6 +91,7 @@ export function resetRecords(): Records {
 export interface InProgress {
   board: Record<string, (string | null)[]>;
   elapsedMs: number;
+  notes?: string[]; // anotações "não é aqui" — chaves "cat:pos:valor"
 }
 const INPROGRESS_KEY = "logicas360.inprogress.v1";
 
