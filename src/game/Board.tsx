@@ -470,6 +470,7 @@ export function Board({ puzzle, settings, nextId, allDone, onBack, onNext, onSol
             ? new Set(locks.filter((l) => l.cat === sheet.cat.id).map((l) => l.pos))
             : undefined
         }
+        posLabel={(i) => puzzle.spine.labels[i]}
         onPick={pick}
         onClose={() => setSheet(null)}
       />

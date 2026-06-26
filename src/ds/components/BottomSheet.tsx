@@ -13,11 +13,12 @@ interface Props {
   spineLabel: string; // ex.: "Posição 3 da fila"
   column: (string | null)[]; // estado atual da coluna (categoryId) por posição
   lockedPos?: Set<number>; // posições cravadas por ajuda nesta categoria
+  posLabel?: (i: number) => string; // rótulo da posição i (ex.: "2 anos", "R$ 60")
   onPick: (valueId: string, movedFrom: number) => void;
   onClose: () => void;
 }
 
-export function BottomSheet({ target, spineLabel, column, lockedPos, onPick, onClose }: Props) {
+export function BottomSheet({ target, spineLabel, column, lockedPos, posLabel, onPick, onClose }: Props) {
   const open = target !== null;
   const current = target ? column[target.pos] : null;
 
@@ -34,23 +35,30 @@ export function BottomSheet({ target, spineLabel, column, lockedPos, onPick, onC
             const usedElsewhere = usedAt !== -1 && usedAt !== target.pos;
             const isCurrent = v.id === current;
             const lockedElsewhere = usedElsewhere && !!lockedPos?.has(usedAt); // cravado pela ajuda
+            const movable = usedElsewhere && !lockedElsewhere; // usado em outra posição, mas pode mover
+            const whereLabel = usedAt !== -1 ? posLabel?.(usedAt) ?? `${usedAt + 1}ª` : "";
             return (
               <div
                 key={v.id}
-                className={"opt" + (isCurrent ? " current" : "") + (lockedElsewhere ? " locked" : "")}
+                className={
+                  "opt" + (isCurrent ? " current" : "") + (lockedElsewhere ? " locked" : "") + (movable ? " taken" : "")
+                }
                 onClick={() => {
                   if (lockedElsewhere) return; // não move um valor cravado
                   onPick(v.id, usedElsewhere ? usedAt : -1);
                 }}
               >
-                <Swatch value={v} />
+                <span className="opt-swatch">
+                  <Swatch value={v} />
+                  {(movable || lockedElsewhere) && <span className="opt-x" aria-hidden>✕</span>}
+                </span>
                 <span className="name">{v.label}</span>
                 {isCurrent ? (
                   <span className="used clear-x">remover ✕</span>
                 ) : lockedElsewhere ? (
                   <span className="used">🔒 fixo</span>
-                ) : usedElsewhere ? (
-                  <span className="used">em uso → move</span>
+                ) : movable ? (
+                  <span className="used">em {whereLabel} · mover</span>
                 ) : null}
               </div>
             );
