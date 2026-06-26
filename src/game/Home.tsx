@@ -47,6 +47,8 @@ export function Home({
     () => BANDS.map((b) => ({ b, n: puzzles.filter((p) => b.test(p.difficulty)).length })),
     [puzzles]
   );
+  // número sequencial da fase (posição na lista ordenada), estável ao filtrar
+  const numberOf = useMemo(() => new Map(puzzles.map((p, i) => [p.id, i + 1])), [puzzles]);
 
   return (
     <div className="home">
@@ -98,14 +100,14 @@ export function Home({
           const inProgress = !done && hasInProgress(p.id);
           return (
             <button key={p.id} className={"level-card" + (done ? " done" : "")} onClick={() => onPick(p.id)}>
-              <div className="level-num">{p.difficulty}</div>
+              <div className="level-num">{numberOf.get(p.id)}</div>
               <div className="level-body">
                 <h3>
                   {p.title}
                   {done && <span className="done-tick"> ✓</span>}
                 </h3>
                 <p className="level-meta">
-                  {diffWord(p.difficulty)} · nível {p.difficulty} · {p.size}×{p.categories.length}
+                  {diffWord(p.difficulty)} · {p.size}×{p.categories.length}
                 </p>
                 {rec != null ? (
                   <span className="level-diff">🏆 recorde {formatTime(rec)}</span>

@@ -74,10 +74,10 @@ export default function App() {
     );
   }
 
-  // próxima fase não concluída (a partir da atual, seguindo a ordem da lista; com wrap)
+  // próxima fase não concluída ESTRITAMENTE à frente na lista (nunca volta nível)
   const idx = PUZZLES.findIndex((p) => p.id === active.id);
-  const order = [...PUZZLES.slice(idx + 1), ...PUZZLES.slice(0, idx)];
-  const nextId = order.find((p) => !progress.completed.includes(p.id))?.id ?? null;
+  const nextId = PUZZLES.slice(idx + 1).find((p) => !progress.completed.includes(p.id))?.id ?? null;
+  const allDone = PUZZLES.every((p) => progress.completed.includes(p.id));
 
   return (
     <>
@@ -86,6 +86,7 @@ export default function App() {
         puzzle={active}
         settings={settings}
         nextId={nextId}
+        allDone={allDone}
         onBack={() => setActiveId(null)}
         onNext={() => nextId && setActiveId(nextId)}
         onSolved={() => setProgress(markCompleted(active.id))}

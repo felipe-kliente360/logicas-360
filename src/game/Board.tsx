@@ -58,14 +58,15 @@ function applyLocks(board: Board, puzzle: Puzzle, locks: { cat: string; pos: num
 interface Props {
   puzzle: Puzzle;
   settings: Settings;
-  nextId: string | null; // próxima fase não concluída (ou null se acabou)
+  nextId: string | null; // próxima fase não concluída à frente (ou null)
+  allDone: boolean; // todas as fases concluídas
   onBack: () => void;
   onNext: () => void;
   onSolved: () => void;
   onOpenSettings: () => void;
 }
 
-export function Board({ puzzle, settings, nextId, onBack, onNext, onSolved, onOpenSettings }: Props) {
+export function Board({ puzzle, settings, nextId, allDone, onBack, onNext, onSolved, onOpenSettings }: Props) {
   const saved = useMemo(() => loadInProgress(puzzle.id), [puzzle.id]);
   const savedHints = useMemo(() => loadHints(puzzle.id), [puzzle.id]);
 
@@ -506,7 +507,7 @@ export function Board({ puzzle, settings, nextId, onBack, onNext, onSolved, onOp
             <div className="v">{puzzle.clues.length}</div>
           </div>
         </div>
-        {!nextId && <p className="win-alldone">🎉 Você concluiu todas as fases!</p>}
+        {allDone && <p className="win-alldone">🎉 Você concluiu todas as fases!</p>}
         <div className="win-actions">
           {nextId ? (
             <>
