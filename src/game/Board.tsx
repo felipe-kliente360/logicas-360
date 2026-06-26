@@ -372,7 +372,11 @@ export function Board({ puzzle, settings, nextId, allDone, onBack, onNext, onSol
                       <span className="slabel">{cat.label}</span>
                       <span className="sval">{v ? v.label : "tocar para escolher"}</span>
                     </span>
-                    {locked && <span className="lock" aria-label="fixado pela ajuda">🔒</span>}
+                    {locked && (
+                      <span className="lock" aria-label="preenchido pela ajuda">
+                        <IconBulb size={14} />
+                      </span>
+                    )}
                   </button>
                 );
               })}

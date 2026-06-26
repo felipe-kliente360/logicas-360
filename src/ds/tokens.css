@@ -427,12 +427,11 @@ h1.board-h1 {
 .slot:active {
   background: var(--card2);
 }
+/* slot preenchido manualmente: borda iluminada (um pouco mais fraca que o cravado) */
 .slot.filled {
   border-style: solid;
-}
-/* slot vazio: borda iluminada (sem cadeado) como lembrete do que falta preencher */
-.slot:not(.filled) {
   border-color: var(--glow);
+  border-color: color-mix(in srgb, var(--glow) 58%, var(--line));
 }
 .slot.lit {
   border-color: var(--glow);
@@ -450,8 +449,8 @@ h1.board-h1 {
 }
 .lock {
   flex: 0 0 auto;
-  font-size: 12px;
-  opacity: 0.85;
+  display: inline-flex;
+  color: var(--glow);
   margin-left: 4px;
 }
 .dot {

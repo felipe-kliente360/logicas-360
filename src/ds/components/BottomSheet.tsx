@@ -56,7 +56,7 @@ export function BottomSheet({ target, spineLabel, column, lockedPos, posLabel, o
                 {isCurrent ? (
                   <span className="used clear-x">remover ✕</span>
                 ) : lockedElsewhere ? (
-                  <span className="used">🔒 fixo</span>
+                  <span className="used">💡 dica</span>
                 ) : movable ? (
                   <span className="used">em {whereLabel} · mover</span>
                 ) : null}
