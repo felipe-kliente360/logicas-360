@@ -68,15 +68,15 @@ export function BottomSheet({
               >
                 <span className="opt-swatch">
                   <Swatch value={v} />
-                  {(movable || lockedElsewhere || ruled) && <span className="opt-x" aria-hidden>✕</span>}
+                  {ruled && <span className="opt-x" aria-hidden>✕</span>}
                 </span>
                 <span className="name">{v.label}</span>
                 {isCurrent ? (
                   <span className="used clear-x">remover ✕</span>
                 ) : lockedElsewhere ? (
-                  <span className="used">💡 dica</span>
+                  <span className="used">💡 em {whereLabel}</span>
                 ) : movable ? (
-                  <span className="used">em {whereLabel} · mover</span>
+                  <span className="used move">⇄ em {whereLabel}</span>
                 ) : (
                   <button
                     className={"note-x" + (ruled ? " on" : "")}

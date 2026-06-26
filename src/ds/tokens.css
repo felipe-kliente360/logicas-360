@@ -696,14 +696,19 @@ button.act {
   color: #c0392b; /* vermelho escuro */
   text-shadow: 0 0 3px rgba(255, 255, 255, 0.45);
 }
-/* opção usada em outra posição: pouca ênfase (sem borda/fundo), mas clicável (move) */
+/* opção localizada em outra posição: legível, sem borda/fundo, e clicável (move) */
 .opt.taken {
-  opacity: 0.62;
+  opacity: 0.85;
   background: transparent;
   border-color: transparent;
 }
 .opt.taken .name {
-  color: var(--ink-faint);
+  color: var(--ink-dim);
+}
+/* chip "⇄ em X" — valor está em outra posição, toque pra mover (não é dedução) */
+.used.move {
+  color: var(--glow);
+  border-color: color-mix(in srgb, var(--glow) 42%, var(--line));
 }
 /* opção cravada pela ajuda em outra posição: desabilitada, sem ênfase */
 .opt.locked {
