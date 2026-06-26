@@ -74,13 +74,20 @@ export default function App() {
     );
   }
 
+  // próxima fase não concluída (a partir da atual, seguindo a ordem da lista; com wrap)
+  const idx = PUZZLES.findIndex((p) => p.id === active.id);
+  const order = [...PUZZLES.slice(idx + 1), ...PUZZLES.slice(0, idx)];
+  const nextId = order.find((p) => !progress.completed.includes(p.id))?.id ?? null;
+
   return (
     <>
       <Board
         key={active.id}
         puzzle={active}
         settings={settings}
+        nextId={nextId}
         onBack={() => setActiveId(null)}
+        onNext={() => nextId && setActiveId(nextId)}
         onSolved={() => setProgress(markCompleted(active.id))}
         onOpenSettings={() => setShowSettings(true)}
       />

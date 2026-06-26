@@ -287,6 +287,14 @@ h1.board-h1 {
   line-height: 1.5;
   color: var(--ink);
 }
+.story-text {
+  margin: 0;
+  padding: 2px 16px 15px;
+  font-size: 14px;
+  font-weight: 500;
+  line-height: 1.55;
+  color: var(--ink-dim);
+}
 
 /* ---- hint do referencial (abre rápido, fecha ao clicar fora) ---- */
 .hint-wrap {
@@ -521,6 +529,12 @@ button.act {
 .primary:active {
   filter: brightness(0.9);
   transform: scale(0.98);
+}
+.act:disabled {
+  opacity: 0.45;
+  filter: none;
+  transform: none;
+  cursor: default;
 }
 .ghost {
   flex: 0 0 auto;
@@ -1232,6 +1246,13 @@ button.act {
 }
 .win-stat.rec .v {
   color: var(--glow);
+}
+.win-alldone {
+  margin: 22px 0 0;
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--glow);
+  text-align: center;
 }
 .win-actions {
   width: 100%;

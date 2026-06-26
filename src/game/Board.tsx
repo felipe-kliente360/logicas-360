@@ -58,12 +58,14 @@ function applyLocks(board: Board, puzzle: Puzzle, locks: { cat: string; pos: num
 interface Props {
   puzzle: Puzzle;
   settings: Settings;
+  nextId: string | null; // próxima fase não concluída (ou null se acabou)
   onBack: () => void;
+  onNext: () => void;
   onSolved: () => void;
   onOpenSettings: () => void;
 }
 
-export function Board({ puzzle, settings, onBack, onSolved, onOpenSettings }: Props) {
+export function Board({ puzzle, settings, nextId, onBack, onNext, onSolved, onOpenSettings }: Props) {
   const saved = useMemo(() => loadInProgress(puzzle.id), [puzzle.id]);
   const savedHints = useMemo(() => loadHints(puzzle.id), [puzzle.id]);
 
@@ -73,6 +75,7 @@ export function Board({ puzzle, settings, onBack, onSolved, onOpenSettings }: Pr
   const lockedSet = useMemo(() => new Set(locks.map((l) => cellKey(l.cat, l.pos))), [locks]);
 
   const [board, setBoard] = useState<Board>(() => applyLocks(restoreBoard(puzzle, saved), puzzle, savedHints.cells));
+  const [openStory, setOpenStory] = useState(true);
   const [openClues, setOpenClues] = useState(true);
   const [litClue, setLitClue] = useState<string | null>(null);
   const [sheet, setSheet] = useState<SheetTarget | null>(null);
@@ -319,6 +322,17 @@ export function Board({ puzzle, settings, onBack, onSolved, onOpenSettings }: Pr
         </div>
       </header>
 
+      {/* enunciado (colapsável, aberto por padrão) */}
+      <section className={"clues" + (openStory ? " open" : "")}>
+        <div className="clues-head" onClick={() => setOpenStory((o) => !o)}>
+          <h2>Enunciado</h2>
+          <span className="chev">⌄</span>
+        </div>
+        <div className="clue-list">
+          <p className="story-text">{puzzle.story}</p>
+        </div>
+      </section>
+
       {/* pistas */}
       <section className={"clues" + (openClues ? " open" : "")}>
         <div className="clues-head" onClick={() => setOpenClues((o) => !o)}>
@@ -377,7 +391,7 @@ export function Board({ puzzle, settings, onBack, onSolved, onOpenSettings }: Pr
           >
             <IconRefresh />
           </button>
-          <button className="act primary verificar" onClick={check}>
+          <button className="act primary verificar" onClick={check} disabled={filled < totalSlots}>
             <IconCheck /> Verificar
           </button>
           <button
@@ -492,13 +506,30 @@ export function Board({ puzzle, settings, onBack, onSolved, onOpenSettings }: Pr
             <div className="v">{puzzle.clues.length}</div>
           </div>
         </div>
+        {!nextId && <p className="win-alldone">🎉 Você concluiu todas as fases!</p>}
         <div className="win-actions">
-          <button className="act primary" onClick={reset}>
-            Jogar de novo
-          </button>
-          <button className="act ghost" style={{ marginTop: 10 }} onClick={onBack}>
-            Voltar às fases
-          </button>
+          {nextId ? (
+            <>
+              <button className="act primary" onClick={onNext}>
+                Próxima fase →
+              </button>
+              <button className="act ghost" style={{ marginTop: 10 }} onClick={reset}>
+                Jogar de novo
+              </button>
+              <button className="act ghost" style={{ marginTop: 10 }} onClick={onBack}>
+                Voltar às fases
+              </button>
+            </>
+          ) : (
+            <>
+              <button className="act primary" onClick={reset}>
+                Jogar de novo
+              </button>
+              <button className="act ghost" style={{ marginTop: 10 }} onClick={onBack}>
+                Voltar às fases
+              </button>
+            </>
+          )}
         </div>
       </div>
     </div>
