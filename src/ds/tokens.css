@@ -733,18 +733,18 @@ button.act {
   padding: 0 16px 40px;
 }
 .home-hero {
-  padding: 40px 2px 12px;
+  padding: 40px 2px 18px;
 }
 .home-hero h1 {
   font-family: var(--font-display), sans-serif;
   font-weight: 800;
   font-size: 44px;
   line-height: 0.95;
-  margin: 6px 0 0;
+  margin: 28px 0 0;
   letter-spacing: -0.02em;
 }
 .home-hero .sub {
-  margin-top: 10px;
+  margin-top: 12px;
 }
 .home-grow {
   transform-origin: left;
@@ -754,7 +754,7 @@ button.act {
   display: flex;
   flex-wrap: nowrap;
   gap: 8px;
-  margin-top: 18px;
+  margin-top: 22px;
   overflow-x: auto;
   scrollbar-width: none;
   -ms-overflow-style: none;
@@ -797,8 +797,8 @@ button.act {
 .levels {
   display: flex;
   flex-direction: column;
-  gap: 12px;
-  margin-top: 16px;
+  gap: 14px;
+  margin-top: 18px;
 }
 .level-card {
   display: flex;
@@ -1304,13 +1304,18 @@ button.act {
 }
 
 /* ===== dialog de confirmação (duplo fator) ===== */
-.confirm-dialog {
+.confirm-wrap {
   position: fixed;
-  left: 50%;
-  top: 50%;
-  transform: translate(-50%, -50%);
+  inset: 0;
   z-index: 37;
-  width: calc(100% - 56px);
+  display: grid;
+  place-items: center;
+  padding: 24px;
+  background: rgba(4, 16, 18, 0.55);
+  backdrop-filter: blur(2px);
+}
+.confirm-dialog {
+  width: 100%;
   max-width: 360px;
   background: var(--bg2);
   border: 1px solid var(--line);

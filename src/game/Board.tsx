@@ -395,9 +395,8 @@ export function Board({ puzzle, settings, onBack, onSolved, onOpenSettings }: Pr
 
       {/* confirmação de limpar (duplo fator) */}
       {confirmClear && (
-        <>
-          <div className="scrim show" onClick={() => setConfirmClear(false)} style={{ zIndex: 36 }} />
-          <div className="confirm-dialog" role="dialog" aria-modal="true">
+        <div className="confirm-wrap" onClick={() => setConfirmClear(false)}>
+          <div className="confirm-dialog" role="dialog" aria-modal="true" onClick={(e) => e.stopPropagation()}>
             <h3>Limpar o tabuleiro?</h3>
             <p>
               Isso apaga o que você preencheu e zera o cronômetro.
@@ -418,7 +417,7 @@ export function Board({ puzzle, settings, onBack, onSolved, onOpenSettings }: Pr
               </button>
             </div>
           </div>
-        </>
+        </div>
       )}
 
       {/* folha "como ler as posições" */}
