@@ -30,6 +30,11 @@ export default function App() {
     document.body.dataset.theme = "home";
   }, []);
 
+  // ao trocar de tela, volta o scroll pro topo
+  useEffect(() => {
+    window.scrollTo(0, 0);
+  }, [activeId, splash]);
+
   // claro/escuro global
   useEffect(() => {
     document.body.dataset.mode = settings.theme;

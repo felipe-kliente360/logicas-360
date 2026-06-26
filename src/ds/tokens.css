@@ -81,7 +81,7 @@ body {
 
 /* ---- header ---- */
 header {
-  padding: 22px 2px 8px;
+  padding: 40px 2px 8px; /* mesma âncora-topo da home (.home-hero) */
 }
 .eyebrow {
   font-family: var(--font-mono), monospace;
@@ -152,7 +152,7 @@ h1.board-h1 {
   font-family: var(--font-body), sans-serif;
   font-weight: 600;
   cursor: pointer;
-  margin: 16px 0 0;
+  margin: 0;
 }
 .backbtn:active {
   background: var(--card2);
@@ -752,14 +752,22 @@ button.act {
 }
 .filters {
   display: flex;
-  flex-wrap: wrap;
+  flex-wrap: nowrap;
   gap: 8px;
   margin-top: 18px;
+  overflow-x: auto;
+  scrollbar-width: none;
+  -ms-overflow-style: none;
+}
+.filters::-webkit-scrollbar {
+  display: none;
 }
 .chip {
   display: inline-flex;
   align-items: center;
   gap: 7px;
+  flex: 0 0 auto;
+  white-space: nowrap;
   background: var(--card);
   border: 1px solid var(--line);
   color: var(--ink-dim);
@@ -1293,4 +1301,34 @@ button.act {
   line-height: 1.5;
   color: var(--ink-dim);
   margin: 0;
+}
+
+/* ===== dialog de confirmação (duplo fator) ===== */
+.confirm-dialog {
+  position: fixed;
+  left: 50%;
+  top: 50%;
+  transform: translate(-50%, -50%);
+  z-index: 37;
+  width: calc(100% - 56px);
+  max-width: 360px;
+  background: var(--bg2);
+  border: 1px solid var(--line);
+  border-radius: 18px;
+  padding: 22px;
+  box-shadow: 0 24px 70px -24px rgba(0, 0, 0, 0.7);
+  animation: pop 0.25s cubic-bezier(0.2, 0.8, 0.2, 1);
+}
+.confirm-dialog h3 {
+  font-family: var(--font-display), sans-serif;
+  font-weight: 800;
+  font-size: 19px;
+  margin: 0 0 8px;
+  color: var(--ink);
+}
+.confirm-dialog p {
+  font-size: 13.5px;
+  line-height: 1.5;
+  color: var(--ink-dim);
+  margin: 0 0 18px;
 }

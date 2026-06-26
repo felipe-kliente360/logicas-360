@@ -18,7 +18,7 @@ import {
   type Settings,
 } from "./storage";
 import { chime, winChime, buzz } from "./feedback";
-import { IconRefresh, IconCheck, IconBulb, IconCompass, IconArrowRight } from "../ds/components/icons";
+import { IconRefresh, IconCheck, IconBulb, IconHelp, IconArrowRight } from "../ds/components/icons";
 
 type Board = Record<string, (string | null)[]>;
 
@@ -80,6 +80,7 @@ export function Board({ puzzle, settings, onBack, onSolved, onOpenSettings }: Pr
   const [won, setWon] = useState(false);
   const [shake, setShake] = useState(false);
   const [infoOpen, setInfoOpen] = useState(false);
+  const [confirmClear, setConfirmClear] = useState(false);
   const litTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
   const toastTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
   const shakeTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
@@ -285,6 +286,16 @@ export function Board({ puzzle, settings, onBack, onSolved, onOpenSettings }: Pr
             ‹ Fases
           </button>
           <div className="topbar-right">
+            {showComoLer && (
+              <button
+                className="iconbtn"
+                onClick={() => setInfoOpen(true)}
+                aria-label="Como ler as posições"
+                title="Como ler as posições"
+              >
+                <IconHelp size={18} />
+              </button>
+            )}
             <span className="timer" aria-label="tempo">
               {formatTime(elapsed)}
             </span>
@@ -355,22 +366,17 @@ export function Board({ puzzle, settings, onBack, onSolved, onOpenSettings }: Pr
         ))}
       </section>
 
-      {/* barra de ação: Limpar · Como ler · Verificar · Ajuda (contador) */}
+      {/* barra de ação: Limpar · Verificar · Ajuda (contador) */}
       <div className="bar">
         <div className="bar-inner">
-          <button className="act ghost sq" onClick={reset} aria-label="Limpar e reiniciar" title="Limpar">
+          <button
+            className="act ghost sq"
+            onClick={() => setConfirmClear(true)}
+            aria-label="Limpar e reiniciar"
+            title="Limpar"
+          >
             <IconRefresh />
           </button>
-          {showComoLer && (
-            <button
-              className="act ghost sq"
-              onClick={() => setInfoOpen(true)}
-              aria-label="Como ler as posições"
-              title="Como ler as posições"
-            >
-              <IconCompass />
-            </button>
-          )}
           <button className="act primary verificar" onClick={check}>
             <IconCheck /> Verificar
           </button>
@@ -386,6 +392,34 @@ export function Board({ puzzle, settings, onBack, onSolved, onOpenSettings }: Pr
           </button>
         </div>
       </div>
+
+      {/* confirmação de limpar (duplo fator) */}
+      {confirmClear && (
+        <>
+          <div className="scrim show" onClick={() => setConfirmClear(false)} style={{ zIndex: 36 }} />
+          <div className="confirm-dialog" role="dialog" aria-modal="true">
+            <h3>Limpar o tabuleiro?</h3>
+            <p>
+              Isso apaga o que você preencheu e zera o cronômetro.
+              {locks.length > 0 && " As posições reveladas pela ajuda continuam."}
+            </p>
+            <div className="confirm-btns">
+              <button className="mini ghost" onClick={() => setConfirmClear(false)}>
+                Cancelar
+              </button>
+              <button
+                className="mini danger"
+                onClick={() => {
+                  reset();
+                  setConfirmClear(false);
+                }}
+              >
+                Limpar
+              </button>
+            </div>
+          </div>
+        </>
+      )}
 
       {/* folha "como ler as posições" */}
       {showComoLer && (

@@ -6,9 +6,9 @@ import { Logo } from "../ds/components/Logo";
 
 const diffWord = (d: number) => (d <= 2 ? "Fácil" : d <= 6 ? "Médio" : d <= 8 ? "Difícil" : "Expert");
 
-// bandas de dificuldade para o filtro (nossa escala 1..10)
+// bandas de dificuldade para o filtro (nossa escala 1..10). Multiseleção:
+// nenhuma marcada = mostra todas.
 const BANDS = [
-  { id: "todos", label: "Todos", test: () => true },
   { id: "facil", label: "Fácil", test: (d: number) => d <= 2 },
   { id: "medio", label: "Médio", test: (d: number) => d >= 3 && d <= 6 },
   { id: "dificil", label: "Difícil", test: (d: number) => d >= 7 && d <= 8 },
@@ -27,10 +27,22 @@ export function Home({
   onOpenSettings: () => void;
 }) {
   const doneCount = puzzles.filter((p) => progress.completed.includes(p.id)).length;
-  const [band, setBand] = useState<(typeof BANDS)[number]["id"]>("todos");
+  const [selected, setSelected] = useState<Set<string>>(new Set());
 
-  const active = BANDS.find((b) => b.id === band)!;
-  const visible = useMemo(() => puzzles.filter((p) => active.test(p.difficulty)), [puzzles, active]);
+  const toggle = (id: string) =>
+    setSelected((prev) => {
+      const next = new Set(prev);
+      next.has(id) ? next.delete(id) : next.add(id);
+      return next;
+    });
+
+  const visible = useMemo(
+    () =>
+      selected.size === 0
+        ? puzzles
+        : puzzles.filter((p) => BANDS.some((b) => selected.has(b.id) && b.test(p.difficulty))),
+    [puzzles, selected]
+  );
   const counts = useMemo(
     () => BANDS.map((b) => ({ b, n: puzzles.filter((p) => b.test(p.difficulty)).length })),
     [puzzles]
@@ -70,10 +82,10 @@ export function Home({
 
       <div className="filters">
         {counts.map(({ b, n }) =>
-          n === 0 && b.id !== "todos" ? null : (
-            <button key={b.id} className={"chip" + (band === b.id ? " on" : "")} onClick={() => setBand(b.id)}>
+          n === 0 ? null : (
+            <button key={b.id} className={"chip" + (selected.has(b.id) ? " on" : "")} onClick={() => toggle(b.id)}>
               {b.label}
-              <span className="chip-n">{b.id === "todos" ? puzzles.length : n}</span>
+              <span className="chip-n">{n}</span>
             </button>
           )
         )}

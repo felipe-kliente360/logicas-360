@@ -40,6 +40,14 @@ export const IconCompass = ({ size = 18 }: P) => (
   </svg>
 );
 
+export const IconHelp = ({ size = 18 }: P) => (
+  <svg {...base(size)}>
+    <circle cx="12" cy="12" r="10" />
+    <path d="M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3" />
+    <line x1="12" y1="17" x2="12.01" y2="17" />
+  </svg>
+);
+
 export const IconArrowRight = ({ size = 18 }: P) => (
   <svg {...base(size)}>
     <line x1="5" y1="12" x2="19" y2="12" />
