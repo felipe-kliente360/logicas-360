@@ -59,6 +59,13 @@ export interface Clue {
   constraints: Constraint[]; // predicados que o solver avalia (pode ser composta)
 }
 
+/** Crime de um caso de investigação: evidências que apontam o culpado. */
+export interface Crime {
+  prompt: string; // "Quem matou o colecionador?"
+  /** Fatos do crime (cat/valor). O culpado é a entidade que satisfaz TODOS na solução. */
+  evidence: Ref[];
+}
+
 export interface Puzzle {
   id: string;
   title: string;
@@ -74,4 +81,10 @@ export interface Puzzle {
   sourceDifficulty?: number;
   /** Origem do puzzle, p/ crédito (ex.: "geniol"). */
   source?: string;
+  /** Tipo: grade comum (default) ou caso de investigação (whodunit). */
+  kind?: "grid" | "whodunit";
+  /** Dados do crime (só para kind="whodunit"). */
+  crime?: Crime;
+  /** Índice do culpado na spine — DERIVADO no carregamento (solução + evidências). */
+  culprit?: number;
 }

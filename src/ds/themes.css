@@ -35,6 +35,49 @@
   --on-glow: #2a1c08;
 }
 
+/* ===== Dossiê (investigações) — papel pardo + carimbo vermelho ===== */
+[data-theme="dossie"] {
+  --bg: #c8b491;
+  --bg2: #beac88;
+  --card: #e8dcc2;
+  --card2: #ddcfb0;
+  --line: #a78f68;
+  --ink: #2c2417;
+  --ink-dim: #5b4c34;
+  --ink-faint: #897456;
+  --glow: #a8392a; /* carimbo / tinta vermelha */
+  --glow2: #c25640;
+  --glow-soft: rgba(168, 57, 42, 0.16);
+  --on-glow: #f7efe0;
+}
+/* textura sutil de papel pardo */
+[data-theme="dossie"] .app,
+[data-theme="dossie"] .home {
+  background-image: radial-gradient(rgba(120, 96, 60, 0.06) 1px, transparent 1px),
+    radial-gradient(rgba(120, 96, 60, 0.05) 1px, transparent 1px);
+  background-size: 11px 11px, 17px 17px;
+  background-position: 0 0, 6px 9px;
+}
+/* carimbo (CONFIDENCIAL / CASO FECHADO) */
+.stamp {
+  display: inline-block;
+  font-family: var(--font-display), sans-serif;
+  font-weight: 800;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: #a8392a;
+  border: 3px solid #a8392a;
+  border-radius: 6px;
+  padding: 5px 12px;
+  opacity: 0.82;
+  transform: rotate(-7deg);
+  box-shadow: 0 0 0 1px rgba(168, 57, 42, 0.25) inset;
+  mix-blend-mode: multiply;
+}
+[data-theme="dossie"] .eyebrow {
+  color: #a8392a;
+}
+
 /* ---- motif: chuva (só no mundo do ponto de ônibus) ---- */
 .rain {
   position: fixed;

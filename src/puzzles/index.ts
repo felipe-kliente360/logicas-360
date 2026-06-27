@@ -8,8 +8,9 @@ import { noPonto } from "./no-ponto";
 import { einstein } from "./einstein";
 import { GENIOL } from "./geniol"; // acervo Geniol (auto-gerado)
 import { GENERATED } from "./generated"; // fases do gerador determinístico
+import { WHODUNIT } from "./whodunit"; // casos de investigação
 
-const RAW: Puzzle[] = [noPonto, einstein, ...GENIOL, ...GENERATED];
+const RAW: Puzzle[] = [noPonto, einstein, ...GENIOL, ...GENERATED, ...WHODUNIT];
 
 // --- calibração ancorada (níveis-referência definidos pelo produto) ---
 const LOW_IDS = ["basico-1", "basico-2", "meninas-na-escola"]; // -> nível 1
@@ -41,12 +42,27 @@ function hydrate(p: Puzzle): Puzzle {
   const hasSolution = p.solution && Object.keys(p.solution).length > 0;
   const solution = hasSolution ? p.solution : (solve(p) as Record<string, string[]> | null);
   if (!solution) console.warn(`[puzzles] ${p.id} sem solução — verifique as pistas`);
-  return { ...p, solution: solution ?? {}, difficulty: levelFromRank(rank.get(p.id)!) };
+  // culpado (whodunit): entidade cujos atributos batem com todas as evidências
+  let culprit: number | undefined;
+  if (p.kind === "whodunit" && p.crime && solution) {
+    for (let i = 0; i < p.size; i++) {
+      if (p.crime.evidence.every((e) => solution[e.cat]?.[i] === e.value)) {
+        culprit = i;
+        break;
+      }
+    }
+    if (culprit === undefined) console.warn(`[puzzles] ${p.id}: evidências não apontam culpado`);
+  }
+  return { ...p, solution: solution ?? {}, difficulty: levelFromRank(rank.get(p.id)!), culprit };
 }
 
 export const PUZZLES: Puzzle[] = RAW.map(hydrate).sort(
   (a, b) => a.difficulty - b.difficulty || raw.get(a.id)! - raw.get(b.id)!
 );
+
+// seções: grades comuns × investigações (whodunit)
+export const GRID_PUZZLES: Puzzle[] = PUZZLES.filter((p) => p.kind !== "whodunit");
+export const WHODUNITS: Puzzle[] = PUZZLES.filter((p) => p.kind === "whodunit");
 
 export function getPuzzle(id: string): Puzzle | undefined {
   return PUZZLES.find((p) => p.id === id);

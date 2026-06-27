@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
-import { PUZZLES, getPuzzle } from "./puzzles";
-import { Home } from "./game/Home";
+import { PUZZLES, GRID_PUZZLES, WHODUNITS, getPuzzle } from "./puzzles";
+import { Home, type HomeTab } from "./game/Home";
 import { Board } from "./game/Board";
 import { Settings } from "./game/Settings";
 import { Splash } from "./game/Splash";
@@ -15,9 +15,9 @@ import {
   type Settings as SettingsT,
 } from "./game/storage";
 
-// Navegação leve (home ↔ fase) por estado. Tema do mundo no data-theme; claro/escuro no data-mode.
 export default function App() {
   const [splash, setSplash] = useState(true);
+  const [tab, setTab] = useState<HomeTab>("puzzles");
   const [activeId, setActiveId] = useState<string | null>(null);
   const [progress, setProgress] = useState<Progress>(() => loadProgress());
   const [settings, setSettings] = useState<SettingsT>(() => loadSettings());
@@ -25,17 +25,16 @@ export default function App() {
 
   const active = activeId ? getPuzzle(activeId) : undefined;
 
-  // tema único "Neon Petróleo" no app inteiro (sem tema por fase)
+  // tema: investigações = dossiê (papel pardo); resto = Neon Petróleo
   useEffect(() => {
-    document.body.dataset.theme = "home";
-  }, []);
+    const dossie = active ? active.kind === "whodunit" : tab === "investigacoes";
+    document.body.dataset.theme = dossie ? "dossie" : "home";
+  }, [active, tab]);
 
-  // ao trocar de tela, volta o scroll pro topo
   useEffect(() => {
     window.scrollTo(0, 0);
-  }, [activeId, splash]);
+  }, [activeId, splash, tab]);
 
-  // claro/escuro global
   useEffect(() => {
     document.body.dataset.mode = settings.theme;
   }, [settings.theme]);
@@ -61,10 +60,14 @@ export default function App() {
   }
 
   if (!active) {
+    const list = tab === "investigacoes" ? WHODUNITS : GRID_PUZZLES;
     return (
       <>
         <Home
-          puzzles={PUZZLES}
+          puzzles={list}
+          tab={tab}
+          onTab={setTab}
+          investigacoesCount={WHODUNITS.length}
           progress={progress}
           onPick={(id) => setActiveId(id)}
           onOpenSettings={() => setShowSettings(true)}
@@ -74,10 +77,11 @@ export default function App() {
     );
   }
 
-  // próxima fase não concluída ESTRITAMENTE à frente na lista (nunca volta nível)
-  const idx = PUZZLES.findIndex((p) => p.id === active.id);
-  const nextId = PUZZLES.slice(idx + 1).find((p) => !progress.completed.includes(p.id))?.id ?? null;
-  const allDone = PUZZLES.every((p) => progress.completed.includes(p.id));
+  // próxima fase não concluída à frente, DENTRO da mesma seção (grade ou investigação)
+  const section = active.kind === "whodunit" ? WHODUNITS : GRID_PUZZLES;
+  const idx = section.findIndex((p) => p.id === active.id);
+  const nextId = section.slice(idx + 1).find((p) => !progress.completed.includes(p.id))?.id ?? null;
+  const allDone = section.every((p) => progress.completed.includes(p.id));
 
   return (
     <>

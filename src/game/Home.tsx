@@ -1,13 +1,13 @@
-// Tela de entrada — seletor de fases. Lê o catálogo, o progresso e os recordes.
+// Tela de entrada — abas (Puzzles / Investigações), seletor de fases, progresso e recordes.
 import { useMemo, useState } from "react";
 import type { Puzzle } from "../engine/types";
 import { getRecord, formatTime, hasInProgress, type Progress } from "./storage";
 import { Logo } from "../ds/components/Logo";
 
+export type HomeTab = "puzzles" | "investigacoes";
+
 const diffWord = (d: number) => (d <= 2 ? "Fácil" : d <= 6 ? "Médio" : d <= 8 ? "Difícil" : "Expert");
 
-// bandas de dificuldade para o filtro (nossa escala 1..10). Multiseleção:
-// nenhuma marcada = mostra todas.
 const BANDS = [
   { id: "facil", label: "Fácil", test: (d: number) => d <= 2 },
   { id: "medio", label: "Médio", test: (d: number) => d >= 3 && d <= 6 },
@@ -17,15 +17,22 @@ const BANDS = [
 
 export function Home({
   puzzles,
+  tab,
+  onTab,
+  investigacoesCount,
   progress,
   onPick,
   onOpenSettings,
 }: {
   puzzles: Puzzle[];
+  tab: HomeTab;
+  onTab: (t: HomeTab) => void;
+  investigacoesCount: number;
   progress: Progress;
   onPick: (id: string) => void;
   onOpenSettings: () => void;
 }) {
+  const invest = tab === "investigacoes";
   const doneCount = puzzles.filter((p) => progress.completed.includes(p.id)).length;
   const [selected, setSelected] = useState<Set<string>>(new Set());
 
@@ -47,7 +54,6 @@ export function Home({
     () => BANDS.map((b) => ({ b, n: puzzles.filter((p) => b.test(p.difficulty)).length })),
     [puzzles]
   );
-  // número sequencial da fase (posição na lista ordenada), estável ao filtrar
   const numberOf = useMemo(() => new Map(puzzles.map((p, i) => [p.id, i + 1])), [puzzles]);
 
   return (
@@ -57,17 +63,30 @@ export function Home({
           <div className="brand">
             <Logo size={40} />
             <p className="eyebrow" style={{ margin: 0 }}>
-              Desafios de lógica
+              {invest ? "Arquivo de casos" : "Desafios de lógica"}
             </p>
           </div>
           <button className="iconbtn" onClick={onOpenSettings} aria-label="Configurações">
             ⚙
           </button>
         </div>
-        <h1>Lógicas 360</h1>
+
+        {/* abas */}
+        <div className="tabs">
+          <button className={"tab" + (!invest ? " on" : "")} onClick={() => onTab("puzzles")}>
+            Puzzles
+          </button>
+          <button className={"tab" + (invest ? " on" : "")} onClick={() => onTab("investigacoes")}>
+            Investigações
+            {investigacoesCount > 0 && <span className="tab-n">{investigacoesCount}</span>}
+          </button>
+        </div>
+
+        <h1>{invest ? "Investigações" : "Lógicas 360"}</h1>
         <p className="sub">
-          {puzzles.length} puzzles de dedução em grade, do mais fácil ao expert. Use as pistas pra descobrir quem é
-          quem.
+          {invest
+            ? `${puzzles.length} casos para resolver: deduza a grade e aponte o culpado.`
+            : `${puzzles.length} puzzles de dedução em grade, do mais fácil ao expert.`}
         </p>
         <div className="progress" style={{ marginTop: 16 }}>
           <div className="pbar">
@@ -99,15 +118,17 @@ export function Home({
           const rec = getRecord(p.id);
           const inProgress = !done && hasInProgress(p.id);
           return (
-            <button key={p.id} className={"level-card" + (done ? " done" : "")} onClick={() => onPick(p.id)}>
-              <div className="level-num">{numberOf.get(p.id)}</div>
+            <button key={p.id} className={"level-card" + (done ? " done" : "") + (invest ? " case" : "")} onClick={() => onPick(p.id)}>
+              <div className="level-num">{invest ? "🔍" : numberOf.get(p.id)}</div>
               <div className="level-body">
                 <h3>
                   {p.title}
-                  {done && <span className="done-tick"> ✓</span>}
+                  {done && <span className="done-tick"> {invest ? "· encerrado" : "✓"}</span>}
                 </h3>
                 <p className="level-meta">
-                  {diffWord(p.difficulty)} · {p.size}×{p.categories.length}
+                  {invest
+                    ? `Caso ${numberOf.get(p.id)} · ${diffWord(p.difficulty)} · ${p.size} suspeitos`
+                    : `${diffWord(p.difficulty)} · ${p.size}×${p.categories.length}`}
                 </p>
                 {rec != null ? (
                   <span className="level-diff">🏆 recorde {formatTime(rec)}</span>
@@ -122,7 +143,7 @@ export function Home({
       </div>
 
       <p className="home-foot">
-        {doneCount}/{puzzles.length} fases concluídas
+        {doneCount}/{puzzles.length} {invest ? "casos encerrados" : "fases concluídas"}
       </p>
     </div>
   );

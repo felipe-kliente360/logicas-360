@@ -87,6 +87,8 @@ export function Board({ puzzle, settings, nextId, allDone, onBack, onNext, onSol
   const [shake, setShake] = useState(false);
   const [infoOpen, setInfoOpen] = useState(false);
   const [confirmClear, setConfirmClear] = useState(false);
+  const [accuseOpen, setAccuseOpen] = useState(false);
+  const isWho = puzzle.kind === "whodunit";
   const litTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
   const toastTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
   const shakeTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
@@ -248,33 +250,58 @@ export function Board({ puzzle, settings, nextId, allDone, onBack, onNext, onSol
     return seatMatches(board, puzzle, pos);
   }
 
+  const gridCorrect = () =>
+    puzzle.categories.every((c) => board[c.id].every((v, p) => v === puzzle.solution[c.id][p]));
+
+  function triggerWin() {
+    const ms = Date.now() - startRef.current;
+    setElapsed(ms);
+    setRunning(false);
+    const { best, isNew } = submitTime(puzzle.id, ms);
+    setRecord(best);
+    setResult({ ms, isNew });
+    wonRef.current = true;
+    setWon(true);
+    clearInProgress(puzzle.id);
+    clearHints(puzzle.id);
+    winChime(settings.som);
+    buzz(settings.vib, [18, 40, 18]);
+    onSolved();
+  }
+
+  function wrongShake(msg: string) {
+    showToast(msg);
+    buzz(settings.vib, 40);
+    setShake(true);
+    if (shakeTimer.current) clearTimeout(shakeTimer.current);
+    shakeTimer.current = setTimeout(() => setShake(false), 500);
+  }
+
   function check() {
     if (filled < totalSlots) {
       showToast("Preencha todas as posições.");
       return;
     }
-    const ok = puzzle.categories.every((c) => board[c.id].every((v, p) => v === puzzle.solution[c.id][p]));
-    if (ok) {
-      const ms = Date.now() - startRef.current;
-      setElapsed(ms);
-      setRunning(false);
-      const { best, isNew } = submitTime(puzzle.id, ms);
-      setRecord(best);
-      setResult({ ms, isNew });
-      wonRef.current = true;
-      setWon(true);
-      clearInProgress(puzzle.id);
-      clearHints(puzzle.id); // fase concluída: ajudas voltam ao máximo num próximo jogo
-      winChime(settings.som);
-      buzz(settings.vib, [18, 40, 18]);
-      onSolved();
-    } else {
-      showToast("Ainda não — revise as pistas.");
-      buzz(settings.vib, 40);
-      setShake(true);
-      if (shakeTimer.current) clearTimeout(shakeTimer.current);
-      shakeTimer.current = setTimeout(() => setShake(false), 500);
+    if (gridCorrect()) triggerWin();
+    else wrongShake("Ainda não — revise as pistas.");
+  }
+
+  // whodunit: acusar um suspeito. Exige a grade resolvida E o culpado certo.
+  function accuse(idx: number) {
+    setAccuseOpen(false);
+    if (filled < totalSlots) {
+      showToast("Complete a investigação antes de acusar.");
+      return;
     }
+    if (!gridCorrect()) {
+      wrongShake("Algo não bate nas evidências — revise a grade.");
+      return;
+    }
+    if (idx !== puzzle.culprit) {
+      showToast("As evidências apontam outra pessoa…");
+      return;
+    }
+    triggerWin();
   }
 
   // Limpar/reiniciar: zera o tabuleiro MAS mantém as posições cravadas pela ajuda
@@ -304,7 +331,7 @@ export function Board({ puzzle, settings, nextId, allDone, onBack, onNext, onSol
     []
   );
 
-  const source = (puzzle.source ?? "desafio").toUpperCase();
+  const source = isWho ? "INVESTIGAÇÃO" : (puzzle.source ?? "desafio").toUpperCase();
   const showComoLer = puzzle.spine.ordered && !!puzzle.spine.referential;
 
   return (
@@ -358,6 +385,25 @@ export function Board({ puzzle, settings, nextId, allDone, onBack, onNext, onSol
           <p className="story-text">{puzzle.story}</p>
         </div>
       </section>
+
+      {/* briefing do crime (whodunit) */}
+      {isWho && puzzle.crime && (
+        <section className="briefing">
+          <h2>🔍 O que sabemos do crime</h2>
+          <p className="briefing-q">{puzzle.crime.prompt}</p>
+          <div className="evidence">
+            {puzzle.crime.evidence.map((e, i) => {
+              const cat = puzzle.categories.find((c) => c.id === e.cat);
+              const val = cat?.values.find((v) => v.id === e.value);
+              return (
+                <span className="ev-chip" key={i}>
+                  <span className="ev-cat">{cat?.label}</span> {val?.label ?? e.value}
+                </span>
+              );
+            })}
+          </div>
+        </section>
+      )}
 
       {/* pistas */}
       <section className={"clues" + (openClues ? " open" : "")}>
@@ -424,9 +470,19 @@ export function Board({ puzzle, settings, nextId, allDone, onBack, onNext, onSol
           >
             <IconRefresh />
           </button>
-          <button className="act primary verificar" onClick={check} disabled={filled < totalSlots}>
-            <IconCheck /> Verificar
-          </button>
+          {isWho ? (
+            <button
+              className="act primary verificar"
+              onClick={() => setAccuseOpen(true)}
+              disabled={filled < totalSlots}
+            >
+              🔍 Acusar
+            </button>
+          ) : (
+            <button className="act primary verificar" onClick={check} disabled={filled < totalSlots}>
+              <IconCheck /> Verificar
+            </button>
+          )}
           <button
             className="act help"
             onClick={hint}
@@ -517,6 +573,26 @@ export function Board({ puzzle, settings, nextId, allDone, onBack, onNext, onSol
         onClose={() => setSheet(null)}
       />
 
+      {/* sheet de acusação (whodunit) */}
+      {isWho && (
+        <>
+          <div className={"scrim" + (accuseOpen ? " show" : "")} onClick={() => setAccuseOpen(false)} />
+          <div className={"sheet" + (accuseOpen ? " show" : "")} role="dialog" aria-modal="true">
+            <div className="grab" />
+            <h3>Apontar o culpado</h3>
+            <div className="ctx">{puzzle.crime?.prompt}</div>
+            <div className="opts">
+              {puzzle.spine.labels.map((name, i) => (
+                <button className="opt accuse" key={i} onClick={() => accuse(i)}>
+                  <span className="name">{name}</span>
+                  <span className="used">acusar →</span>
+                </button>
+              ))}
+            </div>
+          </div>
+        </>
+      )}
+
       {/* toast */}
       <div className={"toast" + (toast ? " show" : "")}>{toast}</div>
 
@@ -530,11 +606,14 @@ export function Board({ puzzle, settings, nextId, allDone, onBack, onNext, onSol
             <i style={{ top: 200, right: 64, width: 7, height: 7, borderRadius: 2, background: "var(--glow)", transform: "rotate(35deg)", animationDelay: ".15s" }} />
           </div>
         )}
-        <div className="win-medal">✓</div>
-        <div className="win-eyebrow">Puzzle resolvido</div>
-        <div className="win-title">Resolvido!</div>
+        <div className="win-medal">{isWho ? "🕵️" : "✓"}</div>
+        {isWho && <div className="stamp win-stamp">Caso fechado</div>}
+        <div className="win-eyebrow">{isWho ? "Caso encerrado" : "Puzzle resolvido"}</div>
+        <div className="win-title">{isWho ? "Caso resolvido!" : "Resolvido!"}</div>
         <p className="win-sub">
-          {puzzle.title} · nível {puzzle.difficulty}
+          {isWho && puzzle.culprit != null
+            ? `Culpado: ${puzzle.spine.labels[puzzle.culprit]}`
+            : `${puzzle.title} · nível ${puzzle.difficulty}`}
         </p>
         <div className="win-stats">
           <div className="win-stat">

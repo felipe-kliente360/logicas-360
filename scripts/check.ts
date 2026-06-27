@@ -20,9 +20,19 @@ if (!puzzle) {
 const sols = countSolutions(puzzle, 2);
 console.log("id:", puzzle.id);
 console.log("solutions:", sols, sols === 1 ? "✓ ÚNICA" : "✗ NÃO-ÚNICA (revise as pistas)");
+let culpritOk = true;
 if (sols === 1) {
   const { score, trace } = difficultyScore(puzzle);
-  console.log("solution:", JSON.stringify(solve(puzzle)));
+  const g = solve(puzzle)!;
+  console.log("solution:", JSON.stringify(g));
   console.log("nossa-dificuldade:", score + "/10", "| fonte:", puzzle.sourceDifficulty ?? "—", "| prop:", trace.propagationSolved, "| nós:", trace.searchNodes);
+  if (puzzle.kind === "whodunit" && puzzle.crime) {
+    const matches = puzzle.spine.labels
+      .map((_, i) => i)
+      .filter((i) => puzzle.crime!.evidence.every((e) => g[e.cat]?.[i] === e.value));
+    culpritOk = matches.length === 1;
+    const who = matches.map((i) => puzzle.spine.labels[i]).join(", ") || "(ninguém)";
+    console.log("culpado:", who, culpritOk ? "✓ ÚNICO" : "✗ AMBÍGUO/NENHUM (revise as evidências)");
+  }
 }
-process.exit(sols === 1 ? 0 : 1);
+process.exit(sols === 1 && culpritOk ? 0 : 1);
