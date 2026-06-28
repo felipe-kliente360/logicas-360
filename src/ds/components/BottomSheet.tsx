@@ -16,6 +16,7 @@ interface Props {
   lockedPos?: Set<number>; // posições cravadas por ajuda nesta categoria
   posLabel?: (i: number) => string; // rótulo da posição i (ex.: "2 anos", "R$ 60")
   ruledOut?: Set<string>; // valores marcados como "não é aqui" nesta posição
+  highlightValue?: string; // tutorial: destaca a opção certa
   onToggleNote?: (valueId: string) => void;
   onPick: (valueId: string, movedFrom: number) => void;
   onClose: () => void;
@@ -28,6 +29,7 @@ export function BottomSheet({
   lockedPos,
   posLabel,
   ruledOut,
+  highlightValue,
   onToggleNote,
   onPick,
   onClose,
@@ -60,7 +62,8 @@ export function BottomSheet({
                   (isCurrent ? " current" : "") +
                   (lockedElsewhere ? " locked" : "") +
                   (movable ? " taken" : "") +
-                  (ruled ? " ruled" : "")
+                  (ruled ? " ruled" : "") +
+                  (v.id === highlightValue ? " tut-on" : "")
                 }
                 onClick={() => {
                   if (lockedElsewhere) return; // não move um valor cravado

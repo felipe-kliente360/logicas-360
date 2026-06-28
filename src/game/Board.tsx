@@ -36,6 +36,13 @@ import {
 } from "../ds/components/icons";
 
 type Board = Record<string, (string | null)[]>;
+type TutStep = {
+  text: string;
+  intro?: boolean;
+  slot?: { cat: string; pos: number; value: string };
+  accuseBtn?: boolean;
+  accuseOpt?: boolean;
+};
 
 function emptyBoard(puzzle: Puzzle): Board {
   const b: Board = {};
@@ -104,6 +111,9 @@ export function Board({ puzzle, settings, nextId, allDone, onBack, onNext, onSol
   const [confirmClear, setConfirmClear] = useState(false);
   const [accuseOpen, setAccuseOpen] = useState(false);
   const isWho = puzzle.kind === "whodunit";
+  // tutorial guiado (só no caso de treino, na primeira vez)
+  const isTutorial = puzzle.id === "sumico-padaria";
+  const [tut, setTut] = useState<number>(() => (isTutorial && !getCaseRecord(puzzle.id) ? 0 : -1));
   const litTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
   const toastTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
   const shakeTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
@@ -129,6 +139,30 @@ export function Board({ puzzle, settings, nextId, allDone, onBack, onNext, onSol
     puzzle.categories.forEach((c) => m.set(c.id, new Map(c.values.map((v, i) => [v.id, i]))));
     return (catId: string, valId: string | null) => (valId ? m.get(catId)?.get(valId) : undefined);
   }, [puzzle]);
+
+  // roteiro do tutorial: intro → preenche cada campo (na ordem que deixa o balcão
+  // por último) → abre Acusar → aponta o culpado.
+  const tutSteps = useMemo<TutStep[]>(() => {
+    if (!isTutorial) return [];
+    const order: [string, number][] = [
+      ["item", 0], ["item", 1], ["item", 2], ["lugar", 1], ["lugar", 2], ["lugar", 0],
+    ];
+    const fills: TutStep[] = order.map(([cat, pos]) => {
+      const value = puzzle.solution[cat]?.[pos] as string;
+      const vlabel = valueOf(cat, value)?.label ?? value;
+      const clabel = puzzle.categories.find((c) => c.id === cat)?.label ?? cat;
+      return { text: `Toque no campo ${clabel} de ${puzzle.spine.labels[pos]} e escolha ${vlabel}.`, slot: { cat, pos, value } };
+    });
+    return [
+      { text: "Bem-vindo, detetive. Vou te guiar até o culpado neste caso de treino.", intro: true },
+      ...fills,
+      { text: "Grade fechada! A câmera flagrou o culpado no balcão. Toque em Acusar.", accuseBtn: true },
+      { text: "Quem ficou no balcão? Aponte o culpado.", accuseOpt: true },
+    ];
+  }, [isTutorial, puzzle, valueOf]);
+  const tcur = tut >= 0 ? tutSteps[tut] : undefined;
+  const tutSlot = tcur?.slot;
+  const tutAccuseIdx = tcur?.accuseOpt ? puzzle.culprit ?? -1 : -1;
 
   const filled = puzzle.categories.reduce((a, c) => a + board[c.id].filter(Boolean).length, 0);
 
@@ -170,6 +204,21 @@ export function Board({ puzzle, settings, nextId, allDone, onBack, onNext, onSol
   useEffect(() => {
     persist();
   }, [board, notes, persist]);
+
+  // tutorial: avança ao preencher o campo guiado (passos 1..6) ou ao abrir Acusar (7→8)
+  useEffect(() => {
+    if (tut < 1 || !isTutorial) return;
+    let s = tut;
+    while (s >= 1 && s <= 6) {
+      const st = tutSteps[s];
+      if (st?.slot && board[st.slot.cat][st.slot.pos] === st.slot.value) s++;
+      else break;
+    }
+    if (s !== tut) setTut(s);
+  }, [board, tut, isTutorial, tutSteps]);
+  useEffect(() => {
+    if (isTutorial && tut === 7 && accuseOpen) setTut(8);
+  }, [accuseOpen, tut, isTutorial]);
 
   useEffect(() => {
     const onHide = () => persist();
@@ -387,7 +436,7 @@ export function Board({ puzzle, settings, nextId, allDone, onBack, onNext, onSol
   const showComoLer = puzzle.spine.ordered && !!puzzle.spine.referential;
 
   return (
-    <div className="app screen-in">
+    <div className={"app screen-in" + (isTutorial && tut >= 0 ? " tut-active" : "")}>
       <div className="topbar">
           <button className="backbtn" onClick={onBack} aria-label="Voltar para as fases">
             ‹ Fases
@@ -486,7 +535,13 @@ export function Board({ puzzle, settings, nextId, allDone, onBack, onNext, onSol
                 return (
                   <button
                     key={cat.id}
-                    className={"slot" + (v ? " filled" : "") + (isLit(cat.id, p) ? " lit" : "") + (locked ? " locked" : "")}
+                    className={
+                      "slot" +
+                      (v ? " filled" : "") +
+                      (isLit(cat.id, p) ? " lit" : "") +
+                      (locked ? " locked" : "") +
+                      (tutSlot && tutSlot.cat === cat.id && tutSlot.pos === p ? " tut-on" : "")
+                    }
                     onClick={locked ? undefined : () => setSheet({ cat, pos: p })}
                     aria-disabled={locked}
                   >
@@ -525,7 +580,10 @@ export function Board({ puzzle, settings, nextId, allDone, onBack, onNext, onSol
             <IconRefresh />
           </button>
           {isWho ? (
-            <button className="act primary verificar" onClick={() => setAccuseOpen(true)}>
+            <button
+              className={"act primary verificar" + (tcur?.accuseBtn ? " tut-on" : "")}
+              onClick={() => setAccuseOpen(true)}
+            >
               <IconSearch size={18} /> Acusar{accusations > 0 ? ` · ${accusations}ª` : ""}
             </button>
           ) : (
@@ -545,6 +603,28 @@ export function Board({ puzzle, settings, nextId, allDone, onBack, onNext, onSol
           </button>
         </div>
       </div>
+
+      {/* coach do tutorial (caso de treino) */}
+      {isTutorial && tcur && !won && (
+        <div className="coach">
+          <div className="coach-card">
+            <span className="coach-step">
+              Treino · passo {Math.min(tut + 1, tutSteps.length)} de {tutSteps.length}
+            </span>
+            <p>{tcur.text}</p>
+            <div className="coach-actions">
+              {tcur.intro && (
+                <button className="mini glow" onClick={() => setTut(1)}>
+                  Começar
+                </button>
+              )}
+              <button className="coach-skip" onClick={() => setTut(-1)}>
+                Pular tutorial
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
 
       {/* confirmação de limpar (duplo fator) */}
       {confirmClear && (
@@ -618,6 +698,9 @@ export function Board({ puzzle, settings, nextId, allDone, onBack, onNext, onSol
               )
             : undefined
         }
+        highlightValue={
+          tutSlot && sheet && sheet.cat.id === tutSlot.cat && sheet.pos === tutSlot.pos ? tutSlot.value : undefined
+        }
         onToggleNote={(valueId) => sheet && toggleNote(sheet.cat.id, sheet.pos, valueId)}
         onPick={pick}
         onClose={() => setSheet(null)}
@@ -635,7 +718,7 @@ export function Board({ puzzle, settings, nextId, allDone, onBack, onNext, onSol
               {puzzle.spine.labels.map((name, i) => {
                 const ok = accusationSupported(i);
                 return (
-                  <button className={"opt accuse" + (ok ? "" : " taken")} key={i} onClick={() => accuse(i)}>
+                  <button className={"opt accuse" + (ok ? "" : " taken") + (tutAccuseIdx === i ? " tut-on" : "")} key={i} onClick={() => accuse(i)}>
                     <span className="name">{name}</span>
                     <span className="used">{ok ? "acusar →" : "faltam evidências"}</span>
                   </button>

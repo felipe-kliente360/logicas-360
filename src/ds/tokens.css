@@ -1623,6 +1623,31 @@ button.act {
   gap: 12px;
   margin: 16px 0 2px;
 }
+/* selo CONFIDENCIAL reto, junto ao topo */
+.confid-row {
+  margin: 14px 0 2px;
+}
+.confidential {
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  font-family: var(--font-mono), monospace;
+  font-size: 10.5px;
+  font-weight: 800;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+  color: var(--glow);
+  border: 2px solid var(--glow);
+  border-radius: 5px;
+  padding: 4px 10px;
+}
+.confidential::before {
+  content: "";
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: var(--glow);
+}
 /* headline do arquivo — sempre em uma única linha (escala com a largura) */
 .headline {
   margin: 8px 0 0;
@@ -1692,6 +1717,87 @@ button.act {
 .learn-banner > svg {
   color: var(--glow);
   flex: 0 0 auto;
+}
+
+/* ===== Tutorial guiado (caso de treino) ===== */
+/* alvo do passo atual: anel pulsante */
+.tut-on {
+  outline: 2px solid var(--glow);
+  outline-offset: 2px;
+  animation: tutPulse 1.3s ease-in-out infinite;
+}
+@keyframes tutPulse {
+  0%, 100% { outline-color: color-mix(in srgb, var(--glow) 50%, transparent); }
+  50% { outline-color: var(--glow); }
+}
+/* durante o tutorial, sobra de rolagem pra qualquer campo subir acima do coach */
+.app.tut-active {
+  padding-bottom: calc(var(--bar-h, 72px) + 168px);
+}
+.coach {
+  position: fixed;
+  left: 0;
+  right: 0;
+  bottom: calc(var(--bar-h, 72px) + env(safe-area-inset-bottom) + 12px);
+  z-index: 6;
+  display: flex;
+  justify-content: center;
+  padding: 0 16px;
+  pointer-events: none;
+}
+.coach-card {
+  pointer-events: auto;
+  max-width: 460px;
+  width: 100%;
+  background: var(--card);
+  border: 1px solid var(--glow);
+  border-radius: 14px;
+  padding: 13px 15px;
+  box-shadow: 0 14px 40px -12px rgba(0, 0, 0, 0.6), 0 0 0 4px var(--glow-soft);
+  animation: coachIn 0.3s ease;
+}
+@keyframes coachIn {
+  from { opacity: 0; transform: translateY(8px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+.coach-step {
+  font-family: var(--font-mono), monospace;
+  font-size: 10px;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  color: var(--glow);
+}
+.coach-card p {
+  margin: 5px 0 0;
+  font-size: 14.5px;
+  font-weight: 600;
+  color: var(--ink);
+  line-height: 1.4;
+}
+.coach-actions {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  margin-top: 11px;
+}
+.coach-skip {
+  margin-left: auto;
+  background: none;
+  border: none;
+  font-family: var(--font-mono), monospace;
+  font-size: 11px;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--ink-faint);
+  cursor: pointer;
+}
+.mini.glow {
+  background: var(--glow);
+  color: var(--on-glow);
+  border: none;
+}
+@media (prefers-reduced-motion: reduce) {
+  .tut-on { animation: none; outline-color: var(--glow); }
 }
 .opt.accuse .name {
   font-weight: 700;

@@ -60,7 +60,7 @@ export function Home({
           <div className="brand">
             <Logo size={40} />
             <p className="eyebrow" style={{ margin: 0 }}>
-              Investigação &amp; Lógica
+              Investigações
             </p>
           </div>
           <button className="iconbtn" onClick={onOpenSettings} aria-label="Configurações">
@@ -68,12 +68,12 @@ export function Home({
           </button>
         </div>
 
-        <div className="dossie-cover">
-          <span className="stamp cover-stamp">Confidencial</span>
+        <div className="confid-row">
+          <span className="confidential">Confidencial</span>
         </div>
 
         <h1>Arquivo Nº 360</h1>
-        <p className="headline">Entenda o caso e aponte o culpado.</p>
+        <p className="headline">Junte as pistas e aponte o culpado.</p>
         <div className="progress" style={{ marginTop: 16 }}>
           <div className="pbar">
             <div
