@@ -42,7 +42,7 @@ export function BottomSheet({
         <h3>{target?.cat.label ?? ""}</h3>
         <div className="ctx">{spineLabel}</div>
         <div className="opts">
-          {target?.cat.values.map((v: CategoryValue) => {
+          {target?.cat.values.map((v: CategoryValue, vi: number) => {
             const usedAt = column.indexOf(v.id);
             const usedElsewhere = usedAt !== -1 && usedAt !== target.pos;
             const isCurrent = v.id === current;
@@ -67,7 +67,7 @@ export function BottomSheet({
                 }}
               >
                 <span className="opt-swatch">
-                  <Swatch value={v} />
+                  <Swatch value={v} index={vi} />
                   {ruled && <span className="opt-x" aria-hidden>✕</span>}
                 </span>
                 <span className="name">{v.label}</span>

@@ -110,6 +110,12 @@ export function Board({ puzzle, settings, nextId, allDone, onBack, onNext, onSol
     puzzle.categories.forEach((c) => m.set(c.id, new Map(c.values.map((v) => [v.id, v]))));
     return (catId: string, valId: string | null) => (valId ? m.get(catId)?.get(valId) : undefined);
   }, [puzzle]);
+  // índice do valor dentro da categoria — dá a cor estável da etiqueta (Swatch)
+  const valIndex = useMemo(() => {
+    const m = new Map<string, Map<string, number>>();
+    puzzle.categories.forEach((c) => m.set(c.id, new Map(c.values.map((v, i) => [v.id, i]))));
+    return (catId: string, valId: string | null) => (valId ? m.get(catId)?.get(valId) : undefined);
+  }, [puzzle]);
 
   const filled = puzzle.categories.reduce((a, c) => a + board[c.id].filter(Boolean).length, 0);
 
@@ -229,7 +235,16 @@ export function Board({ puzzle, settings, nextId, allDone, onBack, onNext, onSol
       showToast("Tudo já preenchido — toque em Verificar.");
       return;
     }
-    const pick = wrong[Math.floor(Math.random() * wrong.length)];
+    // numa investigação, a dica nunca entrega um atributo da evidência do crime
+    // (seria atalho — não exigimos a grade inteira pra acusar). Só cai nesses
+    // como último recurso, se for o único que falta.
+    const evCells =
+      isWho && puzzle.culprit != null
+        ? new Set((puzzle.crime?.evidence ?? []).map((e) => cellKey(e.cat, puzzle.culprit!)))
+        : null;
+    const pool = evCells ? wrong.filter((w) => !evCells.has(cellKey(w.cat, w.pos))) : wrong;
+    const from = pool.length > 0 ? pool : wrong;
+    const pick = from[Math.floor(Math.random() * from.length)];
     const val = puzzle.solution[pick.cat][pick.pos];
     const col = [...board[pick.cat]];
     const dup = col.indexOf(val); // mantém permutação: tira o valor de onde estava
@@ -415,17 +430,6 @@ export function Board({ puzzle, settings, nextId, allDone, onBack, onNext, onSol
         <section className="briefing">
           <h2>🔍 O que sabemos do crime</h2>
           <p className="briefing-q">{puzzle.crime.prompt}</p>
-          <div className="evidence">
-            {puzzle.crime.evidence.map((e, i) => {
-              const cat = puzzle.categories.find((c) => c.id === e.cat);
-              const val = cat?.values.find((v) => v.id === e.value);
-              return (
-                <span className="ev-chip" key={i}>
-                  <span className="ev-cat">{cat?.label}</span> {val?.label ?? e.value}
-                </span>
-              );
-            })}
-          </div>
         </section>
       )}
 
@@ -463,7 +467,7 @@ export function Board({ puzzle, settings, nextId, allDone, onBack, onNext, onSol
                     onClick={locked ? undefined : () => setSheet({ cat, pos: p })}
                     aria-disabled={locked}
                   >
-                    <Swatch value={v} />
+                    <Swatch value={v} index={valIndex(cat.id, board[cat.id][p])} />
                     <span className="scol">
                       <span className="slabel">{cat.label}</span>
                       <span className="sval">{v ? v.label : "tocar para escolher"}</span>

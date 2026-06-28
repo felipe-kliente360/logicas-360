@@ -97,7 +97,7 @@ export const puzzle: Puzzle = {
     },
   ],
   crime: {
-    prompt: "Quem matou o colecionador?",
+    prompt: "O legista crava a morte às 23h, e foi no salão que o golpe partiu. Cruzando o salão com as 23h, quem matou o colecionador?",
     evidence: [
       { cat: "comodo", value: "Salao" },
       { cat: "hora", value: "23h" },

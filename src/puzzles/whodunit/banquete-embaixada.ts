@@ -237,7 +237,7 @@ export const puzzle: Puzzle = {
     },
   ],
   crime: {
-    prompt: "Quem envenenou o cônsul?",
+    prompt: "A perícia é taxativa: o veneno veio na taça de champanhe, o brinde fatal foi às 22h e o estopim foi um caso de espionagem. Cruzando o serviço, o horário e o motivo, quem envenenou o cônsul?",
     evidence: [
       { cat: "servico", value: "Champanhe" },
       { cat: "hora", value: "22h" },

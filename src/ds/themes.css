@@ -75,7 +75,41 @@
   mix-blend-mode: multiply;
 }
 [data-theme="dossie"] .eyebrow {
-  color: #a8392a;
+  color: var(--glow);
+}
+
+/* ===== Dossiê NOIR (investigações no modo escuro) — mesa às escuras + abajur ===== */
+[data-mode="dark"][data-theme="dossie"] {
+  --bg: #17130f;
+  --bg2: #1d1812;
+  --card: #29221a;
+  --card2: #332a20;
+  --line: #4b3d2c;
+  --ink: #f0e6d2;
+  --ink-dim: #c7b794;
+  --ink-faint: #948363;
+  --glow: #e2563d; /* tinta de carimbo, viva no escuro */
+  --glow2: #f06b4f;
+  --glow-soft: rgba(226, 86, 61, 0.2);
+  --on-glow: #1b120e;
+}
+/* textura: grão de papel claro sobre a mesa escura + leve vinheta de abajur */
+[data-mode="dark"][data-theme="dossie"] .app,
+[data-mode="dark"][data-theme="dossie"] .home {
+  background-image: radial-gradient(rgba(214, 198, 160, 0.05) 1px, transparent 1px),
+    radial-gradient(rgba(214, 198, 160, 0.04) 1px, transparent 1px),
+    radial-gradient(130% 90% at 50% -8%, rgba(226, 150, 90, 0.07), transparent 62%);
+  background-size: 11px 11px, 17px 17px, 100% 100%;
+  background-position: 0 0, 6px 9px, 0 0;
+  background-attachment: scroll, scroll, fixed;
+}
+/* carimbo no escuro: tinta viva, sem multiply (que sumiria no fundo escuro) */
+[data-mode="dark"][data-theme="dossie"] .stamp {
+  color: var(--glow);
+  border-color: var(--glow);
+  mix-blend-mode: normal;
+  opacity: 0.92;
+  box-shadow: 0 0 0 1px rgba(226, 86, 61, 0.22) inset, 0 0 14px rgba(226, 86, 61, 0.12);
 }
 
 /* ---- motif: chuva (só no mundo do ponto de ônibus) ---- */

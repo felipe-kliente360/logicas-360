@@ -216,7 +216,7 @@ export const puzzle: Puzzle = {
     },
   ],
   crime: {
-    prompt: "Quem matou o diretor do teatro?",
+    prompt: "O legista é taxativo: a morte veio do veneno, o relógio do fosso parou às 20h e o estopim foi a disputa pela herança. Cruzando a arma, o horário e o motivo, quem matou o diretor do teatro?",
     evidence: [
       { cat: "arma", value: "Veneno" },
       { cat: "hora", value: "20h" },

@@ -217,7 +217,7 @@ export const puzzle: Puzzle = {
     },
   ],
   crime: {
-    prompt: "Quem sabotou o carro e matou o chefe de equipe?",
+    prompt: "A perícia é taxativa: a porca foi forçada com uma chave inglesa, o cronômetro do box parou às 14h e o estopim foi a guerra pelo patrocínio. Cruzando a ferramenta, o horário e o motivo, quem sabotou o carro e matou o chefe de equipe?",
     evidence: [
       { cat: "ferramenta", value: "ChaveInglesa" },
       { cat: "hora", value: "14h" },

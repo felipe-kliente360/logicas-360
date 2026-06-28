@@ -2,7 +2,36 @@
 // O mesmo componente serve qualquer mundo — é isso que mantém o DS genérico.
 import type { CategoryValue } from "../../engine/types";
 
-export function Swatch({ value }: { value?: CategoryValue }) {
+// Paleta de etiquetas — cores distintas, tom médio (texto branco legível por cima).
+// Pensada p/ ler bem tanto no papel pardo claro quanto no dossiê noir (dark).
+const PALETTE = [
+  "#b8473a", // vermelho-tijolo
+  "#c97b2c", // âmbar
+  "#3f8f7d", // verde-azulado
+  "#41699c", // azul-tinta
+  "#8a5fa6", // ametista
+  "#7a8a39", // oliva
+  "#c25775", // rosé
+  "#5a7d8c", // azul-ardósia
+  "#a86a3c", // ocre
+  "#5b8a52", // musgo
+  "#a4823a", // mostarda
+  "#7a5cc4", // violeta
+];
+
+// hash estável p/ quando não recebemos o índice (cor determinística por id)
+function hashIndex(id: string): number {
+  let h = 0;
+  for (let i = 0; i < id.length; i++) h = (h * 31 + id.charCodeAt(i)) >>> 0;
+  return h % PALETTE.length;
+}
+
+export function swatchTint(index: number): string {
+  const i = ((index % PALETTE.length) + PALETTE.length) % PALETTE.length;
+  return PALETTE[i];
+}
+
+export function Swatch({ value, index }: { value?: CategoryValue; index?: number }) {
   if (!value) return <span className="dot" aria-hidden />;
   const d = value.display;
   if (d.kind === "color") {
@@ -15,10 +44,11 @@ export function Swatch({ value }: { value?: CategoryValue }) {
       </span>
     );
   }
-  // texto: marca neutra com a inicial
+  // texto: etiqueta colorida + inicial em alto contraste (legível, nada de hachura)
+  const tint = swatchTint(index ?? hashIndex(value.id));
   return (
-    <span className="dot" aria-hidden>
-      <span style={{ fontSize: 11, fontWeight: 700, color: "var(--ink-dim)" }}>{value.label.charAt(0)}</span>
+    <span className="dot tint" style={{ background: tint }} aria-hidden>
+      <span className="dot-i">{value.label.charAt(0).toUpperCase()}</span>
     </span>
   );
 }
