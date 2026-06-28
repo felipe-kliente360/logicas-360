@@ -114,6 +114,7 @@ export function Board({ puzzle, settings, nextId, allDone, onBack, onNext, onSol
   // tutorial guiado (só no caso de treino, na primeira vez)
   const isTutorial = puzzle.id === "sumico-padaria";
   const [tut, setTut] = useState<number>(() => (isTutorial && !getCaseRecord(puzzle.id) ? 0 : -1));
+  const [tutFlash, setTutFlash] = useState(false); // pisca o alvo logo após o auto-scroll
   const litTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
   const toastTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
   const shakeTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
@@ -219,6 +220,22 @@ export function Board({ puzzle, settings, nextId, allDone, onBack, onNext, onSol
   useEffect(() => {
     if (isTutorial && tut === 7 && accuseOpen) setTut(8);
   }, [accuseOpen, tut, isTutorial]);
+
+  // a cada passo do tutorial: traz o próximo alvo pra tela (auto-scroll) e pisca nele
+  useEffect(() => {
+    if (tut < 0 || !isTutorial || won) return;
+    setTutFlash(false);
+    const t1 = setTimeout(() => {
+      const el = document.querySelector<HTMLElement>(".tut-on");
+      el?.scrollIntoView({ block: "center", behavior: "smooth" });
+      setTutFlash(true);
+    }, 60);
+    const t2 = setTimeout(() => setTutFlash(false), 1500);
+    return () => {
+      clearTimeout(t1);
+      clearTimeout(t2);
+    };
+  }, [tut, isTutorial, won]);
 
   useEffect(() => {
     const onHide = () => persist();
@@ -540,7 +557,7 @@ export function Board({ puzzle, settings, nextId, allDone, onBack, onNext, onSol
                       (v ? " filled" : "") +
                       (isLit(cat.id, p) ? " lit" : "") +
                       (locked ? " locked" : "") +
-                      (tutSlot && tutSlot.cat === cat.id && tutSlot.pos === p ? " tut-on" : "")
+                      (tutSlot && tutSlot.cat === cat.id && tutSlot.pos === p ? " tut-on" + (tutFlash ? " tut-flash" : "") : "")
                     }
                     onClick={locked ? undefined : () => setSheet({ cat, pos: p })}
                     aria-disabled={locked}
@@ -581,7 +598,7 @@ export function Board({ puzzle, settings, nextId, allDone, onBack, onNext, onSol
           </button>
           {isWho ? (
             <button
-              className={"act primary verificar" + (tcur?.accuseBtn ? " tut-on" : "")}
+              className={"act primary verificar" + (tcur?.accuseBtn ? " tut-on" + (tutFlash ? " tut-flash" : "") : "")}
               onClick={() => setAccuseOpen(true)}
             >
               <IconSearch size={18} /> Acusar{accusations > 0 ? ` · ${accusations}ª` : ""}
@@ -718,7 +735,7 @@ export function Board({ puzzle, settings, nextId, allDone, onBack, onNext, onSol
               {puzzle.spine.labels.map((name, i) => {
                 const ok = accusationSupported(i);
                 return (
-                  <button className={"opt accuse" + (ok ? "" : " taken") + (tutAccuseIdx === i ? " tut-on" : "")} key={i} onClick={() => accuse(i)}>
+                  <button className={"opt accuse" + (ok ? "" : " taken") + (tutAccuseIdx === i ? " tut-on" + (tutFlash ? " tut-flash" : "") : "")} key={i} onClick={() => accuse(i)}>
                     <span className="name">{name}</span>
                     <span className="used">{ok ? "acusar →" : "faltam evidências"}</span>
                   </button>
