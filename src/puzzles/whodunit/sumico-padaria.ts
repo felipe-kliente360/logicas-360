@@ -18,6 +18,6 @@ export const puzzle: Puzzle = {
     { id:"c5", text:"Seu Tonho mordiscava um sonho.", highlights:[], constraints:[{k:"at",cat:"item",value:"Sonho",pos:1}] },
     { id:"c6", text:"Bia saboreava um cafezinho.", highlights:[], constraints:[{k:"at",cat:"item",value:"Cafezinho",pos:2}] },
   ],
-  crime: { prompt: "A câmera da padaria flagrou o ladrão bem coladinho no balcão, no instante em que a coxinha ainda fumegava. Quem estava no balcão surrupiou a última coxinha?", evidence: [{cat:"lugar",value:"Balcao"}] },
+  crime: { prompt: "A câmera da padaria flagrou, bem no balcão, o vulto que abocanhou a última coxinha ainda quentinha.", evidence: [{cat:"lugar",value:"Balcao"}] },
   solution: {},
 };

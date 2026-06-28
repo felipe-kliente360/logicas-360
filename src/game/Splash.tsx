@@ -1,7 +1,6 @@
 // Abertura: marca + barra de carregamento. Auto-avança após 2300ms; toque pula.
 import { useEffect } from "react";
-
-const MARK = [true, false, false, false, true, false, false, false, true]; // diagonal acesa
+import { Logo } from "../ds/components/Logo";
 
 export function Splash({ onEnter }: { onEnter: () => void }) {
   useEffect(() => {
@@ -12,20 +11,16 @@ export function Splash({ onEnter }: { onEnter: () => void }) {
   return (
     <div className="splash" onClick={onEnter} role="button" aria-label="Entrar">
       <div className="splash-icon">
-        <div className="splash-mark">
-          {MARK.map((on, i) => (
-            <span key={i} className={on ? "on" : ""} />
-          ))}
-        </div>
+        <Logo size={112} />
       </div>
       <div>
         <div className="splash-word">Lógicas 360</div>
-        <div className="splash-eyebrow">Desafios de lógica</div>
+        <div className="splash-eyebrow">Investigação &amp; Lógica</div>
       </div>
       <div className="loadtrack">
         <div className="loadfill" />
       </div>
-      <div className="splash-foot">toque para entrar</div>
+      <div className="splash-foot">toque para abrir o arquivo</div>
     </div>
   );
 }

@@ -142,7 +142,7 @@ export const puzzle: Puzzle = {
   ],
   crime: {
     prompt:
-      "O alarme silencioso soou às 16h, e a pedra mais cobiçada sumiu pela porta dos fundos. Cruzando o local e a hora do golpe, quem assaltou a joalheria?",
+      "O alarme silencioso soou às 16h, e a pedra mais cobiçada sumiu pela porta dos fundos.",
     evidence: [
       { cat: "local", value: "Fundos" },
       { cat: "hora", value: "16h" },

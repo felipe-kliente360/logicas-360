@@ -214,7 +214,7 @@ export const puzzle: Puzzle = {
   ],
   crime: {
     prompt:
-      "A perícia cravou a hora da morte às 22h em ponto, e o setor de origem do alarme silencioso foi a suíte master, o primeiro do plano do iate. Cruzando o horário do crime com a suíte master, quem afundou o anfitrião do Aurora Negra?",
+      "A perícia cravou a hora da morte às 22h em ponto, e o setor de origem do alarme silencioso foi a suíte master, o primeiro do plano do iate.",
     evidence: [
       { cat: "setor", value: "Suite Master" },
       { cat: "hora", value: "22h" },

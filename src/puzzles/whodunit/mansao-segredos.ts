@@ -198,7 +198,7 @@ export const puzzle: Puzzle = {
     },
   ],
   crime: {
-    prompt: "O legista é categórico: a ferida é de adaga, o relógio parado marcava 23h e o testamento recém-aberto aponta a herança como estopim. Cruzando a arma, o horário e o motivo, quem matou o patriarca?",
+    prompt: "O legista é categórico: a ferida é de adaga, o relógio parado marcava 23h e o testamento recém-aberto aponta a herança como estopim.",
     evidence: [
       { cat: "arma", value: "Adaga" },
       { cat: "hora", value: "23h" },

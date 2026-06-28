@@ -241,7 +241,7 @@ export const puzzle: Puzzle = {
   ],
   crime: {
     prompt:
-      "O legista é taxativo: o golpe veio do castiçal, o relógio parou às 02h e o estopim foi o medo da expulsão. Cruzando o objeto, o horário e o motivo, quem matou o herdeiro no internato?",
+      "O legista é taxativo: o golpe veio do castiçal, o relógio parou às 02h e o estopim foi o medo da expulsão.",
     evidence: [
       { cat: "objeto", value: "Castical" },
       { cat: "hora", value: "02h" },

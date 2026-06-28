@@ -54,7 +54,7 @@ export const puzzle: Puzzle = {
     { id: "c20", text: "O Barão Klaus passou a madrugada na mesa de dados.", highlights: [], constraints: [{ k: "at", cat: "mesa", value: "Dados", pos: 4 }] },
   ],
   crime: {
-    prompt: "A perícia cravou a hora da morte às 22h em ponto, e a primeira mesa do salão — a roleta — guardava o estojo da arma. Cruzando o horário do crime com a roleta, quem cometeu o crime no cassino?",
+    prompt: "A perícia cravou a hora da morte às 22h em ponto, e a primeira mesa do salão — a roleta — guardava o estojo da arma.",
     evidence: [
       { cat: "mesa", value: "Roleta" },
       { cat: "hora", value: "22h" },

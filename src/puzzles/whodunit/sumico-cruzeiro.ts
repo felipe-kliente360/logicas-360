@@ -69,7 +69,7 @@ export const puzzle: Puzzle = {
     { id: "c17", text: "O Comandante Vasco não carregava a corda.", highlights: [], constraints: [{ k: "notAt", cat: "objeto", value: "Corda", pos: 0 }] },
   ],
   crime: {
-    prompt: "As buscas fixaram o sumiço às 22h em ponto, e a última imagem da vítima foi captada na ponte de comando. Cruzando o horário do sumiço com a ponte, quem fez a passageira desaparecer no cruzeiro?",
+    prompt: "As buscas fixaram o sumiço às 22h em ponto, e a última imagem da vítima foi captada na ponte de comando.",
     evidence: [
       { cat: "local", value: "Ponte" },
       { cat: "hora", value: "22h" },

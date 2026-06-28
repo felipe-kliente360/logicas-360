@@ -97,7 +97,7 @@ export const puzzle: Puzzle = {
     },
   ],
   crime: {
-    prompt: "O legista crava a morte às 22h, e o corpo caiu no depósito de figurinos. Cruzando o depósito com as 22h, quem matou o ator na noite de estreia?",
+    prompt: "O legista crava a morte às 22h, e o corpo caiu no depósito de figurinos.",
     evidence: [
       { cat: "local", value: "Deposito" },
       { cat: "hora", value: "22h" },

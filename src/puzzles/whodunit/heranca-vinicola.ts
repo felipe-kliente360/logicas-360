@@ -199,7 +199,7 @@ export const puzzle: Puzzle = {
   ],
   crime: {
     prompt:
-      "O legista fixou a morte às 23h em ponto, e a arma foi uma foice de vindima. Cruzando a lâmina com a hora do golpe, quem herdou a vinícola sobre o cadáver do patriarca?",
+      "O legista fixou a morte às 23h em ponto, e a arma foi uma foice de vindima.",
     evidence: [
       { cat: "objeto", value: "Foice" },
       { cat: "hora", value: "23h" },

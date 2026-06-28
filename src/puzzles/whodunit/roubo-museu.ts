@@ -21,7 +21,7 @@ export const puzzle: Puzzle = {
     { id: "c7", text: "Lúcia não estava na Sala Moderna naquela noite.", highlights: [], constraints: [{ k: "notAt", cat: "sala", value: "Moderna", pos: 3 }] },
   ],
   crime: {
-    prompt: "As lentes da segurança flagraram, na sala do Acervo trancado, um vulto de capa comprida escapando com algo a reluzir. Cruzando o Acervo com a capa, quem roubou a Coroa de Âmbar?",
+    prompt: "As lentes da segurança flagraram, na sala do Acervo trancado, um vulto de capa comprida escapando com algo a reluzir.",
     evidence: [{ cat: "sala", value: "Acervo" }, { cat: "disfarce", value: "Capa" }],
   },
   solution: {},

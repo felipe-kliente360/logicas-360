@@ -17,7 +17,7 @@ import {
 
 export default function App() {
   const [splash, setSplash] = useState(true);
-  const [tab, setTab] = useState<HomeTab>("puzzles");
+  const [tab, setTab] = useState<HomeTab>("investigacoes");
   const [activeId, setActiveId] = useState<string | null>(null);
   const [progress, setProgress] = useState<Progress>(() => loadProgress());
   const [settings, setSettings] = useState<SettingsT>(() => loadSettings());

@@ -142,7 +142,7 @@ export const puzzle: Puzzle = {
   ],
   crime: {
     prompt:
-      "A perícia apontou que a dose fatal foi servida às 17h, sob o sol do solário. Cruzando o ambiente e a hora, quem envenenou a hóspede?",
+      "A perícia apontou que a dose fatal foi servida às 17h, sob o sol do solário.",
     evidence: [
       { cat: "ambiente", value: "Solario" },
       { cat: "hora", value: "17h" },

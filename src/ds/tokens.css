@@ -201,18 +201,20 @@ h1.board-h1 {
   border-radius: 99px;
   padding: 6px 12px;
 }
-/* topo fixo da fase: voltar · cronômetro · ajustes acompanham o scroll */
-.app header .topbar {
+/* topo fixo da fase: voltar · cronômetro · ajustes acompanham o scroll.
+   Fica como filho DIRETO de .app (não do <header>, que é curto) — assim o sticky
+   gruda durante toda a rolagem da tela, não só enquanto o header está visível. */
+.app > .topbar {
   position: sticky;
   top: 0;
   z-index: 9;
-  margin: -40px -18px 0;
-  padding: calc(env(safe-area-inset-top) + 9px) 18px 9px;
-  background: color-mix(in srgb, var(--bg) 85%, transparent);
+  margin: 0 -16px;
+  padding: calc(env(safe-area-inset-top) + 11px) 16px 11px;
+  background: color-mix(in srgb, var(--bg) 86%, transparent);
   backdrop-filter: blur(10px);
   -webkit-backdrop-filter: blur(10px);
 }
-.app header .topbar::after {
+.app > .topbar::after {
   content: "";
   position: absolute;
   left: 0;
@@ -1285,28 +1287,15 @@ button.act {
   width: 112px;
   height: 112px;
   border-radius: 28px;
-  background: linear-gradient(160deg, #123a42, #081d22);
-  box-shadow: 0 0 0 1px rgba(127, 227, 209, 0.22), 0 22px 50px -14px var(--glow);
+  box-shadow: 0 22px 50px -14px rgba(0, 0, 0, 0.6), 0 0 0 1px var(--line);
   display: grid;
   place-items: center;
+  overflow: hidden;
   animation: floaty 4s ease-in-out infinite;
 }
-.splash-mark {
-  width: 66px;
-  height: 66px;
-  display: grid;
-  grid-template-columns: repeat(3, 1fr);
-  gap: 7px;
-}
-.splash-mark span {
-  border-radius: 7px;
-  background: #143840;
-  border: 1px solid var(--line);
-}
-.splash-mark span.on {
-  background: linear-gradient(135deg, var(--glow), var(--glow2));
-  box-shadow: 0 0 12px var(--glow);
-  border: none;
+.splash-icon svg {
+  width: 112px;
+  height: 112px;
 }
 .splash-word {
   font-family: var(--font-display), sans-serif;
@@ -1585,4 +1574,15 @@ button.act {
   margin: 16px 0 4px;
   font-size: 22px;
   padding: 9px 20px;
+  /* carimbo "bate" na ficha: vem grande e torto, dá um overshoot e assenta */
+  animation: stampSlam 0.5s cubic-bezier(0.2, 0.9, 0.25, 1) 0.4s both;
+}
+@keyframes stampSlam {
+  0% { opacity: 0; transform: rotate(-26deg) scale(2.7); }
+  55% { opacity: 1; transform: rotate(-7deg) scale(0.84); }
+  74% { transform: rotate(-7deg) scale(1.07); }
+  100% { opacity: 0.9; transform: rotate(-7deg) scale(1); }
+}
+@media (prefers-reduced-motion: reduce) {
+  .win-stamp { animation: none; }
 }

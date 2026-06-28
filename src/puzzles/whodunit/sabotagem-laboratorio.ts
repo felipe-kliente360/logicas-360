@@ -184,7 +184,7 @@ export const puzzle: Puzzle = {
   ],
   crime: {
     prompt:
-      "A perícia cravou a hora da sabotagem às 22h em ponto, e o ponto de adulteração foi a sala limpa, a primeira zona da ala restrita. Cruzando o horário do crime com a sala limpa, quem sabotou o Instituto Helix?",
+      "A perícia cravou a hora da sabotagem às 22h em ponto, e o ponto de adulteração foi a sala limpa, a primeira zona da ala restrita.",
     evidence: [
       { cat: "zona", value: "Sala limpa" },
       { cat: "hora", value: "22h" },

@@ -247,7 +247,7 @@ export const puzzle: Puzzle = {
   ],
   crime: {
     prompt:
-      "O legista é taxativo: o golpe veio do telescópio, o relógio parou às 23h e o estopim foi a sabotagem. Cruzando o instrumento, o horário e o motivo, quem matou o astrônomo-chefe?",
+      "O legista é taxativo: o golpe veio do telescópio, o relógio parou às 23h e o estopim foi a sabotagem.",
     evidence: [
       { cat: "instrumento", value: "Telescopio" },
       { cat: "horario", value: "23h" },

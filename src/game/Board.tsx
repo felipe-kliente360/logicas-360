@@ -369,8 +369,7 @@ export function Board({ puzzle, settings, nextId, allDone, onBack, onNext, onSol
 
   return (
     <div className="app screen-in">
-      <header>
-        <div className="topbar">
+      <div className="topbar">
           <button className="backbtn" onClick={onBack} aria-label="Voltar para as fases">
             ‹ Fases
           </button>
@@ -393,6 +392,7 @@ export function Board({ puzzle, settings, nextId, allDone, onBack, onNext, onSol
             </button>
           </div>
         </div>
+      <header>
         <p className="eyebrow" style={{ marginTop: 16 }}>
           {source} · nível {puzzle.difficulty}
         </p>
@@ -417,7 +417,7 @@ export function Board({ puzzle, settings, nextId, allDone, onBack, onNext, onSol
       {/* enunciado (colapsável, aberto por padrão) */}
       <section className={"clues" + (openStory ? " open" : "")}>
         <div className="clues-head" onClick={() => setOpenStory((o) => !o)}>
-          <h2>Enunciado</h2>
+          <h2>{isWho ? "O caso" : "Enunciado"}</h2>
           <span className="chev">⌄</span>
         </div>
         <div className="clue-list">
@@ -428,7 +428,7 @@ export function Board({ puzzle, settings, nextId, allDone, onBack, onNext, onSol
       {/* briefing do crime (whodunit) */}
       {isWho && puzzle.crime && (
         <section className="briefing">
-          <h2>🔍 O que sabemos do crime</h2>
+          <h2>🔍 O que se sabe até agora</h2>
           <p className="briefing-q">{puzzle.crime.prompt}</p>
         </section>
       )}

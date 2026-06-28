@@ -197,7 +197,7 @@ export const puzzle: Puzzle = {
   ],
   crime: {
     prompt:
-      "O legista cravou a hora da morte à meia-noite em ponto, e a arma foi um estilete de restauro. Cruzando a lâmina com o horário fatal, quem cometeu o crime no vernissage?",
+      "O legista cravou a hora da morte à meia-noite em ponto, e a arma foi um estilete de restauro.",
     evidence: [
       { cat: "objeto", value: "Estilete" },
       { cat: "hora", value: "00h" },

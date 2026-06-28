@@ -71,7 +71,7 @@ export const puzzle: Puzzle = {
     { id: "c18", text: "O copo de água foi visto no saguão.", highlights: [], constraints: [{ k: "same", a: { cat: "bebida", value: "Agua" }, b: { cat: "ambiente", value: "Saguao" } }] },
   ],
   crime: {
-    prompt: "O legista fixou a morte às 19h em ponto, e a chave encontrada na vítima abria a suíte. Cruzando o horário do crime com a suíte, quem cometeu o crime no hotel à beira-mar?",
+    prompt: "O legista fixou a morte às 19h em ponto, e a chave encontrada na vítima abria a suíte.",
     evidence: [
       { cat: "ambiente", value: "Suite" },
       { cat: "hora", value: "19h" },
