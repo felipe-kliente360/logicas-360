@@ -26,7 +26,7 @@ export const puzzle: Puzzle = {
   size: 5,
   title: "Sabotagem no Grande Prêmio",
   story:
-    "A poucas voltas da bandeirada, o carro líder pegou fogo nos boxes e o chefe da equipe não resistiu. A perícia é taxativa: a porca da roda foi afrouxada com uma chave inglesa, o cronômetro do pit parou às 14h e os documentos apreendidos apontam um contrato de patrocínio como o estopim. Cinco pessoas tinham acesso ao pit naquela tarde, cada uma num setor, manuseando uma ferramenta, num horário, movida por um interesse. Ninguém confessa; cada um joga a culpa no rádio do outro. Reconstrua a corrida inteira — só então a chave inglesa, as 14h e a cobiça pelo patrocínio convergem num único nome.",
+    "A poucas voltas da bandeirada, o carro líder pegou fogo nos boxes e o chefe da equipe não resistiu. Cinco pessoas tinham acesso ao pit naquela tarde, cada uma num setor, manuseando uma ferramenta, num horário, movida por um interesse. Ninguém confessa; cada um joga a culpa no rádio do outro. Reconstrua a corrida inteira — só então um único nome fica sem escapatória.",
   spine: { id: "suspeito", label: "Suspeito", ordered: false, labels: suspeitos },
   categories: [
     {

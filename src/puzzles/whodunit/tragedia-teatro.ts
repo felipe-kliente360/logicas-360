@@ -27,7 +27,7 @@ export const puzzle: Puzzle = {
   size: 4,
   title: "Tragedia no teatro",
   story:
-    "Na noite de estreia, um ator foi encontrado morto nos bastidores. Quatro pessoas circulavam pelo teatro, cada uma num local, com um objeto, em determinado horario. O legista crava a morte as 22h, e foi no deposito de figurinos que o corpo caiu. As testemunhas so falam por descarte: ninguem aponta o deposito nem as 22h diretamente. Reconstrua a noite inteira e veja quem sobra.",
+    "Na noite de estreia, um ator foi encontrado morto nos bastidores. Quatro pessoas circulavam pelo teatro, cada uma num local, com um objeto, em determinado horario. As testemunhas so falam por descarte: ninguem se entrega diretamente. Reconstrua a noite inteira e veja quem sobra.",
   spine: { id: "suspeito", label: "Suspeito", ordered: false, labels: suspeitos },
   categories: [
     { id: "local", label: "Local", values: ["Camarim", "Coxia", "Fosso", "Deposito"].map((v) => tx(v, v === "Deposito" ? "Depósito" : v)) },

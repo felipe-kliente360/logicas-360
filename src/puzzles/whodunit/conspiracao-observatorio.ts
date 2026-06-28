@@ -27,7 +27,7 @@ export const puzzle: Puzzle = {
   size: 5,
   title: "A conspiração do observatório",
   story:
-    "Antes do amanhecer, o astrônomo-chefe foi encontrado caído sob a grande cúpula, os olhos ainda voltados para o céu. O legista resume o caso em três frias certezas: o golpe partiu de um instrumento pesado de observação, o relógio do mezanino congelou às 23h, e o crime nasceu de sabotagem — alguém queria enterrar a descoberta da noite. Cinco pessoas pernoitavam no observatório naquela madrugada de eclipse, cada uma em um setor, manuseando um equipamento, registrada num horário e movida por um motivo. Ninguém confessa; cada álibi contradiz o seguinte. Reconstrua a planta inteira da noite — só então o instrumento certo, as 23h e a sabotagem convergem num único nome.",
+    "Antes do amanhecer, o astrônomo-chefe foi encontrado caído sob a grande cúpula, os olhos ainda voltados para o céu. Cinco pessoas pernoitavam no observatório naquela madrugada de eclipse, cada uma em um setor, manuseando um equipamento, registrada num horário e movida por um motivo. Ninguém confessa; cada álibi contradiz o seguinte. Reconstrua a planta inteira da noite — só então um único nome resta sob a cúpula.",
   spine: { id: "suspeito", label: "Suspeito", ordered: false, labels: suspeitos },
   categories: [
     {

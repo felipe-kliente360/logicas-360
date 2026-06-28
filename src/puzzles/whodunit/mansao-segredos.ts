@@ -27,7 +27,7 @@ export const puzzle: Puzzle = {
   size: 5,
   title: "A mansão dos segredos",
   story:
-    "O velho patriarca foi achado morto numa mansão onde cada parede esconde um segredo. O legista é categórico: a ferida é de lâmina, o relógio parado marcava 23h, e o testamento recém-aberto aponta a herança como o estopim. Cinco hóspedes, cada um num cômodo, com uma arma, a uma certa hora, movido por um motivo. As pistas são poucas e tortuosas: ninguém confessa, todos mentem por omissão. Reconstrua a noite inteira — só então a lâmina, a hora e a cobiça pela herança convergem num único nome.",
+    "O velho patriarca foi achado morto numa mansão onde cada parede esconde um segredo. Cinco hóspedes passaram a noite ali, cada um num cômodo, com uma arma, a uma certa hora, movido por um motivo. As pistas são poucas e tortuosas: ninguém confessa, todos mentem por omissão. Reconstrua a noite inteira — só então um único nome sobra.",
   spine: { id: "suspeito", label: "Suspeito", ordered: false, labels: suspeitos },
   categories: [
     {

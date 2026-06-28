@@ -28,7 +28,7 @@ export const puzzle: Puzzle = {
   size: 4,
   title: "Crime na mansão",
   story:
-    "O velho colecionador foi encontrado sem vida em seu escritório. Quatro convidados passaram a noite na mansão — cada um num cômodo, com um objeto, a uma certa hora. O legista crava a morte às 23h, e foi no salão que o golpe partiu. As testemunhas só falam por descarte: ninguém aponta o salão nem as 23h diretamente. Reconstrua a noite inteira e veja quem sobra.",
+    "O velho colecionador foi encontrado sem vida em seu escritório. Quatro convidados passaram a noite na mansão — cada um num cômodo, com um objeto, a uma certa hora. As testemunhas só falam por descarte: ninguém se entrega diretamente. Reconstrua a noite inteira e veja quem sobra.",
   spine: { id: "suspeito", label: "Suspeito", ordered: false, labels: suspeitos },
   categories: [
     { id: "comodo", label: "Cômodo", values: ["Cozinha", "Biblioteca", "Jardim", "Salao"].map((v) => tx(v, v === "Salao" ? "Salão" : v)) },

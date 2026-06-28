@@ -4,7 +4,7 @@ const suspeitos = ["Dona Rosa", "Seu Tonho", "Bia"];
 export const puzzle: Puzzle = {
   id: "sumico-padaria", kind: "whodunit", source: "investigacao", themeId: "dossie",
   difficulty: 0, size: 3, title: "O sumiço na padaria",
-  story: "A última coxinha quentinha sumiu do balcão da padaria! Três fregueses estavam por perto, cada um num cantinho do salão, cada um beliscando um quitute. Descubra quem estava onde, comendo o quê — e quem surrupiou a coxinha.",
+  story: "A última coxinha quentinha sumiu da padaria! Três fregueses estavam por perto, cada um num cantinho do salão, cada um beliscando um quitute. Descubra quem estava onde, comendo o quê — e quem surrupiou a coxinha.",
   spine: { id: "suspeito", label: "Suspeito", ordered: false, labels: suspeitos },
   categories: [
     { id: "lugar", label: "Lugar", values: ["Balcao","Mesa da janela","Forno"].map((v)=>tx(v)) },

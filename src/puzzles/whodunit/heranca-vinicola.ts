@@ -28,7 +28,7 @@ export const puzzle: Puzzle = {
   size: 6,
   title: "A Herança da Vinícola",
   story:
-    "O velho patriarca da Vinícola Tessari-Sabino morreu na véspera de assinar o novo testamento, e o legista não tem dúvida: não foi o coração, foi uma lâmina. Naquela noite de vindima, seis pessoas rondavam a propriedade — herdeiros, empregados e o advogado da família —, cada uma num recanto da vinícola, portando um objeto, a uma hora distinta. Todos juram que mal se cruzaram, mas as adegas guardam ecos e os relógios não mentem. Reconstrua quem esteve onde, com o quê e quando — só então a arma e a hora do golpe apontam um único herdeiro.",
+    "O velho patriarca da Vinícola Tessari-Sabino morreu na véspera de assinar o novo testamento, e o legista não tem dúvida: não foi o coração. Naquela noite de vindima, seis pessoas rondavam a propriedade — herdeiros, empregados e o advogado da família —, cada uma num recanto da vinícola, portando um objeto, a uma hora distinta. Todos juram que mal se cruzaram, mas as adegas guardam ecos e os relógios não mentem. Reconstrua quem esteve onde, com o quê e quando — só então um único herdeiro fica sem álibi.",
   spine: { id: "suspeito", label: "Suspeito", ordered: false, labels: suspeitos },
   categories: [
     {

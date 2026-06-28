@@ -29,7 +29,7 @@ export const puzzle: Puzzle = {
   size: 5,
   title: "O crime do internato",
   story:
-    "O sino das duas da manhã ainda ecoava quando o jovem herdeiro foi encontrado sem vida no internato adormecido. O legista cerra o caso em três certezas geladas: o golpe veio de um castiçal de bronze, o relógio do corredor parou às 02h, e o crime nasceu de um único pavor — o de ser expulso e perder tudo. Cinco internos velavam aquela madrugada, cada um num cômodo, com um objeto à mão, registrado num horário e movido por um motivo. Todos juram que dormiam; cada versão desmente a anterior. Reconstrua a planta inteira da noite — só então o castiçal, as 02h e o medo da expulsão convergem num único nome.",
+    "O sino das duas da manhã ainda ecoava quando o jovem herdeiro foi encontrado sem vida no internato adormecido. Cinco internos velavam aquela madrugada, cada um num cômodo, com um objeto à mão, registrado num horário e movido por um motivo. Todos juram que dormiam; cada versão desmente a anterior. Reconstrua a planta inteira da noite — só então um único nome deixa de fechar.",
   spine: { id: "suspeito", label: "Suspeito", ordered: false, labels: suspeitos },
   categories: [
     {

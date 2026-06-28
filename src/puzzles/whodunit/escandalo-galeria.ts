@@ -26,7 +26,7 @@ export const puzzle: Puzzle = {
   size: 6,
   title: "O Escândalo da Galeria",
   story:
-    "Na noite de abertura da exposição mais cobiçada do ano, o vernissage terminou em tragédia: um dos convidados foi achado caído entre as obras, com um corte limpo de lâmina. Seis figuras do mundo da arte circulavam pelas alas da galeria, cada uma num espaço, portando um objeto, e tendo chegado a um horário diferente. Os depoimentos são esquivos, as coartadas se contradizem e o catálogo de luxo continua aberto na página errada. Reconstrua o trajeto de cada um pela galeria — só então a lâmina e a hora do crime convergem num único nome.",
+    "Na noite de abertura da exposição mais cobiçada do ano, o vernissage terminou em tragédia: um dos convidados foi achado caído entre as obras. Seis figuras do mundo da arte circulavam pelas alas da galeria, cada uma num espaço, portando um objeto, e tendo chegado a um horário diferente. Os depoimentos são esquivos, as coartadas se contradizem e o catálogo de luxo continua aberto na página errada. Reconstrua o trajeto de cada um pela galeria — só então um único nome resta sob suspeita.",
   spine: { id: "suspeito", label: "Suspeito", ordered: false, labels: suspeitos },
   categories: [
     {

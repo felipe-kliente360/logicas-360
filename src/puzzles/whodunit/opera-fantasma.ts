@@ -27,7 +27,7 @@ export const puzzle: Puzzle = {
   size: 5,
   title: "O fantasma da ópera",
   story:
-    "Na noite de estreia, o velho diretor do teatro foi achado sem vida atrás das cortinas, enquanto a orquestra ainda afinava. O legista é categórico: a morte veio por veneno na taça, o relógio do fosso parara às 20h e um testamento rasurado revela a herança do teatro como o estopim. Cinco artistas e funcionários rondavam os bastidores, cada um num ponto da casa, com um instrumento de morte ao alcance, num horário, movido por uma paixão inconfessável. As pistas são poucas e tortuosas: sob a luz dos refletores todos representam inocência, mas nos bastidores ninguém diz a verdade inteira. Reconstrua a estreia inteira — só então o veneno, as 20h e a cobiça pela herança se calam sobre um único nome.",
+    "Na noite de estreia, o velho diretor do teatro foi achado sem vida atrás das cortinas, enquanto a orquestra ainda afinava. Cinco artistas e funcionários rondavam os bastidores, cada um num ponto da casa, com um objeto ao alcance, num horário, movido por uma paixão inconfessável. As pistas são poucas e tortuosas: sob a luz dos refletores todos representam inocência, mas nos bastidores ninguém diz a verdade inteira. Reconstrua a estreia inteira — só então um único nome faz o pano cair.",
   spine: { id: "suspeito", label: "Suspeito", ordered: false, labels: suspeitos },
   categories: [
     {

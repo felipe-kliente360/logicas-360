@@ -26,7 +26,7 @@ export const puzzle: Puzzle = {
   size: 5,
   title: "O banquete da embaixada",
   story:
-    "No jantar de gala da embaixada, o cônsul tombou sobre a toalha de linho antes da sobremesa. O laudo não deixa dúvidas: o veneno viajou numa taça de champanhe, o relógio de pêndulo do salão parou às 22h e uma pasta de documentos sigilosos revela espionagem como o verdadeiro motivo. Cinco convidados de honra circulavam pelo prédio, cada um num ambiente, com uma bebida ou prato à mão, num horário, movido por um interesse secreto. Todos sorriem para as câmeras; ninguém admite nada. Reconstrua a noite inteira — só então a champanhe, as 22h e a espionagem se fecham sobre um único nome.",
+    "No jantar de gala da embaixada, o cônsul tombou sobre a toalha de linho antes da sobremesa — não foi mal súbito. Cinco convidados de honra circulavam pelo prédio, cada um num ambiente, com uma bebida ou prato à mão, num horário, movido por um interesse secreto. Todos sorriem para as câmeras; ninguém admite nada. Reconstrua a noite inteira — só então um único nome se trai.",
   spine: { id: "suspeito", label: "Suspeito", ordered: false, labels: suspeitos },
   categories: [
     {

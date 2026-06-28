@@ -207,6 +207,14 @@ function propagate(puzzle: Puzzle): { solved: boolean; rounds: number; residual:
  * suspeito capaz de satisfazer todas as evidências, e quantas células ainda estavam
  * indeterminadas nesse momento (openCellsWhenUnique). ≈0 = ideal (só sabe no fim);
  * alto = "encurtável" (dá pra cravar o culpado sem resolver o caso).
+ *
+ * REGRA DE REDAÇÃO — sem redundância entre os dois textos:
+ * O enunciado ("O caso", campo `story`) ambienta o crime e descreve as DIMENSÕES da
+ * grade (cada um num local, com um objeto, a uma hora, por um motivo), mas NUNCA revela
+ * os VALORES específicos da evidência do crime. Esses valores (a arma/hora/local/motivo
+ * do culpado) vivem SÓ em "O que se sabe até agora" (`crime.prompt`). Nada de repetir no
+ * `story` o que o `prompt` já diz — nem mesmo em forma de "só então a adaga e as 23h
+ * convergem"; o fecho do enunciado deve ser genérico ("e veja quem sobra").
  */
 export interface CulpritAudit {
   evidence: number;
