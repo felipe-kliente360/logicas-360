@@ -1743,7 +1743,6 @@ button.act {
   z-index: 2;
   outline: 2.5px solid var(--glow);
   outline-offset: 2px;
-  border-radius: 11px;
   animation: tutPulse 1.3s ease-in-out infinite;
 }
 @keyframes tutPulse {

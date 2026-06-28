@@ -41,6 +41,8 @@ type Board = Record<string, (string | null)[]>;
 type TutStep = {
   text: string;
   intro?: boolean;
+  manual?: boolean; // avança por botão "Próximo" (passos de leitura, sem ação)
+  focus?: "caso" | "sabe" | "pistas"; // seção a destacar nos passos de leitura
   slot?: { cat: string; pos: number; value: string };
   accuseBtn?: boolean;
   accuseOpt?: boolean;
@@ -157,7 +159,11 @@ export function Board({ puzzle, settings, nextId, allDone, onBack, onNext, onSol
       return { text: `Toque no campo ${clabel} de ${puzzle.spine.labels[pos]} e escolha ${vlabel}.`, slot: { cat, pos, value } };
     });
     return [
-      { text: "Bem-vindo, detetive. Vou te guiar até o culpado neste caso de treino.", intro: true },
+      { text: "Bem-vindo, detetive. Vou te guiar pelo seu primeiro caso, passo a passo.", intro: true, manual: true },
+      { text: "Tudo começa pelo enunciado — “O caso”. Leia com calma: ele monta o cenário e diz quantos suspeitos há e o que precisamos descobrir de cada um.", focus: "caso", manual: true },
+      { text: "“O que se sabe até agora” é o laudo da perícia. Guarde bem: é o que vai apontar o culpado quando a grade estiver fechada.", focus: "sabe", manual: true },
+      { text: "As pistas são linhas numeradas que dizem onde cada suspeito estava e o que fazia. É cruzando-as que você preenche a grade. (Toque numa pista pra destacá-la quando quiser.)", focus: "pistas", manual: true },
+      { text: "Agora a parte boa: vamos preencher a grade. Eu aponto cada campo.", manual: true },
       ...fills,
       { text: "Grade fechada! A câmera flagrou o culpado no balcão. Toque em Acusar.", accuseBtn: true },
       { text: "Quem ficou no balcão? Aponte o culpado.", accuseOpt: true },
@@ -165,6 +171,7 @@ export function Board({ puzzle, settings, nextId, allDone, onBack, onNext, onSol
   }, [isTutorial, puzzle, valueOf]);
   const tcur = tut >= 0 ? tutSteps[tut] : undefined;
   const tutSlot = tcur?.slot;
+  const tutFocus = tcur?.focus;
   const tutAccuseIdx = tcur?.accuseOpt ? puzzle.culprit ?? -1 : -1;
 
   const filled = puzzle.categories.reduce((a, c) => a + board[c.id].filter(Boolean).length, 0);
@@ -208,20 +215,20 @@ export function Board({ puzzle, settings, nextId, allDone, onBack, onNext, onSol
     persist();
   }, [board, notes, persist]);
 
-  // tutorial: avança ao preencher o campo guiado (passos 1..6) ou ao abrir Acusar (7→8)
+  // tutorial: avança ao preencher o campo guiado (passos de slot) ou ao abrir Acusar
   useEffect(() => {
-    if (tut < 1 || !isTutorial) return;
+    if (tut < 0 || !isTutorial) return;
     let s = tut;
-    while (s >= 1 && s <= 6) {
-      const st = tutSteps[s];
-      if (st?.slot && board[st.slot.cat][st.slot.pos] === st.slot.value) s++;
+    while (tutSteps[s]?.slot) {
+      const sl = tutSteps[s].slot!;
+      if (board[sl.cat][sl.pos] === sl.value) s++;
       else break;
     }
     if (s !== tut) setTut(s);
   }, [board, tut, isTutorial, tutSteps]);
   useEffect(() => {
-    if (isTutorial && tut === 7 && accuseOpen) setTut(8);
-  }, [accuseOpen, tut, isTutorial]);
+    if (isTutorial && tcur?.accuseBtn && accuseOpen) setTut((t) => t + 1);
+  }, [accuseOpen, isTutorial, tcur]);
 
   // a cada passo do tutorial: traz o próximo alvo pra tela (auto-scroll) e pisca nele
   useEffect(() => {
@@ -507,7 +514,7 @@ export function Board({ puzzle, settings, nextId, allDone, onBack, onNext, onSol
       </header>
 
       {/* enunciado (colapsável, aberto por padrão) */}
-      <section className={"clues" + (openStory ? " open" : "")}>
+      <section className={"clues" + (openStory ? " open" : "") + (tutFocus === "caso" ? " tut-on" + (tutFlash ? " tut-flash" : "") : "")}>
         <div className="clues-head" onClick={() => setOpenStory((o) => !o)}>
           <h2>{isWho ? "O caso" : "Enunciado"}</h2>
           <span className="chev"><IconChevronDown size={16} /></span>
@@ -519,14 +526,14 @@ export function Board({ puzzle, settings, nextId, allDone, onBack, onNext, onSol
 
       {/* briefing do crime (whodunit) */}
       {isWho && puzzle.crime && (
-        <section className="briefing">
+        <section className={"briefing" + (tutFocus === "sabe" ? " tut-on" + (tutFlash ? " tut-flash" : "") : "")}>
           <h2><IconSearch size={16} /> O que se sabe até agora</h2>
           <p className="briefing-q">{puzzle.crime.prompt}</p>
         </section>
       )}
 
       {/* pistas */}
-      <section className={"clues" + (openClues ? " open" : "")}>
+      <section className={"clues" + (openClues ? " open" : "") + (tutFocus === "pistas" ? " tut-on" + (tutFlash ? " tut-flash" : "") : "")}>
         <div className="clues-head" onClick={() => setOpenClues((o) => !o)}>
           <h2>Pistas</h2>
           <span className="meta">{puzzle.clues.length} · toque p/ destacar</span>
@@ -633,9 +640,9 @@ export function Board({ puzzle, settings, nextId, allDone, onBack, onNext, onSol
             </span>
             <p>{tcur.text}</p>
             <div className="coach-actions">
-              {tcur.intro && (
-                <button className="mini glow" onClick={() => setTut(1)}>
-                  Começar
+              {tcur.manual && (
+                <button className="mini glow" onClick={() => setTut(tut + 1)}>
+                  {tcur.intro ? "Começar" : "Próximo"}
                 </button>
               )}
               <button
