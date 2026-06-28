@@ -69,7 +69,13 @@ function restoreBoard(puzzle: Puzzle, saved?: InProgress): Board {
 const seatMatches = (b: Board, puzzle: Puzzle, pos: number) =>
   puzzle.categories.every((c) => b[c.id][pos] && b[c.id][pos] === puzzle.solution[c.id][pos]);
 
-const MAX_HINTS = 3;
+// dicas por faixa de dificuldade: fácil 3 · médio 2 · difícil 1 · expert 0
+function hintsForDifficulty(d: number): number {
+  if (d <= 2) return 3;
+  if (d <= 6) return 2;
+  if (d <= 8) return 1;
+  return 0;
+}
 const cellKey = (cat: string, pos: number) => `${cat}:${pos}`;
 const noteKey = (cat: string, pos: number, value: string) => `${cat}:${pos}:${value}`;
 
@@ -96,10 +102,11 @@ interface Props {
 export function Board({ puzzle, settings, nextId, allDone, onBack, onNext, onSolved, onOpenSettings }: Props) {
   const saved = useMemo(() => loadInProgress(puzzle.id), [puzzle.id]);
   const savedHints = useMemo(() => loadHints(puzzle.id), [puzzle.id]);
+  const maxHints = hintsForDifficulty(puzzle.difficulty);
 
   // posições cravadas pela ajuda (persistem ao Limpar; só zeram ao concluir)
   const [locks, setLocks] = useState<{ cat: string; pos: number }[]>(() => savedHints.cells);
-  const [hintsLeft, setHintsLeft] = useState(() => Math.max(0, MAX_HINTS - savedHints.used));
+  const [hintsLeft, setHintsLeft] = useState(() => Math.max(0, maxHints - savedHints.used));
   const lockedSet = useMemo(() => new Set(locks.map((l) => cellKey(l.cat, l.pos))), [locks]);
 
   const [board, setBoard] = useState<Board>(() => applyLocks(restoreBoard(puzzle, saved), puzzle, savedHints.cells));
@@ -438,7 +445,7 @@ export function Board({ puzzle, settings, nextId, allDone, onBack, onNext, onSol
     const fresh = won ? [] : locks; // se veio da vitória, recomeça limpo
     if (won) {
       setLocks([]);
-      setHintsLeft(MAX_HINTS);
+      setHintsLeft(maxHints);
     }
     setNotes(new Set());
     setAccusations(0);
@@ -618,16 +625,18 @@ export function Board({ puzzle, settings, nextId, allDone, onBack, onNext, onSol
               <IconCheck /> Verificar
             </button>
           )}
-          <button
-            className="act help"
-            onClick={hint}
-            disabled={hintsLeft <= 0}
-            aria-label={`Ajuda — ${hintsLeft} restantes`}
-            title="Ajuda: revela uma posição"
-          >
-            <IconBulb />
-            <span className="help-n">{hintsLeft}</span>
-          </button>
+          {maxHints > 0 && (
+            <button
+              className="act help"
+              onClick={hint}
+              disabled={hintsLeft <= 0}
+              aria-label={`Ajuda — ${hintsLeft} restantes`}
+              title="Ajuda: revela uma posição"
+            >
+              <IconBulb />
+              <span className="help-n">{hintsLeft}</span>
+            </button>
+          )}
         </div>
       </div>
 
