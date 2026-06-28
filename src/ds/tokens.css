@@ -1630,6 +1630,54 @@ button.act {
   padding: 5px 11px;
   transform: rotate(-5deg);
 }
+/* banner de onboarding: "aprenda a jogar com o caso de treino" */
+.learn-banner {
+  display: flex;
+  align-items: center;
+  gap: 13px;
+  width: 100%;
+  margin: 2px 0 6px;
+  padding: 13px 15px;
+  border-radius: 14px;
+  border: 1px solid color-mix(in srgb, var(--glow) 45%, var(--line));
+  background: linear-gradient(180deg, var(--glow-soft), transparent);
+  color: var(--ink);
+  text-align: left;
+  cursor: pointer;
+  transition: transform 0.12s, border-color 0.2s;
+}
+.learn-banner:active {
+  transform: translateY(1px);
+}
+.learn-ic {
+  flex: 0 0 auto;
+  width: 38px;
+  height: 38px;
+  border-radius: 10px;
+  display: grid;
+  place-items: center;
+  background: var(--glow);
+  color: var(--on-glow);
+}
+.learn-tx {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  line-height: 1.25;
+  gap: 1px;
+}
+.learn-tx b {
+  font-size: 14px;
+  color: var(--ink);
+}
+.learn-tx span {
+  font-size: 12.5px;
+  color: var(--ink-dim);
+}
+.learn-banner > svg {
+  color: var(--glow);
+  flex: 0 0 auto;
+}
 .opt.accuse .name {
   font-weight: 700;
 }

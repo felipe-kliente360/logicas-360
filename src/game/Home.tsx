@@ -3,7 +3,7 @@ import { useMemo, useState } from "react";
 import type { Puzzle } from "../engine/types";
 import { getRecord, getCaseRecord, formatTime, hasInProgress, type Progress } from "./storage";
 import { Logo } from "../ds/components/Logo";
-import { IconGear, IconFolder, IconStar, IconCheck, IconChevronRight } from "../ds/components/icons";
+import { IconGear, IconFolder, IconStar, IconCheck, IconChevronRight, IconSearch } from "../ds/components/icons";
 
 export type HomeTab = "puzzles" | "investigacoes";
 
@@ -108,6 +108,19 @@ export function Home({
           </span>
         </div>
       </div>
+
+      {invest && puzzles[0] && !progress.completed.includes(puzzles[0].id) && (
+        <button className="learn-banner" onClick={() => onPick(puzzles[0].id)}>
+          <span className="learn-ic">
+            <IconSearch size={20} />
+          </span>
+          <span className="learn-tx">
+            <b>Primeira vez por aqui?</b>
+            <span>Aprenda a jogar com o caso de treino.</span>
+          </span>
+          <IconChevronRight size={20} />
+        </button>
+      )}
 
       <div className="filters">
         {counts.map(({ b, n }) =>
