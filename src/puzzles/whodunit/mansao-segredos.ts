@@ -29,7 +29,7 @@ export const puzzle: Puzzle = {
     {
       id: "comodo",
       label: "Cômodo",
-      values: ["Estufa", "Adega", "Escritorio", "Biblioteca", "Salao"].map((v) => tx(v)),
+      values: ["Escritorio", "Salao", "Adega", "Biblioteca", "Estufa"].map((v) => tx(v)),
     },
     {
       id: "arma",
@@ -39,7 +39,7 @@ export const puzzle: Puzzle = {
     {
       id: "hora",
       label: "Horário",
-      values: ["20h", "21h", "22h", "23h", "00h"].map((v) => tx(v)),
+      values: ["23h", "21h", "22h", "00h", "20h"].map((v) => tx(v)),
     },
     {
       id: "motivo",
@@ -171,20 +171,6 @@ export const puzzle: Puzzle = {
       ],
     },
     {
-      id: "c13",
-      text: "A Condessa não foi vista às 20h, 21h nem 22h, e não agiu por chantagem, vingança, ciúme ou dívidas.",
-      highlights: [],
-      constraints: [
-        { k: "notAt", cat: "hora", value: "20h", pos: 0 },
-        { k: "notAt", cat: "hora", value: "21h", pos: 0 },
-        { k: "notAt", cat: "hora", value: "22h", pos: 0 },
-        { k: "notAt", cat: "motivo", value: "Chantagem", pos: 0 },
-        { k: "notAt", cat: "motivo", value: "Vinganca", pos: 0 },
-        { k: "notAt", cat: "motivo", value: "Ciume", pos: 0 },
-        { k: "notAt", cat: "motivo", value: "Dividas", pos: 0 },
-      ],
-    },
-    {
       id: "c14",
       text: "O Jardineiro não estava na estufa, no escritório nem na biblioteca; tampouco agiu por herança, chantagem ou vingança.",
       highlights: [],
@@ -205,16 +191,6 @@ export const puzzle: Puzzle = {
         { k: "notAt", cat: "comodo", value: "Estufa", pos: 3 },
         { k: "notAt", cat: "comodo", value: "Adega", pos: 3 },
         { k: "notAt", cat: "comodo", value: "Escritorio", pos: 3 },
-      ],
-    },
-    {
-      id: "c16",
-      text: "O Mordomo não foi visto na estufa, na biblioteca nem no salão.",
-      highlights: [],
-      constraints: [
-        { k: "notAt", cat: "comodo", value: "Estufa", pos: 1 },
-        { k: "notAt", cat: "comodo", value: "Biblioteca", pos: 1 },
-        { k: "notAt", cat: "comodo", value: "Salao", pos: 1 },
       ],
     },
   ],
