@@ -12,7 +12,10 @@ const suspeitos = ["Condessa", "Mordomo", "Capitao", "Pianista", "Jardineiro"];
 //   idx 3 Pianista    -> Biblioteca  | Veneno     | 22h | Ciume
 //   idx 4 Jardineiro  -> Salao       | Corda      | 20h | Dividas
 //
-// Culpado: Capitao (Escritorio + Revolver + 00h) — evidências do crime.
+// Culpado: Condessa (Adaga + 23h + Heranca) — evidências do crime.
+// (Adaga/23h/Heranca são exatamente os atributos deduzidos por ÚLTIMO na
+//  propagação: nenhuma pista os fixa direto, então o culpado só fica único
+//  quando a grade está praticamente resolvida — sem atalho.)
 
 export const puzzle: Puzzle = {
   id: "mansao-segredos",
@@ -23,7 +26,7 @@ export const puzzle: Puzzle = {
   size: 5,
   title: "A mansão dos segredos",
   story:
-    "O velho patriarca foi achado morto numa mansão onde cada parede esconde um segredo. Cinco hóspedes, cada um num cômodo, com uma arma, a uma certa hora, movido por um motivo. As pistas são poucas e tortuosas: ninguém confessa, todos mentem por omissão. Reconstrua a noite — e aponte o culpado.",
+    "O velho patriarca foi achado morto numa mansão onde cada parede esconde um segredo. O legista é categórico: a ferida é de lâmina, o relógio parado marcava 23h, e o testamento recém-aberto aponta a herança como o estopim. Cinco hóspedes, cada um num cômodo, com uma arma, a uma certa hora, movido por um motivo. As pistas são poucas e tortuosas: ninguém confessa, todos mentem por omissão. Reconstrua a noite inteira — só então a lâmina, a hora e a cobiça pela herança convergem num único nome.",
   spine: { id: "suspeito", label: "Suspeito", ordered: false, labels: suspeitos },
   categories: [
     {
@@ -197,9 +200,9 @@ export const puzzle: Puzzle = {
   crime: {
     prompt: "Quem matou o patriarca?",
     evidence: [
-      { cat: "comodo", value: "Escritorio" },
-      { cat: "arma", value: "Revolver" },
-      { cat: "hora", value: "00h" },
+      { cat: "arma", value: "Adaga" },
+      { cat: "hora", value: "23h" },
+      { cat: "motivo", value: "Heranca" },
     ],
   },
   solution: {},
