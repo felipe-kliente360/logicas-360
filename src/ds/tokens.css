@@ -1358,6 +1358,7 @@ button.act {
   padding: 24px 28px calc(24px + env(safe-area-inset-bottom));
   background: radial-gradient(120% 75% at 50% 0%, var(--glow-soft), transparent 60%), var(--bg);
   animation: screenIn 0.3s ease;
+  overflow-y: auto;
 }
 .winscreen.show { display: flex; }
 .win-medal {
@@ -1651,4 +1652,130 @@ button.act {
 }
 @media (prefers-reduced-motion: reduce) {
   .win-stamp { animation: none; }
+}
+
+/* ===== Vitória cinematográfica (investigação): fechamento de caso ===== */
+.case-closed {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  width: 100%;
+  max-width: 360px;
+}
+.cc-eyebrow {
+  animation: revealUp 0.4s ease both;
+}
+.case-closed .win-stamp {
+  margin: 8px 0 22px;
+}
+.culprit-card {
+  position: relative;
+  width: 100%;
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  background: var(--card);
+  border: 1px solid var(--line);
+  border-radius: 16px;
+  padding: 16px 18px;
+  overflow: hidden;
+  box-shadow: 0 18px 42px -18px rgba(0, 0, 0, 0.6);
+  animation: cardIn 0.5s cubic-bezier(0.2, 0.8, 0.2, 1) 0.62s both;
+}
+.mug {
+  flex: 0 0 auto;
+  width: 58px;
+  height: 58px;
+  border-radius: 12px;
+  display: grid;
+  place-items: center;
+  background: var(--bg2);
+  border: 1px solid var(--line);
+  color: var(--ink-dim);
+}
+.culprit-meta {
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+  min-width: 0;
+}
+.culprit-role {
+  font-family: var(--font-mono), monospace;
+  font-size: 10px;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  color: var(--ink-faint);
+}
+.culprit-name {
+  font-family: var(--font-display), sans-serif;
+  font-weight: 800;
+  font-size: 22px;
+  color: var(--ink);
+  line-height: 1.05;
+}
+.tarja {
+  position: absolute;
+  right: -6px;
+  top: 13px;
+  font-family: var(--font-mono), monospace;
+  font-weight: 800;
+  font-size: 12px;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  color: #fff;
+  background: var(--glow);
+  padding: 5px 12px;
+  border-radius: 3px;
+  transform: rotate(7deg);
+  box-shadow: 0 6px 16px -4px var(--glow);
+  animation: tarjaIn 0.42s cubic-bezier(0.2, 0.9, 0.25, 1) 1.05s both;
+}
+.conviction {
+  width: 100%;
+  margin-top: 20px;
+  text-align: center;
+  animation: revealUp 0.45s ease 1.3s both;
+}
+.conv-label {
+  font-family: var(--font-mono), monospace;
+  font-size: 10px;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  color: var(--ink-faint);
+  display: block;
+  margin-bottom: 10px;
+}
+.conv-tags {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  justify-content: center;
+}
+.conv-tag {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  background: var(--card2);
+  border: 1px solid var(--line);
+  border-radius: 10px;
+  padding: 7px 12px 7px 8px;
+  font-weight: 600;
+  color: var(--ink);
+  font-size: 14px;
+}
+@keyframes revealUp {
+  from { opacity: 0; transform: translateY(10px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+@keyframes cardIn {
+  0% { opacity: 0; transform: translateY(16px) scale(0.96); }
+  100% { opacity: 1; transform: translateY(0) scale(1); }
+}
+@keyframes tarjaIn {
+  0% { opacity: 0; transform: rotate(20deg) scale(1.8); }
+  60% { opacity: 1; transform: rotate(7deg) scale(0.92); }
+  100% { opacity: 1; transform: rotate(7deg) scale(1); }
+}
+@media (prefers-reduced-motion: reduce) {
+  .cc-eyebrow, .culprit-card, .tarja, .conviction { animation: none; }
 }

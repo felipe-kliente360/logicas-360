@@ -99,3 +99,10 @@ export const IconChevronRight = ({ size = 18 }: P) => (
     <polyline points="9 18 15 12 9 6" />
   </svg>
 );
+
+export const IconSuspect = ({ size = 18 }: P) => (
+  <svg {...base(size)}>
+    <circle cx="12" cy="8" r="4" />
+    <path d="M5.5 21v-1.5a6.5 6.5 0 0 1 13 0V21" />
+  </svg>
+);

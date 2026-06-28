@@ -32,6 +32,7 @@ import {
   IconStar,
   IconX,
   IconChevronDown,
+  IconSuspect,
 } from "../ds/components/icons";
 
 type Board = Record<string, (string | null)[]>;
@@ -658,15 +659,51 @@ export function Board({ puzzle, settings, nextId, allDone, onBack, onNext, onSol
             <i style={{ top: 200, right: 64, width: 7, height: 7, borderRadius: 2, background: "var(--glow)", transform: "rotate(35deg)", animationDelay: ".15s" }} />
           </div>
         )}
-        <div className="win-medal">{isWho ? <IconSearch size={42} /> : <IconCheck size={42} />}</div>
-        {isWho && <div className="stamp win-stamp">Caso fechado</div>}
-        <div className="win-eyebrow">{isWho ? "Caso encerrado" : "Puzzle resolvido"}</div>
-        <div className="win-title">{isWho ? "Caso resolvido!" : "Resolvido!"}</div>
-        <p className="win-sub">
-          {isWho && puzzle.culprit != null
-            ? `Culpado: ${puzzle.spine.labels[puzzle.culprit]}`
-            : `${puzzle.title} · nível ${puzzle.difficulty}`}
-        </p>
+        {isWho ? (
+          <div className="case-closed">
+            <div className="win-eyebrow cc-eyebrow">Caso encerrado</div>
+            <div className="stamp win-stamp">Caso fechado</div>
+            {puzzle.culprit != null && (
+              <div className="culprit-card">
+                <div className="mug">
+                  <IconSuspect size={46} />
+                </div>
+                <div className="culprit-meta">
+                  <span className="culprit-role">O culpado</span>
+                  <span className="culprit-name">{puzzle.spine.labels[puzzle.culprit]}</span>
+                </div>
+                <span className="tarja">Culpado</span>
+              </div>
+            )}
+            {puzzle.crime && (
+              <div className="conviction">
+                <span className="conv-label">Provas que fecharam o caso</span>
+                <div className="conv-tags">
+                  {puzzle.crime.evidence.map((e, i) => {
+                    const v = valueOf(e.cat, e.value);
+                    return (
+                      <span className="conv-tag" key={i}>
+                        <Swatch value={v} index={valIndex(e.cat, e.value)} />
+                        {v?.label ?? e.value}
+                      </span>
+                    );
+                  })}
+                </div>
+              </div>
+            )}
+          </div>
+        ) : (
+          <>
+            <div className="win-medal">
+              <IconCheck size={42} />
+            </div>
+            <div className="win-eyebrow">Puzzle resolvido</div>
+            <div className="win-title">Resolvido!</div>
+            <p className="win-sub">
+              {puzzle.title} · nível {puzzle.difficulty}
+            </p>
+          </>
+        )}
         <div className="win-stats">
           <div className="win-stat">
             <div className="k">Tempo</div>
