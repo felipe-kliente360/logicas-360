@@ -19,7 +19,7 @@ import {
   type InProgress,
   type Settings,
 } from "./storage";
-import { chime, winChime, buzz } from "./feedback";
+import { chime, winChime, buzz, typeTick, fileClick, stamp, thunk } from "./feedback";
 import {
   IconRefresh,
   IconCheck,
@@ -211,6 +211,7 @@ export function Board({ puzzle, settings, nextId, allDone, onBack, onNext, onSol
       col[pos] = valueId;
     }
     const next: Board = { ...board, [cat]: col };
+    fileClick(settings.som);
     maybeCelebrateSeat(next, pos, was);
     setBoard(next);
     // ao escolher um valor, some a marca "não é aqui" dele (decisão oposta)
@@ -268,10 +269,13 @@ export function Board({ puzzle, settings, nextId, allDone, onBack, onNext, onSol
     setBoard(next);
     setLocks(nextLocks);
     setHintsLeft((n) => n - 1);
+    chime(settings.som);
+    buzz(settings.vib, 12);
     saveHints(puzzle.id, { used: nextLocks.length, cells: nextLocks });
   }
 
   function lightClue(id: string) {
+    typeTick(settings.som);
     setLitClue((cur) => (cur === id ? null : id));
     if (litTimer.current) clearTimeout(litTimer.current);
     litTimer.current = setTimeout(() => setLitClue(null), 4000);
@@ -309,6 +313,7 @@ export function Board({ puzzle, settings, nextId, allDone, onBack, onNext, onSol
     setWon(true);
     clearInProgress(puzzle.id);
     clearHints(puzzle.id);
+    if (isWho) stamp(settings.som);
     winChime(settings.som);
     buzz(settings.vib, [18, 40, 18]);
     onSolved();
@@ -316,6 +321,7 @@ export function Board({ puzzle, settings, nextId, allDone, onBack, onNext, onSol
 
   function wrongShake(msg: string) {
     showToast(msg);
+    thunk(settings.som);
     buzz(settings.vib, 40);
     setShake(true);
     if (shakeTimer.current) clearTimeout(shakeTimer.current);
