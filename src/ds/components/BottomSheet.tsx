@@ -2,6 +2,7 @@
 // categoria move ele do outro cartão (a fila nunca fica inválida).
 import type { Category, CategoryValue } from "../../engine/types";
 import { Swatch } from "./Swatch";
+import { IconX } from "./icons";
 
 export interface SheetTarget {
   cat: Category;
@@ -68,11 +69,11 @@ export function BottomSheet({
               >
                 <span className="opt-swatch">
                   <Swatch value={v} index={vi} />
-                  {ruled && <span className="opt-x" aria-hidden>✕</span>}
+                  {ruled && <span className="opt-x" aria-hidden><IconX size={15} /></span>}
                 </span>
                 <span className="name">{v.label}</span>
                 {isCurrent ? (
-                  <span className="used clear-x">remover ✕</span>
+                  <span className="used clear-x">remover <IconX size={12} /></span>
                 ) : lockedElsewhere ? (
                   <span className="used">💡 em {whereLabel}</span>
                 ) : movable ? (
@@ -86,7 +87,7 @@ export function BottomSheet({
                       onToggleNote?.(v.id);
                     }}
                   >
-                    ✕
+                    <IconX size={14} />
                   </button>
                 )}
               </div>

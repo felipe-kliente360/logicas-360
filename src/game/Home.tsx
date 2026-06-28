@@ -3,6 +3,7 @@ import { useMemo, useState } from "react";
 import type { Puzzle } from "../engine/types";
 import { getRecord, getCaseRecord, formatTime, hasInProgress, type Progress } from "./storage";
 import { Logo } from "../ds/components/Logo";
+import { IconGear, IconFolder, IconStar, IconCheck, IconChevronRight } from "../ds/components/icons";
 
 export type HomeTab = "puzzles" | "investigacoes";
 
@@ -67,7 +68,7 @@ export function Home({
             </p>
           </div>
           <button className="iconbtn" onClick={onOpenSettings} aria-label="Configurações">
-            ⚙
+            <IconGear size={18} />
           </button>
         </div>
 
@@ -127,11 +128,15 @@ export function Home({
           const inProgress = !done && hasInProgress(p.id);
           return (
             <button key={p.id} className={"level-card" + (done ? " done" : "") + (invest ? " case" : "")} onClick={() => onPick(p.id)}>
-              <div className="level-num">{invest ? "🔍" : numberOf.get(p.id)}</div>
+              <div className="level-num">{invest ? <IconFolder size={22} /> : numberOf.get(p.id)}</div>
               <div className="level-body">
                 <h3>
                   {p.title}
-                  {done && <span className="done-tick"> {invest ? "· encerrado" : "✓"}</span>}
+                  {done && (
+                    <span className="done-tick">
+                      {invest ? "· encerrado" : <IconCheck size={13} />}
+                    </span>
+                  )}
                 </h3>
                 <p className="level-meta">
                   {invest
@@ -139,14 +144,20 @@ export function Home({
                     : `${diffWord(p.difficulty)} · ${p.size}×${p.categories.length}`}
                 </p>
                 {caseRec ? (
-                  <span className="level-diff">🗄️ {caseRec.accusations}ª acusação · {formatTime(caseRec.ms)}</span>
+                  <span className="level-diff">
+                    <IconFolder size={13} /> {caseRec.accusations}ª acusação · {formatTime(caseRec.ms)}
+                  </span>
                 ) : rec != null ? (
-                  <span className="level-diff">🏆 recorde {formatTime(rec)}</span>
+                  <span className="level-diff">
+                    <IconStar size={13} /> recorde {formatTime(rec)}
+                  </span>
                 ) : inProgress ? (
-                  <span className="level-diff resume">▸ continuar de onde parou</span>
+                  <span className="level-diff resume">
+                    <IconChevronRight size={13} /> continuar de onde parou
+                  </span>
                 ) : null}
               </div>
-              <span className="level-chev">›</span>
+              <span className="level-chev"><IconChevronRight size={18} /></span>
             </button>
           );
         })}

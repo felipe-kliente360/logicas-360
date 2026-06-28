@@ -16,6 +16,7 @@
 import type { Puzzle } from "../../engine/types";
 
 const tx = (id: string, label = id) => ({ id, label, display: { kind: "text" as const } });
+const gl = (id: string, label: string, icon: string) => ({ id, label, display: { kind: "icon" as const, icon } });
 const suspeitos = ["Dona Branca", "Coronel Mostarda", "Sr. Verde", "Srta. Rosa"];
 
 export const puzzle: Puzzle = {
@@ -31,7 +32,7 @@ export const puzzle: Puzzle = {
   spine: { id: "suspeito", label: "Suspeito", ordered: false, labels: suspeitos },
   categories: [
     { id: "comodo", label: "Cômodo", values: ["Cozinha", "Biblioteca", "Jardim", "Salao"].map((v) => tx(v, v === "Salao" ? "Salão" : v)) },
-    { id: "objeto", label: "Objeto", values: ["Corda", "Castical", "Veneno", "Revolver"].map((v) => tx(v, v === "Castical" ? "Castiçal" : v === "Revolver" ? "Revólver" : v)) },
+    { id: "objeto", label: "Objeto", values: [gl("Corda", "Corda", "corda"), gl("Castical", "Castiçal", "castical"), gl("Veneno", "Veneno", "veneno"), gl("Revolver", "Revólver", "revolver")] },
     { id: "hora", label: "Horário", values: ["20h", "21h", "22h", "23h"].map((v) => tx(v)) },
   ],
   // NB: a ordem das constraints (no flatMap das pistas) é proposital — mantém atalho 0%.

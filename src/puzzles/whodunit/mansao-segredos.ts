@@ -1,6 +1,7 @@
 import type { Puzzle } from "../../engine/types";
 
 const tx = (id: string, label = id) => ({ id, label, display: { kind: "text" as const } });
+const gl = (id: string, label: string, icon: string) => ({ id, label, display: { kind: "icon" as const, icon } });
 
 // Suspeitos (spine não-ordenada). Índices: 0..4
 const suspeitos = ["Condessa", "Mordomo", "Capitao", "Pianista", "Jardineiro"];
@@ -37,7 +38,13 @@ export const puzzle: Puzzle = {
     {
       id: "arma",
       label: "Arma",
-      values: ["Adaga", "Castical", "Revolver", "Veneno", "Corda"].map((v) => tx(v)),
+      values: [
+        gl("Adaga", "Adaga", "adaga"),
+        gl("Castical", "Castiçal", "castical"),
+        gl("Revolver", "Revólver", "revolver"),
+        gl("Veneno", "Veneno", "veneno"),
+        gl("Corda", "Corda", "corda"),
+      ],
     },
     {
       id: "hora",

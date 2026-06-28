@@ -1,6 +1,7 @@
 // Tela de Configurações (overlay). Tudo persistido em localStorage.
 import { useState } from "react";
 import type { Settings } from "./storage";
+import { IconX } from "../ds/components/icons";
 
 interface Props {
   settings: Settings;
@@ -35,7 +36,7 @@ export function Settings({ settings, completed, total, onChange, onResetProgress
         <div className="panel-head">
           <h2>Configurações</h2>
           <button className="x" onClick={onClose} aria-label="Fechar">
-            ✕
+            <IconX size={18} />
           </button>
         </div>
 

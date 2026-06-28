@@ -506,6 +506,13 @@ h1.board-h1 {
   letter-spacing: 0.02em;
   text-shadow: 0 1px 1.5px rgba(0, 0, 0, 0.4);
 }
+/* glifo temático: emblema branco sobre a etiqueta */
+.dot.glyph {
+  color: #fff;
+}
+.dot.glyph svg {
+  filter: drop-shadow(0 1px 1px rgba(0, 0, 0, 0.35));
+}
 .slot.filled .dot.color {
   border-color: rgba(0, 0, 0, 0.2);
 }
@@ -1562,6 +1569,44 @@ button.act {
   font-weight: 600;
   line-height: 1.55;
   color: var(--ink);
+}
+/* alinhamento dos ícones inline da nossa linha (texto + glifo) */
+.record-line,
+.win-alldone {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+}
+.briefing h2 {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+.ruled-n {
+  display: inline-flex;
+  align-items: center;
+  gap: 1px;
+}
+.win-stat .v {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 5px;
+}
+.level-diff {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+}
+.done-tick {
+  display: inline-flex;
+  align-items: center;
+  gap: 3px;
+}
+.clear-x {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
 }
 /* capa do dossiê (home das investigações): linha de arquivo + carimbo */
 .dossie-cover {

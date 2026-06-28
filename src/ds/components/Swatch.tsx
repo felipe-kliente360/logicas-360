@@ -1,6 +1,7 @@
 // Renderiza o "dot" de um valor conforme seu display (cor, ícone/emoji ou texto).
 // O mesmo componente serve qualquer mundo — é isso que mantém o DS genérico.
 import type { CategoryValue } from "../../engine/types";
+import { Glyph, GLYPHS } from "./glyphs";
 
 // Paleta de etiquetas — cores distintas, tom médio (texto branco legível por cima).
 // Pensada p/ ler bem tanto no papel pardo claro quanto no dossiê noir (dark).
@@ -37,10 +38,12 @@ export function Swatch({ value, index }: { value?: CategoryValue; index?: number
   if (d.kind === "color") {
     return <span className="dot color" style={{ background: d.hex, borderColor: "rgba(0,0,0,.2)" }} aria-hidden />;
   }
-  if (d.kind === "icon") {
+  // glifo temático da nossa linha autoral, em emblema branco sobre a etiqueta colorida
+  if (d.kind === "icon" && GLYPHS[d.icon]) {
+    const tint = swatchTint(index ?? hashIndex(value.id));
     return (
-      <span className="dot" aria-hidden>
-        {d.icon}
+      <span className="dot tint glyph" style={{ background: tint }} aria-hidden>
+        <Glyph name={d.icon} />
       </span>
     );
   }

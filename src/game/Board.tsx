@@ -20,7 +20,19 @@ import {
   type Settings,
 } from "./storage";
 import { chime, winChime, buzz } from "./feedback";
-import { IconRefresh, IconCheck, IconBulb, IconHelp, IconArrowRight } from "../ds/components/icons";
+import {
+  IconRefresh,
+  IconCheck,
+  IconBulb,
+  IconHelp,
+  IconArrowRight,
+  IconGear,
+  IconSearch,
+  IconFolder,
+  IconStar,
+  IconX,
+  IconChevronDown,
+} from "../ds/components/icons";
 
 type Board = Record<string, (string | null)[]>;
 
@@ -388,7 +400,7 @@ export function Board({ puzzle, settings, nextId, allDone, onBack, onNext, onSol
               {formatTime(elapsed)}
             </span>
             <button className="iconbtn" onClick={onOpenSettings} aria-label="Configurações">
-              ⚙
+              <IconGear size={18} />
             </button>
           </div>
         </div>
@@ -400,10 +412,14 @@ export function Board({ puzzle, settings, nextId, allDone, onBack, onNext, onSol
         {isWho
           ? caseRecord && (
               <p className="record-line">
-                🗄️ Caso encerrado · {caseRecord.accusations}ª acusação · {formatTime(caseRecord.ms)}
+                <IconFolder size={13} /> Caso encerrado · {caseRecord.accusations}ª acusação · {formatTime(caseRecord.ms)}
               </p>
             )
-          : record != null && <p className="record-line">🏆 Seu recorde: {formatTime(record)}</p>}
+          : record != null && (
+              <p className="record-line">
+                <IconStar size={13} /> Seu recorde: {formatTime(record)}
+              </p>
+            )}
         <div className="progress">
           <div className="pbar">
             <div className="pfill" style={{ width: `${(filled / totalSlots) * 100}%` }} />
@@ -418,7 +434,7 @@ export function Board({ puzzle, settings, nextId, allDone, onBack, onNext, onSol
       <section className={"clues" + (openStory ? " open" : "")}>
         <div className="clues-head" onClick={() => setOpenStory((o) => !o)}>
           <h2>{isWho ? "O caso" : "Enunciado"}</h2>
-          <span className="chev">⌄</span>
+          <span className="chev"><IconChevronDown size={16} /></span>
         </div>
         <div className="clue-list">
           <p className="story-text">{puzzle.story}</p>
@@ -428,7 +444,7 @@ export function Board({ puzzle, settings, nextId, allDone, onBack, onNext, onSol
       {/* briefing do crime (whodunit) */}
       {isWho && puzzle.crime && (
         <section className="briefing">
-          <h2>🔍 O que se sabe até agora</h2>
+          <h2><IconSearch size={16} /> O que se sabe até agora</h2>
           <p className="briefing-q">{puzzle.crime.prompt}</p>
         </section>
       )}
@@ -437,8 +453,8 @@ export function Board({ puzzle, settings, nextId, allDone, onBack, onNext, onSol
       <section className={"clues" + (openClues ? " open" : "")}>
         <div className="clues-head" onClick={() => setOpenClues((o) => !o)}>
           <h2>Pistas</h2>
-          <span className="meta">{puzzle.clues.length} · toque p/ destacar ⌄</span>
-          <span className="chev">⌄</span>
+          <span className="meta">{puzzle.clues.length} · toque p/ destacar</span>
+          <span className="chev"><IconChevronDown size={16} /></span>
         </div>
         <div className="clue-list">
           {puzzle.clues.map((c, i) => (
@@ -477,7 +493,10 @@ export function Board({ puzzle, settings, nextId, allDone, onBack, onNext, onSol
                         <IconBulb size={14} />
                       </span>
                     ) : ruledCount > 0 ? (
-                      <span className="ruled-n" aria-label={`${ruledCount} descartados`}>✕{ruledCount}</span>
+                      <span className="ruled-n" aria-label={`${ruledCount} descartados`}>
+                        <IconX size={10} />
+                        {ruledCount}
+                      </span>
                     ) : null}
                   </button>
                 );
@@ -500,7 +519,7 @@ export function Board({ puzzle, settings, nextId, allDone, onBack, onNext, onSol
           </button>
           {isWho ? (
             <button className="act primary verificar" onClick={() => setAccuseOpen(true)}>
-              🔍 Acusar{accusations > 0 ? ` · ${accusations}ª` : ""}
+              <IconSearch size={18} /> Acusar{accusations > 0 ? ` · ${accusations}ª` : ""}
             </button>
           ) : (
             <button className="act primary verificar" onClick={check} disabled={filled < totalSlots}>
@@ -633,7 +652,7 @@ export function Board({ puzzle, settings, nextId, allDone, onBack, onNext, onSol
             <i style={{ top: 200, right: 64, width: 7, height: 7, borderRadius: 2, background: "var(--glow)", transform: "rotate(35deg)", animationDelay: ".15s" }} />
           </div>
         )}
-        <div className="win-medal">{isWho ? "🕵️" : "✓"}</div>
+        <div className="win-medal">{isWho ? <IconSearch size={42} /> : <IconCheck size={42} />}</div>
         {isWho && <div className="stamp win-stamp">Caso fechado</div>}
         <div className="win-eyebrow">{isWho ? "Caso encerrado" : "Puzzle resolvido"}</div>
         <div className="win-title">{isWho ? "Caso resolvido!" : "Resolvido!"}</div>
@@ -656,7 +675,13 @@ export function Board({ puzzle, settings, nextId, allDone, onBack, onNext, onSol
               <div className="win-stat rec">
                 <div className="k">No registro</div>
                 <div className="v">
-                  {result?.isNew ? "★ cravado" : caseRecord ? `${caseRecord.accusations}ª · ${formatTime(caseRecord.ms)}` : "—"}
+                  {result?.isNew ? (
+                    <><IconStar size={13} /> cravado</>
+                  ) : caseRecord ? (
+                    `${caseRecord.accusations}ª · ${formatTime(caseRecord.ms)}`
+                  ) : (
+                    "—"
+                  )}
                 </div>
               </div>
             </>
@@ -664,7 +689,9 @@ export function Board({ puzzle, settings, nextId, allDone, onBack, onNext, onSol
             <>
               <div className="win-stat rec">
                 <div className="k">Recorde</div>
-                <div className="v">{result?.isNew ? "★ novo" : formatTime(record ?? result?.ms ?? elapsed)}</div>
+                <div className="v">
+                  {result?.isNew ? <><IconStar size={13} /> novo</> : formatTime(record ?? result?.ms ?? elapsed)}
+                </div>
               </div>
               <div className="win-stat">
                 <div className="k">Pistas</div>
@@ -673,7 +700,11 @@ export function Board({ puzzle, settings, nextId, allDone, onBack, onNext, onSol
             </>
           )}
         </div>
-        {allDone && <p className="win-alldone">🎉 Você concluiu todas as fases!</p>}
+        {allDone && (
+          <p className="win-alldone">
+            <IconStar size={15} /> Você concluiu todas as fases!
+          </p>
+        )}
         <div className="win-actions">
           {nextId ? (
             <>
