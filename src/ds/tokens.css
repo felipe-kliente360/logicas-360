@@ -1648,6 +1648,23 @@ button.act {
   border-radius: 50%;
   background: var(--glow);
 }
+/* variante compacta — no eyebrow, ao lado de "Investigação" */
+.confidential.sm {
+  font-size: 8.5px;
+  letter-spacing: 0.1em;
+  padding: 3px 7px;
+  border-width: 1.5px;
+  gap: 5px;
+}
+.confidential.sm::before {
+  width: 4px;
+  height: 4px;
+}
+.brand {
+  min-width: 0;
+  flex-wrap: wrap;
+  row-gap: 4px;
+}
 /* headline do arquivo — sempre em uma única linha (escala com a largura) */
 .headline {
   margin: 8px 0 0;

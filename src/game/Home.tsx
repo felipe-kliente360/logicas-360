@@ -60,16 +60,13 @@ export function Home({
           <div className="brand">
             <Logo size={40} />
             <p className="eyebrow" style={{ margin: 0 }}>
-              Investigações
+              Investigação
             </p>
+            <span className="confidential sm">Confidencial</span>
           </div>
           <button className="iconbtn" onClick={onOpenSettings} aria-label="Configurações">
             <IconGear size={18} />
           </button>
-        </div>
-
-        <div className="confid-row">
-          <span className="confidential">Confidencial</span>
         </div>
 
         <h1>Arquivo Nº 360</h1>
