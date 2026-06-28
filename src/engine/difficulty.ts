@@ -195,6 +195,74 @@ function propagate(puzzle: Puzzle): { solved: boolean; rounds: number; residual:
   return { solved, rounds, residual };
 }
 
+/**
+ * PREMISSA DE DESIGN — casos de investigação (whodunit):
+ * A evidência do crime ("o que sabemos do crime") deve ser a peça que se deduz por
+ * ÚLTIMO — o atributo que nenhuma pista entrega direto e que só fica único quando a
+ * grade está praticamente resolvida. Ou seja: a evidência NÃO pode ser um atalho que
+ * revela o culpado cedo. Quanto mais tarde o culpado fica único, melhor (e mais difícil)
+ * é o caso. Usamos "profundidade do culpado" para auditar e calibrar isso.
+ *
+ * culpritAudit roda a propagação rodada a rodada e mede em que ponto sobra UM único
+ * suspeito capaz de satisfazer todas as evidências, e quantas células ainda estavam
+ * indeterminadas nesse momento (openCellsWhenUnique). ≈0 = ideal (só sabe no fim);
+ * alto = "encurtável" (dá pra cravar o culpado sem resolver o caso).
+ */
+export interface CulpritAudit {
+  evidence: number;
+  roundsToSolve: number;
+  uniqueRound: number; // rodada em que o culpado ficou único
+  openCellsWhenUnique: number; // células ainda indeterminadas nesse momento
+  totalCells: number;
+  shortcutPct: number; // openCellsWhenUnique / totalCells (0 = só no fim; alto = encurtável)
+}
+
+export function culpritAudit(puzzle: Puzzle): CulpritAudit | null {
+  if (puzzle.kind !== "whodunit" || !puzzle.crime) return null;
+  const cats = puzzle.categories.map((x) => x.id);
+  const cons = puzzle.clues.flatMap((cl) => cl.constraints);
+  const ev = puzzle.crime.evidence;
+  const n = puzzle.size;
+  const totalCells = n * cats.length;
+  const c = initCands(puzzle);
+  const possibleCulprits = () => {
+    let cnt = 0;
+    for (let p = 0; p < n; p++) if (ev.every((e) => c[e.cat][p].has(e.value))) cnt++;
+    return cnt;
+  };
+  const openCells = () => {
+    let o = 0;
+    for (const cat of cats) for (let p = 0; p < n; p++) if (c[cat][p].size > 1) o++;
+    return o;
+  };
+  let rounds = 0;
+  let changed = true;
+  let uniqueRound = -1;
+  let openWhenUnique = totalCells;
+  if (possibleCulprits() === 1) {
+    uniqueRound = 0;
+    openWhenUnique = openCells();
+  }
+  while (changed && rounds < 200) {
+    changed = false;
+    for (const k of cons) if (prune(c, n, k)) changed = true;
+    if (structural(c, cats, n)) changed = true;
+    rounds++;
+    if (uniqueRound === -1 && possibleCulprits() === 1) {
+      uniqueRound = rounds;
+      openWhenUnique = openCells();
+    }
+  }
+  return {
+    evidence: ev.length,
+    roundsToSolve: rounds,
+    uniqueRound,
+    openCellsWhenUnique: openWhenUnique,
+    totalCells,
+    shortcutPct: Math.round((openWhenUnique / totalCells) * 100),
+  };
+}
+
 // --- backtracking instrumentado (sempre funciona, mesmo quando propagação trava) ---
 function posOf(g: Record<string, (string | null)[]>, cat: string, value: string): number {
   const a = g[cat];

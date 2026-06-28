@@ -304,14 +304,21 @@ export function Board({ puzzle, settings, nextId, allDone, onBack, onNext, onSol
     else wrongShake("Ainda não — revise as pistas.");
   }
 
-  // whodunit: acusar é LIVRE (a qualquer momento). O recorde grava quantas
-  // acusações você usou até acertar — e fica cravado (não melhora em rejogadas).
+  // a acusação precisa estar SUSTENTADA: o suspeito acusado já tem, na sua grade,
+  // todos os atributos das evidências do crime (não dá pra acusar quem você não deduziu).
+  const accusationSupported = (idx: number) =>
+    (puzzle.crime?.evidence ?? []).every((e) => board[e.cat][idx] === e.value);
+
   function accuse(idx: number) {
     setAccuseOpen(false);
+    if (!accusationSupported(idx)) {
+      showToast("Suas anotações ainda não sustentam essa acusação.");
+      return; // não conta como acusação
+    }
     const n = accusations + 1;
     setAccusations(n);
     if (idx === puzzle.culprit) triggerWin(n);
-    else wrongShake("As evidências não sustentam essa acusação.");
+    else wrongShake("As evidências não fecham — esse não é o culpado.");
   }
 
   // Limpar/reiniciar: zera o tabuleiro MAS mantém as posições cravadas pela ajuda
@@ -595,12 +602,15 @@ export function Board({ puzzle, settings, nextId, allDone, onBack, onNext, onSol
             <h3>Apontar o culpado</h3>
             <div className="ctx">{puzzle.crime?.prompt}</div>
             <div className="opts">
-              {puzzle.spine.labels.map((name, i) => (
-                <button className="opt accuse" key={i} onClick={() => accuse(i)}>
-                  <span className="name">{name}</span>
-                  <span className="used">acusar →</span>
-                </button>
-              ))}
+              {puzzle.spine.labels.map((name, i) => {
+                const ok = accusationSupported(i);
+                return (
+                  <button className={"opt accuse" + (ok ? "" : " taken")} key={i} onClick={() => accuse(i)}>
+                    <span className="name">{name}</span>
+                    <span className="used">{ok ? "acusar →" : "faltam evidências"}</span>
+                  </button>
+                );
+              })}
             </div>
           </div>
         </>
