@@ -82,6 +82,13 @@ export function Home({
           </button>
         </div>
 
+        {invest && (
+          <div className="dossie-cover">
+            <span className="cover-file">Arquivo Nº 360 · {puzzles.length} casos</span>
+            <span className="stamp cover-stamp">Confidencial</span>
+          </div>
+        )}
+
         <h1>{invest ? "Investigações" : "Lógicas 360"}</h1>
         <p className="sub">
           {invest

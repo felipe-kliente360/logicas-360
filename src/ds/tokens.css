@@ -1563,6 +1563,27 @@ button.act {
   line-height: 1.55;
   color: var(--ink);
 }
+/* capa do dossiê (home das investigações): linha de arquivo + carimbo */
+.dossie-cover {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  margin: 18px 0 2px;
+}
+.cover-file {
+  font-family: var(--font-mono), monospace;
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--ink-faint);
+}
+.stamp.cover-stamp {
+  font-size: 13px;
+  padding: 5px 11px;
+  transform: rotate(-5deg);
+}
 .opt.accuse .name {
   font-weight: 700;
 }
