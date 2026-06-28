@@ -4,6 +4,7 @@
 import type { Puzzle } from "../engine/types";
 import { solve } from "../engine/solver";
 import { difficultyRaw } from "../engine/difficulty";
+import { GLYPH_FOR } from "../ds/components/glyphs";
 import { noPonto } from "./no-ponto";
 import { einstein } from "./einstein";
 import { GENIOL } from "./geniol"; // acervo Geniol (auto-gerado)
@@ -53,7 +54,19 @@ function hydrate(p: Puzzle): Puzzle {
     }
     if (culprit === undefined) console.warn(`[puzzles] ${p.id}: evidências não apontam culpado`);
   }
-  return { ...p, solution: solution ?? {}, difficulty: levelFromRank(rank.get(p.id)!), culprit };
+  // glifos temáticos: nos casos de investigação, troca os valores de texto cujo id
+  // tem glifo na nossa linha autoral por display de ícone (cor semântica opcional).
+  const categories =
+    p.kind === "whodunit"
+      ? p.categories.map((c) => ({
+          ...c,
+          values: c.values.map((v) => {
+            const g = v.display.kind === "text" ? GLYPH_FOR[v.id] : undefined;
+            return g ? { ...v, display: { kind: "icon" as const, icon: g.icon, hex: g.hex } } : v;
+          }),
+        }))
+      : p.categories;
+  return { ...p, categories, solution: solution ?? {}, difficulty: levelFromRank(rank.get(p.id)!), culprit };
 }
 
 export const PUZZLES: Puzzle[] = RAW.map(hydrate).sort(

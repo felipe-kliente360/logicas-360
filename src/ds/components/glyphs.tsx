@@ -2,6 +2,11 @@
 // etiqueta colorida do valor. Mesma gramática dos ícones: 24×24, currentColor.
 // Usados quando um valor declara display { kind:"icon", icon:"<nome>" }.
 import type { JSX } from "react";
+import { FOOD_GLYPHS } from "./glyphs-food";
+import { OBJECT_GLYPHS } from "./glyphs-objects";
+import { TOOL_GLYPHS } from "./glyphs-tools";
+import { TECH_GLYPHS } from "./glyphs-tech";
+import { APPAREL_GLYPHS } from "./glyphs-apparel";
 
 const g = (size: number) => ({
   width: size,
@@ -16,6 +21,11 @@ const g = (size: number) => ({
 });
 
 export const GLYPHS: Record<string, (size: number) => JSX.Element> = {
+  ...FOOD_GLYPHS,
+  ...OBJECT_GLYPHS,
+  ...TOOL_GLYPHS,
+  ...TECH_GLYPHS,
+  ...APPAREL_GLYPHS,
   // adaga — lâmina, guarda, cabo e pomo
   adaga: (s) => (
     <svg {...g(s)}>
@@ -66,3 +76,54 @@ export const GLYPHS: Record<string, (size: number) => JSX.Element> = {
 export function Glyph({ name, size = 15 }: { name: string; size?: number }) {
   return GLYPHS[name]?.(size) ?? null;
 }
+
+/**
+ * Mapa global valor→glifo (chave = id do valor). Os nomes de objetos são
+ * consistentes entre os casos (uma "Corda" é sempre corda), então atribuímos o
+ * glifo uma vez aqui e o `hydrate` aplica a todos os casos de investigação.
+ * `hex` define a cor semântica da etiqueta (gemas, fichas, bebidas); sem hex, a
+ * etiqueta usa a cor por posição na categoria.
+ */
+export const GLYPH_FOR: Record<string, { icon: string; hex?: string }> = {
+  // armas / objetos
+  Adaga: { icon: "adaga" }, Corda: { icon: "corda" }, Castical: { icon: "castical" },
+  Veneno: { icon: "veneno" }, Revolver: { icon: "revolver" }, Frasco: { icon: "frasco" },
+  Faca: { icon: "faca" }, "Faca de chef": { icon: "faca" }, Estatueta: { icon: "estatueta" },
+  Bengala: { icon: "bengala" }, "Lenco de seda": { icon: "lenco" }, Relogio: { icon: "relogio" },
+  Charuto: { icon: "charuto" }, Bussola: { icon: "bussola" }, Binoculo: { icon: "binoculo" },
+  Cantil: { icon: "cantil" }, Lanterna: { icon: "lanterna" }, "Cabo de aco": { icon: "cabo" },
+  Pulseira: { icon: "pulseira" }, "Taca quebrada": { icon: "taca" }, Taca: { icon: "taca" },
+  Travesseiro: { icon: "travesseiro" }, Estilete: { icon: "estilete" }, Catalogo: { icon: "livro" },
+  Luvas: { icon: "luva" }, Cravo: { icon: "flor" },
+  // perícia / laboratório
+  "Frasco de acido": { icon: "frasco", hex: "#7a8a39" }, "Seringa contaminada": { icon: "seringa" },
+  Seringa: { icon: "seringa" }, "Cracha clonado": { icon: "cracha" }, "Pen drive": { icon: "pendrive" },
+  "Luva rasgada": { icon: "luva" },
+  // vinícola
+  Sacarrolhas: { icon: "sacarrolhas" }, Decanter: { icon: "decanter" }, Foice: { icon: "foice" },
+  Tesoura: { icon: "tesoura" }, Lampiao: { icon: "lampiao" },
+  // observatório / GP (tech)
+  Telescopio: { icon: "telescopio" }, Caderno: { icon: "livro" }, Laser: { icon: "laser" },
+  Chave: { icon: "chave" }, Camera: { icon: "camera" }, ChaveInglesa: { icon: "chaveinglesa" },
+  Macaco: { icon: "macaco" }, Combustivel: { icon: "combustivel" }, Software: { icon: "chip" },
+  Pneu: { icon: "pneu" },
+  // disfarces (museu)
+  Uniforme: { icon: "uniforme" }, Terno: { icon: "terno" }, "Macacão": { icon: "macacao" }, Capa: { icon: "capa" },
+  // comida / padaria
+  Cafezinho: { icon: "cafe", hex: "#6b4a2f" }, "Pao de queijo": { icon: "pao", hex: "#b9892f" }, Sonho: { icon: "sonho", hex: "#c26a8a" },
+  // bebidas (spa / hotel / embaixada)
+  ChaVerde: { icon: "cha", hex: "#5b8a52" }, ChaPreto: { icon: "cha", hex: "#5a4636" },
+  Espumante: { icon: "flute", hex: "#be9b3f" }, Mimosa: { icon: "flute", hex: "#cf8a3a" },
+  Limonada: { icon: "copo", hex: "#b8a93a" }, Vinho: { icon: "taca", hex: "#7a2f3a" },
+  Champanhe: { icon: "flute", hex: "#c9a84a" }, Uisque: { icon: "uisque", hex: "#a9701f" },
+  Cafe: { icon: "cafe", hex: "#5a4636" }, Agua: { icon: "copo", hex: "#4f8fa6" },
+  Sopa: { icon: "sopa", hex: "#b07a36" }, Caviar: { icon: "caviar", hex: "#2f2a26" },
+  // gemas (joalheria)
+  Diamante: { icon: "gema", hex: "#6f7e8c" }, Esmeralda: { icon: "gema", hex: "#2f8f6f" },
+  Rubi: { icon: "gema", hex: "#b23a3a" }, Safira: { icon: "gema", hex: "#3a5fa0" },
+  Perola: { icon: "perola", hex: "#8a7f86" },
+  // fichas de cassino
+  Vermelha: { icon: "ficha", hex: "#b23a3a" }, Azul: { icon: "ficha", hex: "#3a5fa0" },
+  Verde: { icon: "ficha", hex: "#2f8f6f" }, Preta: { icon: "ficha", hex: "#33302b" },
+  Dourada: { icon: "ficha", hex: "#b9892f" },
+};

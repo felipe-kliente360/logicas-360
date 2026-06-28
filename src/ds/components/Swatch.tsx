@@ -40,7 +40,7 @@ export function Swatch({ value, index }: { value?: CategoryValue; index?: number
   }
   // glifo temático da nossa linha autoral, em emblema branco sobre a etiqueta colorida
   if (d.kind === "icon" && GLYPHS[d.icon]) {
-    const tint = swatchTint(index ?? hashIndex(value.id));
+    const tint = d.hex ?? swatchTint(index ?? hashIndex(value.id));
     return (
       <span className="dot tint glyph" style={{ background: tint }} aria-hidden>
         <Glyph name={d.icon} />

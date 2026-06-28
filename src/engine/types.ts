@@ -4,7 +4,7 @@
 
 export type ValueDisplay =
   | { kind: "color"; hex: string }
-  | { kind: "icon"; icon: string } // emoji ou nome de ícone
+  | { kind: "icon"; icon: string; hex?: string } // glifo da nossa linha; hex = cor semântica opcional
   | { kind: "text" };
 
 export interface CategoryValue {
