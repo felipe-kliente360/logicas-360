@@ -84,7 +84,32 @@ export function submitTime(id: string, ms: number): { best: number; isNew: boole
 }
 export function resetRecords(): Records {
   write(RECORDS_KEY, {});
+  write(CASEREC_KEY, {});
   return {};
+}
+
+/* ---------- recordes de CASO (investigação): tempo + acusações, CRAVADO ---------- */
+export interface CaseRecord {
+  ms: number;
+  accusations: number; // acusações usadas até acertar (1 = de primeira)
+}
+const CASEREC_KEY = "logicas360.caserecords.v1";
+
+function loadAllCaseRecords(): Record<string, CaseRecord> {
+  const r = read<Record<string, CaseRecord>>(CASEREC_KEY, {});
+  return r && typeof r === "object" ? r : {};
+}
+export function getCaseRecord(id: string): CaseRecord | undefined {
+  return loadAllCaseRecords()[id];
+}
+/** Grava o resultado do caso UMA vez (cravado — não melhora em rejogadas). */
+export function submitCaseRecord(id: string, ms: number, accusations: number): { rec: CaseRecord; isNew: boolean } {
+  const all = loadAllCaseRecords();
+  if (all[id]) return { rec: all[id], isNew: false }; // já cravado: não atualiza
+  const rec = { ms, accusations };
+  all[id] = rec;
+  write(CASEREC_KEY, all);
+  return { rec, isNew: true };
 }
 
 /* ---------- estado em andamento (fase abandonada) ---------- */
@@ -92,6 +117,7 @@ export interface InProgress {
   board: Record<string, (string | null)[]>;
   elapsedMs: number;
   notes?: string[]; // anotações "não é aqui" — chaves "cat:pos:valor"
+  accusations?: number; // acusações já feitas neste caso (whodunit)
 }
 const INPROGRESS_KEY = "logicas360.inprogress.v1";
 

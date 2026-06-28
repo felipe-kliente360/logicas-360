@@ -14,6 +14,8 @@ import {
   loadHints,
   saveHints,
   clearHints,
+  getCaseRecord,
+  submitCaseRecord,
   type InProgress,
   type Settings,
 } from "./storage";
@@ -98,7 +100,9 @@ export function Board({ puzzle, settings, nextId, allDone, onBack, onNext, onSol
   const [elapsed, setElapsed] = useState(saved?.elapsedMs ?? 0);
   const [running, setRunning] = useState(true);
   const [record, setRecord] = useState<number | undefined>(() => getRecord(puzzle.id));
-  const [result, setResult] = useState<{ ms: number; isNew: boolean } | null>(null);
+  const [caseRecord, setCaseRecord] = useState(() => getCaseRecord(puzzle.id));
+  const [accusations, setAccusations] = useState<number>(() => saved?.accusations ?? 0);
+  const [result, setResult] = useState<{ ms: number; isNew: boolean; accusations?: number } | null>(null);
 
   const totalSlots = puzzle.size * puzzle.categories.length;
   const valueOf = useMemo(() => {
@@ -120,14 +124,22 @@ export function Board({ puzzle, settings, nextId, allDone, onBack, onNext, onSol
   wonRef.current = won;
   const notesRef = useRef(notes);
   notesRef.current = notes;
+  const accusationsRef = useRef(accusations);
+  accusationsRef.current = accusations;
 
   const persist = useCallback(() => {
     if (wonRef.current) return;
     const ms = runningRef.current ? Date.now() - startRef.current : elapsedRef.current;
     const filledNow = puzzle.categories.reduce((a, c) => a + boardRef.current[c.id].filter(Boolean).length, 0);
-    const hasContent = filledNow > 0 || notesRef.current.size > 0;
+    const hasContent = filledNow > 0 || notesRef.current.size > 0 || accusationsRef.current > 0;
     if (!hasContent) clearInProgress(puzzle.id);
-    else saveInProgress(puzzle.id, { board: boardRef.current, elapsedMs: ms, notes: [...notesRef.current] });
+    else
+      saveInProgress(puzzle.id, {
+        board: boardRef.current,
+        elapsedMs: ms,
+        notes: [...notesRef.current],
+        accusations: accusationsRef.current,
+      });
   }, [puzzle]);
 
   useEffect(() => {
@@ -253,13 +265,19 @@ export function Board({ puzzle, settings, nextId, allDone, onBack, onNext, onSol
   const gridCorrect = () =>
     puzzle.categories.every((c) => board[c.id].every((v, p) => v === puzzle.solution[c.id][p]));
 
-  function triggerWin() {
+  function triggerWin(accCount?: number) {
     const ms = Date.now() - startRef.current;
     setElapsed(ms);
     setRunning(false);
-    const { best, isNew } = submitTime(puzzle.id, ms);
-    setRecord(best);
-    setResult({ ms, isNew });
+    if (isWho) {
+      const { rec, isNew } = submitCaseRecord(puzzle.id, ms, accCount ?? accusations);
+      setCaseRecord(rec);
+      setResult({ ms, isNew, accusations: accCount ?? accusations });
+    } else {
+      const { best, isNew } = submitTime(puzzle.id, ms);
+      setRecord(best);
+      setResult({ ms, isNew });
+    }
     wonRef.current = true;
     setWon(true);
     clearInProgress(puzzle.id);
@@ -286,22 +304,14 @@ export function Board({ puzzle, settings, nextId, allDone, onBack, onNext, onSol
     else wrongShake("Ainda não — revise as pistas.");
   }
 
-  // whodunit: acusar um suspeito. Exige a grade resolvida E o culpado certo.
+  // whodunit: acusar é LIVRE (a qualquer momento). O recorde grava quantas
+  // acusações você usou até acertar — e fica cravado (não melhora em rejogadas).
   function accuse(idx: number) {
     setAccuseOpen(false);
-    if (filled < totalSlots) {
-      showToast("Complete a investigação antes de acusar.");
-      return;
-    }
-    if (!gridCorrect()) {
-      wrongShake("Algo não bate nas evidências — revise a grade.");
-      return;
-    }
-    if (idx !== puzzle.culprit) {
-      showToast("As evidências apontam outra pessoa…");
-      return;
-    }
-    triggerWin();
+    const n = accusations + 1;
+    setAccusations(n);
+    if (idx === puzzle.culprit) triggerWin(n);
+    else wrongShake("As evidências não sustentam essa acusação.");
   }
 
   // Limpar/reiniciar: zera o tabuleiro MAS mantém as posições cravadas pela ajuda
@@ -314,6 +324,7 @@ export function Board({ puzzle, settings, nextId, allDone, onBack, onNext, onSol
       setHintsLeft(MAX_HINTS);
     }
     setNotes(new Set());
+    setAccusations(0);
     setBoard(applyLocks(emptyBoard(puzzle), puzzle, fresh));
     setWon(false);
     setResult(null);
@@ -364,7 +375,13 @@ export function Board({ puzzle, settings, nextId, allDone, onBack, onNext, onSol
           {source} · nível {puzzle.difficulty}
         </p>
         <h1 className="title board-h1">{puzzle.title}</h1>
-        {record != null && <p className="record-line">🏆 Seu recorde: {formatTime(record)}</p>}
+        {isWho
+          ? caseRecord && (
+              <p className="record-line">
+                🗄️ Caso encerrado · {caseRecord.accusations}ª acusação · {formatTime(caseRecord.ms)}
+              </p>
+            )
+          : record != null && <p className="record-line">🏆 Seu recorde: {formatTime(record)}</p>}
         <div className="progress">
           <div className="pbar">
             <div className="pfill" style={{ width: `${(filled / totalSlots) * 100}%` }} />
@@ -471,12 +488,8 @@ export function Board({ puzzle, settings, nextId, allDone, onBack, onNext, onSol
             <IconRefresh />
           </button>
           {isWho ? (
-            <button
-              className="act primary verificar"
-              onClick={() => setAccuseOpen(true)}
-              disabled={filled < totalSlots}
-            >
-              🔍 Acusar
+            <button className="act primary verificar" onClick={() => setAccuseOpen(true)}>
+              🔍 Acusar{accusations > 0 ? ` · ${accusations}ª` : ""}
             </button>
           ) : (
             <button className="act primary verificar" onClick={check} disabled={filled < totalSlots}>
@@ -620,14 +633,31 @@ export function Board({ puzzle, settings, nextId, allDone, onBack, onNext, onSol
             <div className="k">Tempo</div>
             <div className="v">{formatTime(result?.ms ?? elapsed)}</div>
           </div>
-          <div className="win-stat rec">
-            <div className="k">Recorde</div>
-            <div className="v">{result?.isNew ? "★ novo" : formatTime(record ?? result?.ms ?? elapsed)}</div>
-          </div>
-          <div className="win-stat">
-            <div className="k">Pistas</div>
-            <div className="v">{puzzle.clues.length}</div>
-          </div>
+          {isWho ? (
+            <>
+              <div className="win-stat">
+                <div className="k">Acusações</div>
+                <div className="v">{result?.accusations ?? accusations}</div>
+              </div>
+              <div className="win-stat rec">
+                <div className="k">No registro</div>
+                <div className="v">
+                  {result?.isNew ? "★ cravado" : caseRecord ? `${caseRecord.accusations}ª · ${formatTime(caseRecord.ms)}` : "—"}
+                </div>
+              </div>
+            </>
+          ) : (
+            <>
+              <div className="win-stat rec">
+                <div className="k">Recorde</div>
+                <div className="v">{result?.isNew ? "★ novo" : formatTime(record ?? result?.ms ?? elapsed)}</div>
+              </div>
+              <div className="win-stat">
+                <div className="k">Pistas</div>
+                <div className="v">{puzzle.clues.length}</div>
+              </div>
+            </>
+          )}
         </div>
         {allDone && <p className="win-alldone">🎉 Você concluiu todas as fases!</p>}
         <div className="win-actions">

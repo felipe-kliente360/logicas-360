@@ -1,7 +1,7 @@
 // Tela de entrada — abas (Puzzles / Investigações), seletor de fases, progresso e recordes.
 import { useMemo, useState } from "react";
 import type { Puzzle } from "../engine/types";
-import { getRecord, formatTime, hasInProgress, type Progress } from "./storage";
+import { getRecord, getCaseRecord, formatTime, hasInProgress, type Progress } from "./storage";
 import { Logo } from "../ds/components/Logo";
 
 export type HomeTab = "puzzles" | "investigacoes";
@@ -116,6 +116,7 @@ export function Home({
         {visible.map((p) => {
           const done = progress.completed.includes(p.id);
           const rec = getRecord(p.id);
+          const caseRec = invest ? getCaseRecord(p.id) : undefined;
           const inProgress = !done && hasInProgress(p.id);
           return (
             <button key={p.id} className={"level-card" + (done ? " done" : "") + (invest ? " case" : "")} onClick={() => onPick(p.id)}>
@@ -130,7 +131,9 @@ export function Home({
                     ? `Caso ${numberOf.get(p.id)} · ${diffWord(p.difficulty)} · ${p.size} suspeitos`
                     : `${diffWord(p.difficulty)} · ${p.size}×${p.categories.length}`}
                 </p>
-                {rec != null ? (
+                {caseRec ? (
+                  <span className="level-diff">🗄️ {caseRec.accusations}ª acusação · {formatTime(caseRec.ms)}</span>
+                ) : rec != null ? (
                   <span className="level-diff">🏆 recorde {formatTime(rec)}</span>
                 ) : inProgress ? (
                   <span className="level-diff resume">▸ continuar de onde parou</span>
