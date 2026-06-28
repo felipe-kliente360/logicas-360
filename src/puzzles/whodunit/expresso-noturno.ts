@@ -28,7 +28,8 @@ export const puzzle: Puzzle = {
     { id:"c14", text:"A bengala não pertencia a quem se recolheu às 23h.", highlights:[], constraints:[{k:"diff",a:{cat:"objeto",value:"Bengala"},b:{cat:"hora",value:"23h"}}] },
     { id:"c15", text:"O frasco não estava guardado na Cabine 5.", highlights:[], constraints:[{k:"diff",a:{cat:"objeto",value:"Frasco"},b:{cat:"cabine",value:"Cabine 5"}}] },
     { id:"c16", text:"O charuto não foi achado na Cabine 4.", highlights:[], constraints:[{k:"diff",a:{cat:"objeto",value:"Charuto"},b:{cat:"cabine",value:"Cabine 4"}}] },
+    { id:"c17", text:"O Coronel Adler não portava a bengala.", highlights:[], constraints:[{k:"notAt",cat:"objeto",value:"Bengala",pos:0}] },
   ],
-  crime: { prompt: "Quem cometeu o crime a bordo do Expresso Noturno?", evidence: [{cat:"objeto",value:"Frasco"},{cat:"cabine",value:"Cabine 3"}] },
+  crime: { prompt: "O legista fixou a morte às 22h em ponto, e o vagão de serviço confirmou: a cabine de origem do bilhete fatal foi a Cabine 1. Cruzando o horário do crime com a primeira cabine do vagão-leito, quem cometeu o crime a bordo do Expresso Noturno?", evidence: [{cat:"cabine",value:"Cabine 1"},{cat:"hora",value:"22h"}] },
   solution: {},
 };
