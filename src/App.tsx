@@ -17,7 +17,8 @@ import {
 
 export default function App() {
   const [splash, setSplash] = useState(true);
-  const [tab, setTab] = useState<HomeTab>("investigacoes");
+  // Aba única por enquanto: investigações. (Puzzles de lógica ficam guardados.)
+  const [tab] = useState<HomeTab>("investigacoes");
   const [activeId, setActiveId] = useState<string | null>(null);
   const [progress, setProgress] = useState<Progress>(() => loadProgress());
   const [settings, setSettings] = useState<SettingsT>(() => loadSettings());
@@ -66,8 +67,6 @@ export default function App() {
         <Home
           puzzles={list}
           tab={tab}
-          onTab={setTab}
-          investigacoesCount={WHODUNITS.length}
           progress={progress}
           onPick={(id) => setActiveId(id)}
           onOpenSettings={() => setShowSettings(true)}

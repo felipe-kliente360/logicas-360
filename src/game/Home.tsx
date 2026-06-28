@@ -19,16 +19,12 @@ const BANDS = [
 export function Home({
   puzzles,
   tab,
-  onTab,
-  investigacoesCount,
   progress,
   onPick,
   onOpenSettings,
 }: {
   puzzles: Puzzle[];
   tab: HomeTab;
-  onTab: (t: HomeTab) => void;
-  investigacoesCount: number;
   progress: Progress;
   onPick: (id: string) => void;
   onOpenSettings: () => void;
@@ -64,7 +60,7 @@ export function Home({
           <div className="brand">
             <Logo size={40} />
             <p className="eyebrow" style={{ margin: 0 }}>
-              {invest ? "Arquivo de casos" : "Desafios de lógica"}
+              Investigação &amp; Lógica
             </p>
           </div>
           <button className="iconbtn" onClick={onOpenSettings} aria-label="Configurações">
@@ -72,30 +68,12 @@ export function Home({
           </button>
         </div>
 
-        {/* abas */}
-        <div className="tabs">
-          <button className={"tab" + (!invest ? " on" : "")} onClick={() => onTab("puzzles")}>
-            Puzzles
-          </button>
-          <button className={"tab" + (invest ? " on" : "")} onClick={() => onTab("investigacoes")}>
-            Investigações
-            {investigacoesCount > 0 && <span className="tab-n">{investigacoesCount}</span>}
-          </button>
+        <div className="dossie-cover">
+          <span className="stamp cover-stamp">Confidencial</span>
         </div>
 
-        {invest && (
-          <div className="dossie-cover">
-            <span className="cover-file">Arquivo Nº 360 · {puzzles.length} casos</span>
-            <span className="stamp cover-stamp">Confidencial</span>
-          </div>
-        )}
-
-        <h1>{invest ? "Investigações" : "Lógicas 360"}</h1>
-        <p className="sub">
-          {invest
-            ? `${puzzles.length} casos para resolver: deduza a grade e aponte o culpado.`
-            : `${puzzles.length} puzzles de dedução em grade, do mais fácil ao expert.`}
-        </p>
+        <h1>Arquivo Nº 360</h1>
+        <p className="headline">Entenda o caso e aponte o culpado.</p>
         <div className="progress" style={{ marginTop: 16 }}>
           <div className="pbar">
             <div

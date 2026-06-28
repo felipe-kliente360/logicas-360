@@ -54,6 +54,11 @@
   box-sizing: border-box;
   -webkit-tap-highlight-color: transparent;
 }
+/* iOS pinta texto de <button> com o azul do sistema por padrão — herdar a cor do
+   tema mata isso (títulos dentro de cards de fase apareciam azuis no Safari). */
+button {
+  color: inherit;
+}
 html,
 body {
   margin: 0;
@@ -1065,6 +1070,7 @@ button.act {
   font-family: var(--font-display), sans-serif;
   font-size: 18px;
   font-weight: 700;
+  color: var(--ink);
 }
 .level-meta {
   margin: 3px 0 0;
@@ -1613,9 +1619,18 @@ button.act {
 .dossie-cover {
   display: flex;
   align-items: center;
-  justify-content: space-between;
+  justify-content: flex-end;
   gap: 12px;
-  margin: 18px 0 2px;
+  margin: 16px 0 2px;
+}
+/* headline do arquivo — sempre em uma única linha (escala com a largura) */
+.headline {
+  margin: 8px 0 0;
+  font-size: clamp(14px, 4.2vw, 17px);
+  font-weight: 600;
+  letter-spacing: -0.01em;
+  color: var(--ink-dim);
+  white-space: nowrap;
 }
 .cover-file {
   font-family: var(--font-mono), monospace;
