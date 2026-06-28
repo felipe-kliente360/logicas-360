@@ -3,6 +3,15 @@
 const PROGRESS_KEY = "logicas360.progress.v1";
 const SETTINGS_KEY = "logicas360.settings.v1";
 const RECORDS_KEY = "logicas360.records.v1";
+const TUTSEEN_KEY = "logicas360.tutseen.v1";
+
+/* ---------- onboarding (tutorial guiado visto) ---------- */
+export function getTutorialSeen(): boolean {
+  return read<boolean>(TUTSEEN_KEY, false) === true;
+}
+export function setTutorialSeen(v = true): void {
+  write(TUTSEEN_KEY, v);
+}
 
 const read = <T>(key: string, fallback: T): T => {
   try {
@@ -40,6 +49,7 @@ export function markCompleted(id: string): Progress {
 export function resetProgress(): Progress {
   const empty = { completed: [] };
   write(PROGRESS_KEY, empty);
+  write(TUTSEEN_KEY, false); // reabilita o onboarding
   return empty;
 }
 

@@ -16,6 +16,8 @@ import {
   clearHints,
   getCaseRecord,
   submitCaseRecord,
+  getTutorialSeen,
+  setTutorialSeen,
   type InProgress,
   type Settings,
 } from "./storage";
@@ -113,7 +115,7 @@ export function Board({ puzzle, settings, nextId, allDone, onBack, onNext, onSol
   const isWho = puzzle.kind === "whodunit";
   // tutorial guiado (só no caso de treino, na primeira vez)
   const isTutorial = puzzle.id === "sumico-padaria";
-  const [tut, setTut] = useState<number>(() => (isTutorial && !getCaseRecord(puzzle.id) ? 0 : -1));
+  const [tut, setTut] = useState<number>(() => (isTutorial && !getTutorialSeen() ? 0 : -1));
   const [tutFlash, setTutFlash] = useState(false); // pisca o alvo logo após o auto-scroll
   const litTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
   const toastTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
@@ -378,6 +380,7 @@ export function Board({ puzzle, settings, nextId, allDone, onBack, onNext, onSol
     }
     wonRef.current = true;
     setWon(true);
+    if (isTutorial) setTutorialSeen();
     clearInProgress(puzzle.id);
     clearHints(puzzle.id);
     if (isWho) stamp(settings.som);
@@ -635,7 +638,13 @@ export function Board({ puzzle, settings, nextId, allDone, onBack, onNext, onSol
                   Começar
                 </button>
               )}
-              <button className="coach-skip" onClick={() => setTut(-1)}>
+              <button
+                className="coach-skip"
+                onClick={() => {
+                  setTut(-1);
+                  setTutorialSeen();
+                }}
+              >
                 Pular tutorial
               </button>
             </div>

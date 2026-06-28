@@ -1,7 +1,7 @@
 // Tela de entrada — abas (Puzzles / Investigações), seletor de fases, progresso e recordes.
 import { useMemo, useState } from "react";
 import type { Puzzle } from "../engine/types";
-import { getRecord, getCaseRecord, formatTime, hasInProgress, type Progress } from "./storage";
+import { getRecord, getCaseRecord, formatTime, hasInProgress, getTutorialSeen, type Progress } from "./storage";
 import { Logo } from "../ds/components/Logo";
 import { IconGear, IconFolder, IconStar, IconCheck, IconChevronRight, IconSearch } from "../ds/components/icons";
 
@@ -84,7 +84,7 @@ export function Home({
         </div>
       </div>
 
-      {invest && puzzles[0] && !progress.completed.includes(puzzles[0].id) && (
+      {invest && puzzles[0] && !getTutorialSeen() && (
         <button className="learn-banner" onClick={() => onPick(puzzles[0].id)}>
           <span className="learn-ic">
             <IconSearch size={20} />
