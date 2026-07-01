@@ -46,6 +46,10 @@ export interface WhoGenOptions {
   rawMax?: number;
   maxAttempts?: number;
   maxShortcut?: number; // atalho% máximo aceito (0 = culpado estritamente profundo)
+  // Three Clue Rule: nº de pistas CORROBORANTES a acrescentar além do conjunto
+  // mínimo, abrindo trilhas alternativas de dedução (menos "gargalos"). Recomendado
+  // em níveis fáceis, onde o perdão importa mais; 0 = conjunto mínimo/enxuto.
+  redundancy?: number;
 }
 export interface WhoGenResult {
   puzzle: Puzzle;
@@ -129,7 +133,7 @@ function minimize(base: Omit<Puzzle, "clues">, cons: Constraint[], rng: () => nu
 }
 
 /** Uma tentativa: devolve o puzzle válido (único + culpado profundo) ou null. */
-function attemptOnce(skin: WhoSkin, rng: () => number, maxShortcut: number): { puzzle: Puzzle; raw: number; atalho: number } | null {
+function attemptOnce(skin: WhoSkin, rng: () => number, maxShortcut: number, redundancy: number): { puzzle: Puzzle; raw: number; atalho: number } | null {
   const n = skin.size;
   const sol = buildSolution(skin.categories, rng);
   const culprit = Math.floor(rng() * n);
@@ -158,8 +162,16 @@ function attemptOnce(skin: WhoSkin, rng: () => number, maxShortcut: number): { p
   const minimal = minimize(base, pool, rng);
   if (!minimal) return null;
 
+  // Three Clue Rule: acrescenta pistas corroborantes (redundantes, portanto não
+  // revelam a evidência e não quebram a unicidade) para abrir trilhas alternativas.
+  let chosen = minimal;
+  if (redundancy > 0) {
+    const extra = shuffle(pool.filter((c) => !minimal.includes(c)), rng).slice(0, redundancy);
+    chosen = [...minimal, ...extra];
+  }
+
   const verb = skin.clueVerb ?? {};
-  const clues: Clue[] = shuffle(minimal, rng).map((c, i) => ({
+  const clues: Clue[] = shuffle(chosen, rng).map((c, i) => ({
     id: `c${i + 1}`,
     text: clueText(c, skin.categories, skin.spine, verb),
     highlights: [],
@@ -175,11 +187,11 @@ function attemptOnce(skin: WhoSkin, rng: () => number, maxShortcut: number): { p
 
 /** Gera um caso mirando a faixa de raw; varia a semente e devolve o melhor. */
 export function generateWhodunit(skin: WhoSkin, opts: WhoGenOptions = {}): WhoGenResult | null {
-  const { seed = 1, rawMin = 0, rawMax = 99, maxAttempts = 120, maxShortcut = 0 } = opts;
+  const { seed = 1, rawMin = 0, rawMax = 99, maxAttempts = 120, maxShortcut = 0, redundancy = 0 } = opts;
   let best: WhoGenResult | null = null;
   for (let attempt = 0; attempt < maxAttempts; attempt++) {
     const rng = mulberry32(seed + attempt * 7919);
-    const r = attemptOnce(skin, rng, maxShortcut);
+    const r = attemptOnce(skin, rng, maxShortcut, redundancy);
     if (!r) continue;
     const result: WhoGenResult = { puzzle: r.puzzle, raw: r.raw, atalho: r.atalho, clueCount: r.puzzle.clues.length, attempts: attempt + 1 };
     if (r.raw >= rawMin && r.raw <= rawMax) return result;
