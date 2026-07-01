@@ -20,8 +20,15 @@ import { puzzle as sabotagemGrandePremio } from "./sabotagem-grande-premio";
 import { puzzle as banqueteEmbaixada } from "./banquete-embaixada";
 import { puzzle as mansaoSegredos } from "./mansao-segredos";
 import { puzzle as operaFantasma } from "./opera-fantasma";
+// --- piloto do gerador (temas novos, lógica gerada) ---
+import { puzzle as crimeSetCinema } from "./crime-set-cinema";
+import { puzzle as terrorNoCirco } from "./terror-no-circo";
+import { puzzle as sabotagemSubmarino } from "./sabotagem-submarino";
 
 export const WHODUNIT: Puzzle[] = [
+  crimeSetCinema,
+  terrorNoCirco,
+  sabotagemSubmarino,
   sumicoPadaria,
   rouboMuseu,
   crimeMansao,

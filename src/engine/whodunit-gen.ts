@@ -33,7 +33,10 @@ export interface WhoSkin {
   spine: Spine; // { id:"suspeito", label:"Suspeito", ordered:false, labels:[...] }
   categories: Category[];
   evidenceCats: string[]; // categorias que formam a evidência do crime
-  crimePrompt: string; // "o que se sabe até agora" (laudo)
+  // "o que se sabe até agora" (laudo). Como o culpado é sorteado, aceite uma função
+  // que recebe os RÓTULOS da evidência escolhida e monta o texto (sem redundância
+  // com o enunciado, que não revela valores).
+  crimePrompt: string | ((ev: Record<string, string>) => string);
   clueVerb?: Record<string, string>; // verbo por categoria p/ texto natural ("estava em", "portava", "foi visto às")
 }
 
@@ -42,6 +45,7 @@ export interface WhoGenOptions {
   rawMin?: number;
   rawMax?: number;
   maxAttempts?: number;
+  maxShortcut?: number; // atalho% máximo aceito (0 = culpado estritamente profundo)
 }
 export interface WhoGenResult {
   puzzle: Puzzle;
@@ -125,12 +129,15 @@ function minimize(base: Omit<Puzzle, "clues">, cons: Constraint[], rng: () => nu
 }
 
 /** Uma tentativa: devolve o puzzle válido (único + culpado profundo) ou null. */
-function attemptOnce(skin: WhoSkin, rng: () => number): { puzzle: Puzzle; raw: number; atalho: number } | null {
+function attemptOnce(skin: WhoSkin, rng: () => number, maxShortcut: number): { puzzle: Puzzle; raw: number; atalho: number } | null {
   const n = skin.size;
   const sol = buildSolution(skin.categories, rng);
   const culprit = Math.floor(rng() * n);
   const evidence = skin.evidenceCats.map((cat) => ({ cat, value: sol[cat][culprit] }));
   const banned = new Set(evidence.map((e) => e.cat + "|" + e.value));
+  const evLabels: Record<string, string> = {};
+  for (const e of evidence) evLabels[e.cat] = labelOf(skin.categories, e.cat, e.value);
+  const prompt = typeof skin.crimePrompt === "function" ? skin.crimePrompt(evLabels) : skin.crimePrompt;
 
   const base: Omit<Puzzle, "clues"> = {
     id: skin.id,
@@ -144,7 +151,7 @@ function attemptOnce(skin: WhoSkin, rng: () => number): { puzzle: Puzzle; raw: n
     categories: skin.categories,
     solution: {},
     difficulty: 0,
-    crime: { prompt: skin.crimePrompt, evidence } as Crime,
+    crime: { prompt, evidence } as Crime,
   };
 
   const pool = enumerate(skin.categories, n, sol, banned);
@@ -162,17 +169,17 @@ function attemptOnce(skin: WhoSkin, rng: () => number): { puzzle: Puzzle; raw: n
 
   if (countSolutions(puzzle, 2) !== 1) return null;
   const audit = culpritAudit(puzzle);
-  if (!audit || audit.shortcutPct > 10) return null; // exige culpado profundo
+  if (!audit || audit.shortcutPct > maxShortcut) return null; // exige culpado profundo
   return { puzzle, raw: difficultyRaw(puzzle), atalho: audit.shortcutPct };
 }
 
 /** Gera um caso mirando a faixa de raw; varia a semente e devolve o melhor. */
 export function generateWhodunit(skin: WhoSkin, opts: WhoGenOptions = {}): WhoGenResult | null {
-  const { seed = 1, rawMin = 0, rawMax = 99, maxAttempts = 120 } = opts;
+  const { seed = 1, rawMin = 0, rawMax = 99, maxAttempts = 120, maxShortcut = 0 } = opts;
   let best: WhoGenResult | null = null;
   for (let attempt = 0; attempt < maxAttempts; attempt++) {
     const rng = mulberry32(seed + attempt * 7919);
-    const r = attemptOnce(skin, rng);
+    const r = attemptOnce(skin, rng, maxShortcut);
     if (!r) continue;
     const result: WhoGenResult = { puzzle: r.puzzle, raw: r.raw, atalho: r.atalho, clueCount: r.puzzle.clues.length, attempts: attempt + 1 };
     if (r.raw >= rawMin && r.raw <= rawMax) return result;
