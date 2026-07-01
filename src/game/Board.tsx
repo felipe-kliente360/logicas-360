@@ -560,7 +560,14 @@ export function Board({ puzzle, settings, nextId, allDone, onBack, onNext, onSol
       <section className={"queue" + (puzzle.spine.ordered ? " ordered" : "") + (shake ? " shake" : "")}>
         {Array.from({ length: puzzle.size }, (_, p) => (
           <div key={p} className={"seat" + (seatSolved(p) ? " solved" : "")}>
-            <div className="badge">{puzzle.spine.labels[p]}</div>
+            <div className={"badge" + (isWho ? " has-mug" : "")}>
+              {isWho && (
+                <span className="badge-mug">
+                  <SuspectAvatar name={puzzle.spine.labels[p]} size={30} />
+                </span>
+              )}
+              {puzzle.spine.labels[p]}
+            </div>
             <div className="slots">
               {puzzle.categories.map((cat) => {
                 const v = valueOf(cat.id, board[cat.id][p]);

@@ -6,7 +6,7 @@ export const puzzle: Puzzle = {
   "source": "gerador",
   "themeId": "dossie",
   "title": "Sabotagem no submarino",
-  "story": "A 200 metros de profundidade, um oficial foi achado sem vida e um sistema vital sabotado na mesma vigília. Cinco tripulantes tinham acesso aos compartimentos — cada um num setor, com um objeto, num horário, movido por um motivo. Reconstrua o turno inteiro e veja quem sobra.",
+  "story": "Duzentos metros abaixo da superfície, o casco range sob a pressão e o único som constante é o zumbido do reator. Naquela vigília, um oficial foi encontrado sem vida numa das anteparas e um sistema vital amanheceu sabotado — os dois golpes vieram no mesmo turno de escuridão. Cinco tripulantes tinham as escotilhas abertas para si: cada um passou por um setor, empunhou um objeto, cruzou um horário do relógio de bordo e carregava um motivo abafado desde a última imersão. Refaça a vigília inteira, compartimento por compartimento, e descubra quem sobra quando as portas estanques se fecham.",
   "size": 5,
   "spine": {
     "id": "suspeito",
@@ -189,7 +189,7 @@ export const puzzle: Puzzle = {
   "solution": {},
   "difficulty": 0,
   "crime": {
-    "prompt": "O laudo é taxativo: a morte foi às 01h, o ponto de sabotagem foi Cozinha, e o estopim foi segredo.",
+    "prompt": "O laudo do médico de bordo não deixa margem: o relógio do morto parou às 01h, marca da hora exata em que o coração cedeu. A sabotagem foi rastreada até a Cozinha, onde uma válvula manipulada quase levou a tripulação junto. E o estopim de tudo, sussurram os autos, foi um segredo que alguém a bordo estava disposto a matar para manter submerso.",
     "evidence": [
       {
         "cat": "setor",
@@ -208,7 +208,7 @@ export const puzzle: Puzzle = {
   "clues": [
     {
       "id": "c1",
-      "text": "Quem portava Chave não agiu por Motim.",
+      "text": "Aquele que trazia a Chave presa ao cinto não se movia por Motim — sua sublevação era de outra natureza.",
       "highlights": [],
       "constraints": [
         {
@@ -226,7 +226,7 @@ export const puzzle: Puzzle = {
     },
     {
       "id": "c2",
-      "text": "Comandante estava no Reator.",
+      "text": "O Comandante passou a vigília junto ao Reator, o rosto lavado pela luz âmbar dos mostradores.",
       "highlights": [],
       "constraints": [
         {
@@ -239,7 +239,7 @@ export const puzzle: Puzzle = {
     },
     {
       "id": "c3",
-      "text": "Médica apareceu às 22h.",
+      "text": "O relógio de bordo registrou a Médica em ronda logo no início do turno, às 22h.",
       "highlights": [],
       "constraints": [
         {
@@ -252,7 +252,7 @@ export const puzzle: Puzzle = {
     },
     {
       "id": "c4",
-      "text": "Quem portava Chave não apareceu às 00h.",
+      "text": "À meia-noite, às 00h, o portador da Chave não constava em lugar nenhum do diário — não foi ele quem cruzou aquele horário.",
       "highlights": [],
       "constraints": [
         {
@@ -270,7 +270,7 @@ export const puzzle: Puzzle = {
     },
     {
       "id": "c5",
-      "text": "Comandante não portava Cabo de aço.",
+      "text": "Vasculharam o Comandante de alto a baixo: nenhum Cabo de aço em suas mãos naquela noite.",
       "highlights": [],
       "constraints": [
         {
@@ -283,7 +283,7 @@ export const puzzle: Puzzle = {
     },
     {
       "id": "c6",
-      "text": "Quem portava Corda também agiu por Espionagem.",
+      "text": "A mesma mão que enrolava a Corda servia a interesses estrangeiros: quem a carregava agia por Espionagem.",
       "highlights": [],
       "constraints": [
         {
@@ -301,7 +301,7 @@ export const puzzle: Puzzle = {
     },
     {
       "id": "c7",
-      "text": "Quem estava no Torpedos também portava Faca.",
+      "text": "Entre os tubos frios da sala de Torpedos, quem ali montava guarda tinha uma Faca à cintura.",
       "highlights": [],
       "constraints": [
         {
@@ -319,7 +319,7 @@ export const puzzle: Puzzle = {
     },
     {
       "id": "c8",
-      "text": "Cozinheiro portava Chave.",
+      "text": "O Cozinheiro trazia consigo a Chave — a mesma que abria a despensa e boa parte das anteparas.",
       "highlights": [],
       "constraints": [
         {
@@ -332,7 +332,7 @@ export const puzzle: Puzzle = {
     },
     {
       "id": "c9",
-      "text": "Médica estava no Sonar.",
+      "text": "A Médica passou o turno debruçada sobre o Sonar, os fones colados aos ouvidos escutando o breu lá fora.",
       "highlights": [],
       "constraints": [
         {
@@ -345,7 +345,7 @@ export const puzzle: Puzzle = {
     },
     {
       "id": "c10",
-      "text": "Sonarista agiu por Sabotagem.",
+      "text": "O que movia o Sonarista era a Sabotagem pura e simples — vontade de ver o barco ceder.",
       "highlights": [],
       "constraints": [
         {
@@ -358,7 +358,7 @@ export const puzzle: Puzzle = {
     },
     {
       "id": "c11",
-      "text": "Quem estava no Comando também agiu por Espionagem.",
+      "text": "Quem cruzou o posto de Comando naquela vigília não estava ali por dever: agia por Espionagem.",
       "highlights": [],
       "constraints": [
         {
@@ -376,7 +376,7 @@ export const puzzle: Puzzle = {
     },
     {
       "id": "c12",
-      "text": "Comandante apareceu às 23h.",
+      "text": "O diário anota o Comandante em sua estação às 23h, uma hora após o mergulho da noite se firmar.",
       "highlights": [],
       "constraints": [
         {
@@ -389,7 +389,7 @@ export const puzzle: Puzzle = {
     },
     {
       "id": "c13",
-      "text": "Quem apareceu às 02h também agiu por Sabotagem.",
+      "text": "Na derradeira ronda, às 02h, quem ainda rondava os corredores movia-se por Sabotagem.",
       "highlights": [],
       "constraints": [
         {
@@ -407,7 +407,7 @@ export const puzzle: Puzzle = {
     },
     {
       "id": "c14",
-      "text": "Quem apareceu às 23h também agiu por Vingança.",
+      "text": "Aquele cuja passagem o relógio marcou às 23h carregava Vingança no peito, uma conta velha a acertar.",
       "highlights": [],
       "constraints": [
         {

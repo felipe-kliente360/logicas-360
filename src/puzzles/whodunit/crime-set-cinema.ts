@@ -6,7 +6,7 @@ export const puzzle: Puzzle = {
   "source": "gerador",
   "themeId": "dossie",
   "title": "O crime no set de cinema",
-  "story": "Nas gravações do filme mais caro do ano, o astro foi achado sem vida entre os refletores. Cinco pessoas do set rondavam os bastidores — cada uma num ponto do estúdio, com um objeto, num horário. Reconstrua a diária inteira e veja quem sobra.",
+  "story": "A superprodução mais cara do ano rodava havia semanas quando os holofotes se apagaram de vez: o astro do elenco foi encontrado sem vida no set, a claquete ainda tombada a seus pés. Cinco figuras conhecidas dos bastidores tinham circulado pelo estúdio naquela diária — o Diretor, a Atriz, o Dublê, o Roteirista e a Produtora —, e cada uma delas ocupou um ponto diferente das gravações, empunhou um objeto e foi vista num horário certo. Reconstrua a diária inteira, minuto a minuto, e veja quem sobra sob a luz.",
   "size": 5,
   "spine": {
     "id": "suspeito",
@@ -148,7 +148,7 @@ export const puzzle: Puzzle = {
   "solution": {},
   "difficulty": 0,
   "crime": {
-    "prompt": "O legista fixou a morte por volta das 14h, e a claquete caída marcava o set onde o corpo foi achado: Refeitório.",
+    "prompt": "O laudo do legista foi seco e definitivo: a morte ocorreu por volta das 14h, ainda no comecinho da diária. E a claquete tombada não deixava dúvida sobre o cenário — o corpo esfriava no Refeitório, longe dos refletores, onde ninguém deveria estar àquela hora.",
     "evidence": [
       {
         "cat": "cena",
@@ -163,7 +163,7 @@ export const puzzle: Puzzle = {
   "clues": [
     {
       "id": "c1",
-      "text": "Diretor não portava Corda.",
+      "text": "Reviraram os bolsos do Diretor e nada de corda: aquele nó não passou pelas mãos dele.",
       "highlights": [],
       "constraints": [
         {
@@ -176,7 +176,7 @@ export const puzzle: Puzzle = {
     },
     {
       "id": "c2",
-      "text": "Produtora estava em Camarim.",
+      "text": "A Produtora passou aquela diária trancada no Camarim, entre espelhos e figurinos.",
       "highlights": [],
       "constraints": [
         {
@@ -189,7 +189,7 @@ export const puzzle: Puzzle = {
     },
     {
       "id": "c3",
-      "text": "Produtora apareceu às 18h.",
+      "text": "Foi às 18h em ponto que a Produtora surgiu na planilha de presença.",
       "highlights": [],
       "constraints": [
         {
@@ -202,7 +202,7 @@ export const puzzle: Puzzle = {
     },
     {
       "id": "c4",
-      "text": "Quem estava em Ilha de edição também apareceu às 22h.",
+      "text": "Quem se enfiou na Ilha de edição só marcou ponto tarde, às 22h, com a moviola ainda ligada.",
       "highlights": [],
       "constraints": [
         {
@@ -220,7 +220,7 @@ export const puzzle: Puzzle = {
     },
     {
       "id": "c5",
-      "text": "Quem estava em Estúdio A também portava Frasco.",
+      "text": "Sob os refletores do Estúdio A, quem lá estava carregava consigo o frasco.",
       "highlights": [],
       "constraints": [
         {
@@ -238,7 +238,7 @@ export const puzzle: Puzzle = {
     },
     {
       "id": "c6",
-      "text": "Produtora não portava Corda.",
+      "text": "A corda também não era da Produtora — nenhuma fibra dela nas mãos que assinavam os cheques.",
       "highlights": [],
       "constraints": [
         {
@@ -251,7 +251,7 @@ export const puzzle: Puzzle = {
     },
     {
       "id": "c7",
-      "text": "Quem estava em Backlot também portava Lanterna.",
+      "text": "No breu do Backlot, quem circulava por ali abria caminho com uma lanterna na mão.",
       "highlights": [],
       "constraints": [
         {
@@ -269,7 +269,7 @@ export const puzzle: Puzzle = {
     },
     {
       "id": "c8",
-      "text": "Roteirista não estava em Estúdio A.",
+      "text": "O Roteirista jurou que não pôs os pés no Estúdio A naquele dia, e as testemunhas confirmaram.",
       "highlights": [],
       "constraints": [
         {
@@ -282,7 +282,7 @@ export const puzzle: Puzzle = {
     },
     {
       "id": "c9",
-      "text": "Quem portava Frasco também apareceu às 20h.",
+      "text": "O frasco só apareceu em cena às 20h — foi essa a hora de quem o segurava.",
       "highlights": [],
       "constraints": [
         {
@@ -300,7 +300,7 @@ export const puzzle: Puzzle = {
     },
     {
       "id": "c10",
-      "text": "Quem portava Lanterna também apareceu às 16h.",
+      "text": "O facho da lanterna cortou o set às 16h; quem a empunhava foi visto nessa hora.",
       "highlights": [],
       "constraints": [
         {
@@ -318,7 +318,7 @@ export const puzzle: Puzzle = {
     },
     {
       "id": "c11",
-      "text": "Diretor não portava Frasco.",
+      "text": "Também não foi o Diretor quem levou o frasco: aquele vidro nunca esteve com ele.",
       "highlights": [],
       "constraints": [
         {
@@ -331,7 +331,7 @@ export const puzzle: Puzzle = {
     },
     {
       "id": "c12",
-      "text": "Atriz estava em Ilha de edição.",
+      "text": "A Atriz se refugiou na Ilha de edição, longe do burburinho dos refletores.",
       "highlights": [],
       "constraints": [
         {
@@ -344,7 +344,7 @@ export const puzzle: Puzzle = {
     },
     {
       "id": "c13",
-      "text": "Atriz portava Faca.",
+      "text": "Nas mãos da Atriz brilhava uma faca — de cena, dizia ela, mas faca.",
       "highlights": [],
       "constraints": [
         {

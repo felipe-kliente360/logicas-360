@@ -6,7 +6,7 @@ export const puzzle: Puzzle = {
   "source": "gerador",
   "themeId": "dossie",
   "title": "Terror no circo",
-  "story": "Na noite de estreia, o trapezista principal despencou — e a perícia garante que não foi acidente. Cinco artistas circulavam pela lona, cada um num ponto do picadeiro, com um objeto, num horário. Reconstrua a noite inteira e veja quem sobra.",
+  "story": "Estreia esgotada, refletores acesos — e então o trapezista principal despencou da altura da lona, sem rede, diante de todos. A perícia foi curta e brutal: não houve acidente. Naquela noite, cinco artistas rondavam a trupe, cada um ancorado num canto do picadeiro, empunhando um objeto, marcado por um horário. Remonte quem esteve onde, com o quê e a que hora — e o nome que sobrar na lona é o do assassino.",
   "size": 5,
   "spine": {
     "id": "suspeito",
@@ -148,7 +148,7 @@ export const puzzle: Puzzle = {
   "solution": {},
   "difficulty": 0,
   "crime": {
-    "prompt": "A perícia cravou a hora da queda às 23h, e o corpo foi encontrado em Picadeiro.",
+    "prompt": "O laudo não deixa margem: a queda fatal deu-se às 23h, quando o público já se retirava, e o corpo foi recolhido caído no Picadeiro, sob a serragem batida pelos refletores. Fixe esses dois fatos e reconstrua o resto da noite em torno deles.",
     "evidence": [
       {
         "cat": "local",
@@ -163,7 +163,7 @@ export const puzzle: Puzzle = {
   "clues": [
     {
       "id": "c1",
-      "text": "Quem estava em Arquibancada também portava Charuto.",
+      "text": "Nas tábuas vazias da Arquibancada, ficou o cheiro adocicado de fumo: quem se sentou ali trazia consigo o Charuto.",
       "highlights": [],
       "constraints": [
         {
@@ -181,7 +181,7 @@ export const puzzle: Puzzle = {
     },
     {
       "id": "c2",
-      "text": "Quem estava em Jaula também portava Corda.",
+      "text": "Junto às grades da Jaula, entre o bafo das feras, havia uma Corda enrolada — e ela pertencia a quem lá esteve.",
       "highlights": [],
       "constraints": [
         {
@@ -199,7 +199,7 @@ export const puzzle: Puzzle = {
     },
     {
       "id": "c3",
-      "text": "Ilusionista estava em Camarim.",
+      "text": "O Ilusionista jurou não ter deixado o Camarim, trancado entre espelhos e cartazes desbotados.",
       "highlights": [],
       "constraints": [
         {
@@ -212,7 +212,7 @@ export const puzzle: Puzzle = {
     },
     {
       "id": "c4",
-      "text": "Domadora apareceu às 21h.",
+      "text": "A Domadora só foi vista em cena às 21h, quando o relógio da bilheteria batia a hora.",
       "highlights": [],
       "constraints": [
         {
@@ -225,7 +225,7 @@ export const puzzle: Puzzle = {
     },
     {
       "id": "c5",
-      "text": "Domadora portava Faca.",
+      "text": "Presa à cintura da Domadora, reluzia uma Faca — arma de ofício, dizia ela.",
       "highlights": [],
       "constraints": [
         {
@@ -238,7 +238,7 @@ export const puzzle: Puzzle = {
     },
     {
       "id": "c6",
-      "text": "Contorcionista não portava Lanterna.",
+      "text": "Nas mãos flexíveis do Contorcionista, nenhuma Lanterna — disso os assistentes tinham certeza.",
       "highlights": [],
       "constraints": [
         {
@@ -251,7 +251,7 @@ export const puzzle: Puzzle = {
     },
     {
       "id": "c7",
-      "text": "Quem portava Lanterna não apareceu às 20h.",
+      "text": "O facho da Lanterna não cortou a escuridão às 20h: quem a segurava não estava em cena naquela hora.",
       "highlights": [],
       "constraints": [
         {
@@ -269,7 +269,7 @@ export const puzzle: Puzzle = {
     },
     {
       "id": "c8",
-      "text": "Quem estava em Camarim não portava Lanterna.",
+      "text": "No Camarim havia luz de sobra dos espelhos; ninguém ali precisou de uma Lanterna, nem a portava.",
       "highlights": [],
       "constraints": [
         {
@@ -287,7 +287,7 @@ export const puzzle: Puzzle = {
     },
     {
       "id": "c9",
-      "text": "Mágico portava Corda.",
+      "text": "Sob a capa do Mágico, escondida como num truque, estava enrolada a Corda.",
       "highlights": [],
       "constraints": [
         {
@@ -300,7 +300,7 @@ export const puzzle: Puzzle = {
     },
     {
       "id": "c10",
-      "text": "Quem estava em Arquibancada não apareceu às 20h.",
+      "text": "Às 20h, as fileiras da Arquibancada seguiam desertas de artistas: quem por lá andou, andou em outra hora.",
       "highlights": [],
       "constraints": [
         {
@@ -318,7 +318,7 @@ export const puzzle: Puzzle = {
     },
     {
       "id": "c11",
-      "text": "Domadora estava em Bilheteria.",
+      "text": "A Domadora foi flagrada na Bilheteria, longe das feras, entre canhotos de ingresso.",
       "highlights": [],
       "constraints": [
         {
@@ -331,7 +331,7 @@ export const puzzle: Puzzle = {
     },
     {
       "id": "c12",
-      "text": "Quem estava em Jaula também apareceu às 22h.",
+      "text": "O rosnar das feras na Jaula marcou as 22h: quem esteve entre as grades, esteve nessa hora.",
       "highlights": [],
       "constraints": [
         {
@@ -349,7 +349,7 @@ export const puzzle: Puzzle = {
     },
     {
       "id": "c13",
-      "text": "Palhaço não apareceu às 19h.",
+      "text": "Às 19h, quando a lona abriu, o Palhaço ainda não havia surgido em parte alguma.",
       "highlights": [],
       "constraints": [
         {
