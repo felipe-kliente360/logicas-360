@@ -46,15 +46,22 @@ dedução. Há redundância (< 100%) quando existem pistas corroborantes que abr
 
 - O `minimize()` do gerador busca o conjunto **mínimo** → tende a **100% de gargalo**.
   Isso é elegante, mas pouco "perdão": errou/não viu uma inferência, empacou.
-- **Regra prática:** níveis **fáceis** (≤ L4) devem ter redundância (mais trilhas,
-  mais perdão); níveis **difíceis** podem ser enxutos/quebradiços de propósito.
 - **Alavanca:** opção `redundancy` em `generateWhodunit` acrescenta N pistas
   corroborantes (redundantes, logo **não revelam evidência nem quebram a unicidade**).
-  Ex.: 5×3 com `redundancy 0` = 100% gargalo; `redundancy 3` ≈ 65%; `redundancy 6` ≈ 50%.
+- **Curva por nível (default):** `redundancyForLevel(level)` — fáceis recebem muitas
+  trilhas (L1–L2: 4, L3–L4: 3, L5–L6: 2, L7: 1), o topo fica enxuto de propósito
+  (L8–L10: 0). `gen-batch` aplica isso automaticamente.
 
-> Nota: redundância aumenta o `raw` (mais pistas para cruzar), então o sweep de
-> semente re-mira a banda de dificuldade normalmente. Resiliência ≠ facilidade; uma
-> trilha mais perdoável pode continuar exigente.
+### Nível ≠ redundância: medir a complexidade ESSENCIAL
+
+`difficultyRaw` conta "mais pistas para cruzar" como mais difícil — mas pista
+redundante **facilita** a dedução. Medir o raw no conjunto completo, portanto, inflaria
+o nível de um caso mais perdoável (num 5×3, +1 pista redundante pulava N4→N8!).
+
+Solução: o gerador mede a dificuldade no **núcleo mínimo** e grava `baseRaw` no puzzle;
+`hydrate` usa `p.baseRaw ?? difficultyRaw(p)`. Assim **a redundância é perdão puro e
+não mexe no nível** — um caso L3 com 3 trilhas alternativas continua L3. Resiliência e
+dificuldade viram eixos independentes.
 
 ## 4. Ofício de prosa — o passo de revisão (2 passadas) codificado
 
@@ -69,8 +76,9 @@ Depois de gerada a lógica, todo caso passa por **duas passadas** de reescrita d
 3. **`story` sem spoiler** — ambienta e cita as dimensões (cada um num lugar, com um
    objeto, numa hora [, por um motivo]); **não** revela os valores da evidência. Pode
    fechar com um convite genérico a desvendar.
-4. **Red herring de prosa** — uma pista pode *soar* incriminadora ("a Faca reluzia na
-   cintura da Domadora") sendo logicamente neutra. A isca é retórica, nunca lógica.
+4. **Red herring de prosa (obrigatório: ≥1 por caso)** — pelo menos uma pista deve
+   *soar* incriminadora ("a Faca reluzia na cintura da Domadora") sendo logicamente
+   neutra. A isca é sempre retórica, nunca lógica — não altera nenhuma `constraint`.
 5. **Regra de três / foreshadowing** — recorrer a um motivo (objeto, gesto) ao longo
    das pistas dá textura e a sensação de inevitabilidade no fecho.
 6. **Varie a estrutura** — nada de "X estava em Y" repetido; ritmo e verbos diversos.
@@ -93,13 +101,17 @@ evitar que um mesmo arquétipo/posição vicie a série.
 
 ## 7. Pipeline e ferramentas
 
+Lotes **pequenos (≤4 casos)** para a prosa manter qualidade.
+
 ```
-gerar lógica (whodunit-gen)  →  validar (check.ts: única + culpado)
-  →  auditar profundidade (whodunit-audit: shortcut 0%)
-  →  auditar ofício (whodunit-craft: gargalo%, variedade)
-  →  revisar prosa 2× (§4)  →  plugar no index
+editar scripts/gen-batch.ts com peles NOVAS (temas inéditos)
+  →  gen-batch (aplica curva de redundância + mira banda pelo núcleo + guarda: não sobrescreve)
+  →  validar (check.ts: única + culpado)  →  auditar (whodunit-audit / whodunit-craft)
+  →  revisar prosa 2× (§4, com ≥1 red herring)  →  importar no index
 ```
 
+- `scripts/gen-batch.ts` — **receita go-forward**: curva de redundância automática,
+  nível pelo núcleo, e **nunca sobrescreve arquivo existente** (protege a prosa).
 - `scripts/check.ts <arquivo>` — solução única + culpado único.
 - `scripts/whodunit-audit.ts` — nível + profundidade do culpado (atalho%).
 - `scripts/whodunit-craft.ts` — fair play, resiliência de trilha (gargalo%), variedade.
@@ -107,7 +119,7 @@ gerar lógica (whodunit-gen)  →  validar (check.ts: única + culpado)
 
 ## 8. Dívida conhecida
 
-7 casos de nível ≤ L4 estão com gargalo 100% (trilha única). Candidatos a um passe
-futuro de `redundancy` — o que exige **regerar + reescrever a prosa** deles, então
-fica registrado como melhoria opcional, não aplicada retroativamente para preservar a
-prosa já lapidada.
+Dos 40 casos atuais, ~20 têm gargalo 100% (7 deles em nível ≤ L4). São de antes da curva
+de redundância; melhorá-los exige **regerar + reescrever a prosa**, então ficam como
+melhoria opcional, **não** aplicada retroativamente (preserva a prosa lapidada). Todo
+caso NOVO já nasce com a curva aplicada via `gen-batch`.

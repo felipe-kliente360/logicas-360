@@ -79,6 +79,12 @@ export interface Puzzle {
   difficulty: number; // 1..10 (nossa escala, do engine/difficulty)
   /** Dificuldade declarada pela fonte original (geniol: ícones de cérebro, 1..5). */
   sourceDifficulty?: number;
+  /**
+   * Raw da COMPLEXIDADE ESSENCIAL (núcleo mínimo de pistas), gravado pelo gerador
+   * quando há pistas redundantes (Three Clue Rule). O nível deve sair daqui, não do
+   * raw do conjunto completo — senão a corroboração (que facilita) inflaria o nível.
+   */
+  baseRaw?: number;
   /** Origem do puzzle, p/ crédito (ex.: "geniol"). */
   source?: string;
   /** Tipo: grade comum (default) ou caso de investigação (whodunit). */

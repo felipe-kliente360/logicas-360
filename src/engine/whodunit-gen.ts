@@ -59,6 +59,19 @@ export interface WhoGenResult {
   attempts: number;
 }
 
+/**
+ * Curva de redundância (Three Clue Rule) por nível. Como o nível é medido no núcleo
+ * mínimo (baseRaw), a corroboração é PERDÃO puro e não infla a dificuldade: níveis
+ * fáceis recebem muitas trilhas alternativas; o topo fica enxuto/quebradiço de propósito.
+ */
+export function redundancyForLevel(level: number): number {
+  if (level <= 2) return 4;
+  if (level <= 4) return 3;
+  if (level <= 6) return 2;
+  if (level <= 7) return 1;
+  return 0; // L8–L10: quilha fina
+}
+
 type Solution = Record<string, string[]>;
 
 function buildSolution(categories: Category[], rng: () => number): Solution {
@@ -162,6 +175,15 @@ function attemptOnce(skin: WhoSkin, rng: () => number, maxShortcut: number, redu
   const minimal = minimize(base, pool, rng);
   if (!minimal) return null;
 
+  const verb = skin.clueVerb ?? {};
+  const toClues = (cons: Constraint[]): Clue[] =>
+    cons.map((c, i) => ({ id: `c${i + 1}`, text: clueText(c, skin.categories, skin.spine, verb), highlights: [], constraints: [c] }));
+
+  // Dificuldade = COMPLEXIDADE ESSENCIAL, medida no núcleo MÍNIMO (antes de redundância).
+  // Assim a corroboração (que facilita a dedução) não infla o nível.
+  const corePuzzle: Puzzle = { ...base, clues: toClues(minimal) };
+  const coreRaw = difficultyRaw(corePuzzle);
+
   // Three Clue Rule: acrescenta pistas corroborantes (redundantes, portanto não
   // revelam a evidência e não quebram a unicidade) para abrir trilhas alternativas.
   let chosen = minimal;
@@ -170,19 +192,14 @@ function attemptOnce(skin: WhoSkin, rng: () => number, maxShortcut: number, redu
     chosen = [...minimal, ...extra];
   }
 
-  const verb = skin.clueVerb ?? {};
-  const clues: Clue[] = shuffle(chosen, rng).map((c, i) => ({
-    id: `c${i + 1}`,
-    text: clueText(c, skin.categories, skin.spine, verb),
-    highlights: [],
-    constraints: [c],
-  }));
-  const puzzle: Puzzle = { ...base, clues };
+  const clues = toClues(shuffle(chosen, rng));
+  // baseRaw só é necessário quando há redundância (senão raw do puzzle == coreRaw).
+  const puzzle: Puzzle = redundancy > 0 ? { ...base, clues, baseRaw: coreRaw } : { ...base, clues };
 
   if (countSolutions(puzzle, 2) !== 1) return null;
   const audit = culpritAudit(puzzle);
-  if (!audit || audit.shortcutPct > maxShortcut) return null; // exige culpado profundo
-  return { puzzle, raw: difficultyRaw(puzzle), atalho: audit.shortcutPct };
+  if (!audit || audit.shortcutPct > maxShortcut) return null; // exige culpado profundo (no puzzle final)
+  return { puzzle, raw: coreRaw, atalho: audit.shortcutPct };
 }
 
 /** Gera um caso mirando a faixa de raw; varia a semente e devolve o melhor. */

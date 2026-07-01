@@ -19,7 +19,10 @@ function levelFromRaw(r: number): number {
   return Math.min(10, lvl);
 }
 
-const raw = new Map(RAW.map((p) => [p.id, difficultyRaw(p)]));
+// Nível vem da COMPLEXIDADE ESSENCIAL: se o caso traz pistas redundantes (Three Clue
+// Rule), o gerador grava `baseRaw` (raw do núcleo mínimo) — usamos ele para que a
+// corroboração, que facilita a dedução, não infle o nível.
+const raw = new Map(RAW.map((p) => [p.id, p.baseRaw ?? difficultyRaw(p)]));
 
 function hydrate(p: Puzzle): Puzzle {
   const hasSolution = p.solution && Object.keys(p.solution).length > 0;
