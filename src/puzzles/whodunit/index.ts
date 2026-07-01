@@ -24,11 +24,46 @@ import { puzzle as operaFantasma } from "./opera-fantasma";
 import { puzzle as crimeSetCinema } from "./crime-set-cinema";
 import { puzzle as terrorNoCirco } from "./terror-no-circo";
 import { puzzle as sabotagemSubmarino } from "./sabotagem-submarino";
+// --- pirâmide gerada (17 temas novos) ---
+import { puzzle as desfileDeModa } from "./desfile-de-moda";
+import { puzzle as estudioDeRadio } from "./estudio-de-radio";
+import { puzzle as lojaANoite } from "./loja-a-noite";
+import { puzzle as seboLivrosRaros } from "./sebo-livros-raros";
+import { puzzle as parqueDeDiversoes } from "./parque-de-diversoes";
+import { puzzle as restauranteEstrelado } from "./restaurante-estrelado";
+import { puzzle as estacaoDeEsqui } from "./estacao-de-esqui";
+import { puzzle as harasDoDerby } from "./haras-do-derby";
+import { puzzle as clubeDeJazz } from "./clube-de-jazz";
+import { puzzle as baseAntartida } from "./base-antartida";
+import { puzzle as escavacaoArqueologica } from "./escavacao-arqueologica";
+import { puzzle as mosteiroIsolado } from "./mosteiro-isolado";
+import { puzzle as estudioDeGravacao } from "./estudio-de-gravacao";
+import { puzzle as farolIsolado } from "./farol-isolado";
+import { puzzle as dirigivelDeLuxo } from "./dirigivel-de-luxo";
+import { puzzle as redacaoDeJornal } from "./redacao-de-jornal";
+import { puzzle as estacaoEspacial } from "./estacao-espacial";
 
 export const WHODUNIT: Puzzle[] = [
   crimeSetCinema,
   terrorNoCirco,
   sabotagemSubmarino,
+  desfileDeModa,
+  estudioDeRadio,
+  lojaANoite,
+  seboLivrosRaros,
+  parqueDeDiversoes,
+  restauranteEstrelado,
+  estacaoDeEsqui,
+  harasDoDerby,
+  clubeDeJazz,
+  baseAntartida,
+  escavacaoArqueologica,
+  mosteiroIsolado,
+  estudioDeGravacao,
+  farolIsolado,
+  dirigivelDeLuxo,
+  redacaoDeJornal,
+  estacaoEspacial,
   sumicoPadaria,
   rouboMuseu,
   crimeMansao,
