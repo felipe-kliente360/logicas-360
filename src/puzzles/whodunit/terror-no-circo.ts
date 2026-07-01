@@ -148,7 +148,7 @@ export const puzzle: Puzzle = {
   "solution": {},
   "difficulty": 0,
   "crime": {
-    "prompt": "O laudo não deixa margem: a queda fatal deu-se às 23h, quando o público já se retirava, e o corpo foi recolhido caído no Picadeiro, sob a serragem batida pelos refletores. Fixe esses dois fatos e reconstrua o resto da noite em torno deles.",
+    "prompt": "O laudo não deixa margem: a queda fatal deu-se às 23h, quando o público já se retirava, e o corpo foi recolhido caído no Picadeiro, sob a serragem batida pelos refletores.",
     "evidence": [
       {
         "cat": "local",
