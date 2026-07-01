@@ -1,5 +1,5 @@
 // Valida UM arquivo de puzzle: unicidade, solução derivada e nossa dificuldade.
-//   npx tsx scripts/check.ts src/puzzles/geniol/<slug>.ts
+//   npx tsx scripts/check.ts src/puzzles/whodunit/<slug>.ts
 import path from "node:path";
 import { countSolutions, solve } from "../src/engine/solver.ts";
 import { difficultyScore } from "../src/engine/difficulty.ts";

@@ -1,11 +1,9 @@
-// Tela de entrada — abas (Puzzles / Investigações), seletor de fases, progresso e recordes.
+// Tela de entrada — seletor de casos de investigação, progresso e recordes.
 import { useMemo, useState } from "react";
 import type { Puzzle } from "../engine/types";
-import { getRecord, getCaseRecord, formatTime, hasInProgress, getTutorialSeen, type Progress } from "./storage";
+import { getCaseRecord, formatTime, hasInProgress, getTutorialSeen, type Progress } from "./storage";
 import { Logo } from "../ds/components/Logo";
-import { IconGear, IconFolder, IconStar, IconCheck, IconChevronRight, IconSearch } from "../ds/components/icons";
-
-export type HomeTab = "puzzles" | "investigacoes";
+import { IconGear, IconFolder, IconChevronRight, IconSearch } from "../ds/components/icons";
 
 const diffWord = (d: number) => (d <= 2 ? "Fácil" : d <= 6 ? "Médio" : d <= 8 ? "Difícil" : "Expert");
 
@@ -18,18 +16,15 @@ const BANDS = [
 
 export function Home({
   puzzles,
-  tab,
   progress,
   onPick,
   onOpenSettings,
 }: {
   puzzles: Puzzle[];
-  tab: HomeTab;
   progress: Progress;
   onPick: (id: string) => void;
   onOpenSettings: () => void;
 }) {
-  const invest = tab === "investigacoes";
   const doneCount = puzzles.filter((p) => progress.completed.includes(p.id)).length;
   const [selected, setSelected] = useState<Set<string>>(new Set());
 
@@ -84,7 +79,7 @@ export function Home({
         </div>
       </div>
 
-      {invest && puzzles[0] && !getTutorialSeen() && (
+      {puzzles[0] && !getTutorialSeen() && (
         <button className="learn-banner" onClick={() => onPick(puzzles[0].id)}>
           <span className="learn-ic">
             <IconSearch size={20} />
@@ -111,33 +106,22 @@ export function Home({
       <div className="levels">
         {visible.map((p) => {
           const done = progress.completed.includes(p.id);
-          const rec = getRecord(p.id);
-          const caseRec = invest ? getCaseRecord(p.id) : undefined;
+          const caseRec = getCaseRecord(p.id);
           const inProgress = !done && hasInProgress(p.id);
           return (
-            <button key={p.id} className={"level-card" + (done ? " done" : "") + (invest ? " case" : "")} onClick={() => onPick(p.id)}>
-              <div className="level-num">{invest ? <IconFolder size={22} /> : numberOf.get(p.id)}</div>
+            <button key={p.id} className={"level-card case" + (done ? " done" : "")} onClick={() => onPick(p.id)}>
+              <div className="level-num"><IconFolder size={22} /></div>
               <div className="level-body">
                 <h3>
                   {p.title}
-                  {done && (
-                    <span className="done-tick">
-                      {invest ? "· encerrado" : <IconCheck size={13} />}
-                    </span>
-                  )}
+                  {done && <span className="done-tick">· encerrado</span>}
                 </h3>
                 <p className="level-meta">
-                  {invest
-                    ? `Caso ${numberOf.get(p.id)} · ${diffWord(p.difficulty)} · ${p.size} suspeitos`
-                    : `${diffWord(p.difficulty)} · ${p.size}×${p.categories.length}`}
+                  {`Caso ${numberOf.get(p.id)} · ${diffWord(p.difficulty)} · ${p.size} suspeitos`}
                 </p>
                 {caseRec ? (
                   <span className="level-diff">
                     <IconFolder size={13} /> {caseRec.accusations}ª acusação · {formatTime(caseRec.ms)}
-                  </span>
-                ) : rec != null ? (
-                  <span className="level-diff">
-                    <IconStar size={13} /> recorde {formatTime(rec)}
                   </span>
                 ) : inProgress ? (
                   <span className="level-diff resume">
@@ -152,7 +136,7 @@ export function Home({
       </div>
 
       <p className="home-foot">
-        {doneCount}/{puzzles.length} {invest ? "casos encerrados" : "fases concluídas"}
+        {doneCount}/{puzzles.length} casos encerrados
       </p>
     </div>
   );

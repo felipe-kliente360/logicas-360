@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
-import { PUZZLES, GRID_PUZZLES, WHODUNITS, getPuzzle } from "./puzzles";
-import { Home, type HomeTab } from "./game/Home";
+import { PUZZLES, WHODUNITS, getPuzzle } from "./puzzles";
+import { Home } from "./game/Home";
 import { Board } from "./game/Board";
 import { Settings } from "./game/Settings";
 import { Splash } from "./game/Splash";
@@ -17,8 +17,6 @@ import {
 
 export default function App() {
   const [splash, setSplash] = useState(true);
-  // Aba única por enquanto: investigações. (Puzzles de lógica ficam guardados.)
-  const [tab] = useState<HomeTab>("investigacoes");
   const [activeId, setActiveId] = useState<string | null>(null);
   const [progress, setProgress] = useState<Progress>(() => loadProgress());
   const [settings, setSettings] = useState<SettingsT>(() => loadSettings());
@@ -26,15 +24,14 @@ export default function App() {
 
   const active = activeId ? getPuzzle(activeId) : undefined;
 
-  // tema: investigações = dossiê (papel pardo); resto = Neon Petróleo
+  // tema único: dossiê (papel pardo) — o app é 100% investigações
   useEffect(() => {
-    const dossie = active ? active.kind === "whodunit" : tab === "investigacoes";
-    document.body.dataset.theme = dossie ? "dossie" : "home";
-  }, [active, tab]);
+    document.body.dataset.theme = "dossie";
+  }, []);
 
   useEffect(() => {
     window.scrollTo(0, 0);
-  }, [activeId, splash, tab]);
+  }, [activeId, splash]);
 
   useEffect(() => {
     document.body.dataset.mode = settings.theme;
@@ -61,12 +58,10 @@ export default function App() {
   }
 
   if (!active) {
-    const list = tab === "investigacoes" ? WHODUNITS : GRID_PUZZLES;
     return (
       <>
         <Home
-          puzzles={list}
-          tab={tab}
+          puzzles={WHODUNITS}
           progress={progress}
           onPick={(id) => setActiveId(id)}
           onOpenSettings={() => setShowSettings(true)}
@@ -76,11 +71,10 @@ export default function App() {
     );
   }
 
-  // próxima fase não concluída à frente, DENTRO da mesma seção (grade ou investigação)
-  const section = active.kind === "whodunit" ? WHODUNITS : GRID_PUZZLES;
-  const idx = section.findIndex((p) => p.id === active.id);
-  const nextId = section.slice(idx + 1).find((p) => !progress.completed.includes(p.id))?.id ?? null;
-  const allDone = section.every((p) => progress.completed.includes(p.id));
+  // próximo caso não concluído à frente
+  const idx = WHODUNITS.findIndex((p) => p.id === active.id);
+  const nextId = WHODUNITS.slice(idx + 1).find((p) => !progress.completed.includes(p.id))?.id ?? null;
+  const allDone = WHODUNITS.every((p) => progress.completed.includes(p.id));
 
   return (
     <>
