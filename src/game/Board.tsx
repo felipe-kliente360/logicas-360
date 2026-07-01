@@ -34,8 +34,8 @@ import {
   IconStar,
   IconX,
   IconChevronDown,
-  IconSuspect,
 } from "../ds/components/icons";
+import { SuspectAvatar } from "../ds/components/Avatar";
 
 type Board = Record<string, (string | null)[]>;
 type TutStep = {
@@ -761,6 +761,9 @@ export function Board({ puzzle, settings, nextId, allDone, onBack, onNext, onSol
                 const ok = accusationSupported(i);
                 return (
                   <button className={"opt accuse" + (ok ? "" : " taken") + (tutAccuseIdx === i ? " tut-on" + (tutFlash ? " tut-flash" : "") : "")} key={i} onClick={() => accuse(i)}>
+                    <span className="opt-mug">
+                      <SuspectAvatar name={name} size={40} />
+                    </span>
                     <span className="name">{name}</span>
                     <span className="used">{ok ? "acusar →" : "faltam evidências"}</span>
                   </button>
@@ -791,7 +794,7 @@ export function Board({ puzzle, settings, nextId, allDone, onBack, onNext, onSol
             {puzzle.culprit != null && (
               <div className="culprit-card">
                 <div className="mug">
-                  <IconSuspect size={46} />
+                  <SuspectAvatar name={puzzle.spine.labels[puzzle.culprit]} size={58} />
                 </div>
                 <div className="culprit-meta">
                   <span className="culprit-role">O culpado</span>
