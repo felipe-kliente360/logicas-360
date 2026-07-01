@@ -42,6 +42,8 @@ import { puzzle as farolIsolado } from "./farol-isolado";
 import { puzzle as dirigivelDeLuxo } from "./dirigivel-de-luxo";
 import { puzzle as redacaoDeJornal } from "./redacao-de-jornal";
 import { puzzle as estacaoEspacial } from "./estacao-espacial";
+// --- lote go-forward (curva de redundância + prosa com red herring) ---
+import { puzzle as jardimBotanico } from "./jardim-botanico";
 
 export const WHODUNIT: Puzzle[] = [
   crimeSetCinema,
@@ -64,6 +66,7 @@ export const WHODUNIT: Puzzle[] = [
   dirigivelDeLuxo,
   redacaoDeJornal,
   estacaoEspacial,
+  jardimBotanico,
   sumicoPadaria,
   rouboMuseu,
   crimeMansao,
