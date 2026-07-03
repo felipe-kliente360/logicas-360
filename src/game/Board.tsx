@@ -36,6 +36,7 @@ import {
   IconChevronDown,
 } from "../ds/components/icons";
 import { SuspectAvatar } from "../ds/components/Avatar";
+import { GridBoard, crossKey } from "./GridBoard";
 
 type Board = Record<string, (string | null)[]>;
 type TutStep = {
@@ -111,6 +112,9 @@ export function Board({ puzzle, settings, nextId, allDone, onBack, onNext, onSol
 
   const [board, setBoard] = useState<Board>(() => applyLocks(restoreBoard(puzzle, saved), puzzle, savedHints.cells));
   const [notes, setNotes] = useState<Set<string>>(() => new Set(saved?.notes ?? [])); // "não é aqui"
+  const [cross, setCross] = useState<Record<string, "yes" | "no">>(() => saved?.cross ?? {}); // matriz: marcas categoria×categoria
+  const [view, setView] = useState<"list" | "grid">("list");
+  const crossAutoRef = useRef<Map<string, string[]>>(new Map()); // ✗ gerados por auto-fill (p/ desfazer)
   const [openStory, setOpenStory] = useState(true);
   const [openClues, setOpenClues] = useState(true);
   const [litClue, setLitClue] = useState<string | null>(null);
@@ -194,6 +198,8 @@ export function Board({ puzzle, settings, nextId, allDone, onBack, onNext, onSol
   wonRef.current = won;
   const notesRef = useRef(notes);
   notesRef.current = notes;
+  const crossRef = useRef(cross);
+  crossRef.current = cross;
   const accusationsRef = useRef(accusations);
   accusationsRef.current = accusations;
 
@@ -201,7 +207,8 @@ export function Board({ puzzle, settings, nextId, allDone, onBack, onNext, onSol
     if (wonRef.current) return;
     const ms = runningRef.current ? Date.now() - startRef.current : elapsedRef.current;
     const filledNow = puzzle.categories.reduce((a, c) => a + boardRef.current[c.id].filter(Boolean).length, 0);
-    const hasContent = filledNow > 0 || notesRef.current.size > 0 || accusationsRef.current > 0;
+    const crossKeys = Object.keys(crossRef.current);
+    const hasContent = filledNow > 0 || notesRef.current.size > 0 || accusationsRef.current > 0 || crossKeys.length > 0;
     if (!hasContent) clearInProgress(puzzle.id);
     else
       saveInProgress(puzzle.id, {
@@ -209,6 +216,7 @@ export function Board({ puzzle, settings, nextId, allDone, onBack, onNext, onSol
         elapsedMs: ms,
         notes: [...notesRef.current],
         accusations: accusationsRef.current,
+        cross: crossKeys.length ? crossRef.current : undefined,
       });
   }, [puzzle]);
 
@@ -220,7 +228,7 @@ export function Board({ puzzle, settings, nextId, allDone, onBack, onNext, onSol
 
   useEffect(() => {
     persist();
-  }, [board, notes, persist]);
+  }, [board, notes, cross, persist]);
 
   // tutorial: avança ao preencher o campo guiado (passos de slot) ou ao abrir Acusar
   useEffect(() => {
@@ -317,6 +325,84 @@ export function Board({ puzzle, settings, nextId, allDone, onBack, onNext, onSol
       n.has(k) ? n.delete(k) : n.add(k);
       return n;
     });
+  }
+
+  // ——— grade (matriz): célula Suspeito×categoria escreve no MESMO board/notes ———
+  // ciclo: vazio → ✗ (nota) → ✓ (atribui, move na permutação) → ✗... limpar via ✓→toque.
+  function gridSuspect(catId: string, pos: number, value: string) {
+    if (lockedSet.has(cellKey(catId, pos))) return; // posição cravada pela ajuda
+    const col = board[catId] ?? [];
+    if (col[pos] === value) {
+      const nc = [...col];
+      nc[pos] = null; // ✓ → limpa
+      setBoard({ ...board, [catId]: nc });
+      typeTick(settings.som);
+      return;
+    }
+    const filledElsewhere = col[pos] != null;
+    const takenByOther = col.includes(value);
+    const manualNote = notes.has(noteKey(catId, pos, value));
+    const isEmpty = !filledElsewhere && !takenByOther && !manualNote;
+    if (isEmpty) {
+      // 1º toque = ✗ (nota "não é aqui")
+      setNotes((prev) => new Set(prev).add(noteKey(catId, pos, value)));
+      typeTick(settings.som);
+      return;
+    }
+    // era ✗ (nota ou implícito) → promove a ✓ (mantém permutação: move o valor)
+    const was = seatMatches(board, puzzle, pos);
+    const nc = col.map((x) => (x === value ? null : x));
+    nc[pos] = value;
+    const next: Board = { ...board, [catId]: nc };
+    if (manualNote) {
+      const n = new Set(notes);
+      n.delete(noteKey(catId, pos, value));
+      setNotes(n);
+    }
+    fileClick(settings.som);
+    maybeCelebrateSeat(next, pos, was);
+    setBoard(next);
+  }
+
+  // ——— grade: célula categoria×categoria (anotação exclusiva da grade, estado `cross`) ———
+  // ciclo: vazio → ✗ → ✓ → (toque no ✓) auto-preenche linha/coluna do sub-grid com ✗
+  //        → (novo toque) limpa a célula e desfaz os ✗ automáticos (os manuais ficam).
+  function gridCross(aId: string, va: string, bId: string, vb: string) {
+    const key = crossKey(aId, va, bId, vb);
+    const cur = cross[key];
+    const next = { ...cross };
+    const auto = crossAutoRef.current;
+    if (!cur) {
+      next[key] = "no";
+      typeTick(settings.som);
+    } else if (cur === "no") {
+      next[key] = "yes";
+      fileClick(settings.som);
+    } else if (!auto.has(key)) {
+      // ✓ sem auto ainda → crava ✗ nas células vazias da mesma linha/coluna do sub-grid
+      const rowVals = puzzle.categories.find((c) => c.id === aId)?.values ?? [];
+      const colVals = puzzle.categories.find((c) => c.id === bId)?.values ?? [];
+      const filled: string[] = [];
+      for (const rv of rowVals)
+        if (rv.id !== va) {
+          const k = crossKey(aId, rv.id, bId, vb);
+          if (!next[k]) { next[k] = "no"; filled.push(k); }
+        }
+      for (const cv of colVals)
+        if (cv.id !== vb) {
+          const k = crossKey(aId, va, bId, cv.id);
+          if (!next[k]) { next[k] = "no"; filled.push(k); }
+        }
+      auto.set(key, filled);
+      fileClick(settings.som);
+    } else {
+      // já auto-preenchido → limpa a célula e desfaz os ✗ automáticos ainda presentes
+      for (const k of auto.get(key) ?? []) if (next[k] === "no") delete next[k];
+      auto.delete(key);
+      delete next[key];
+      typeTick(settings.som);
+    }
+    setCross(next);
   }
 
   // dica: revela um slot ALEATÓRIO ainda errado (vazio ou preenchido errado) e o
@@ -448,6 +534,8 @@ export function Board({ puzzle, settings, nextId, allDone, onBack, onNext, onSol
       setHintsLeft(maxHints);
     }
     setNotes(new Set());
+    setCross({});
+    crossAutoRef.current.clear();
     setAccusations(0);
     setBoard(applyLocks(emptyBoard(puzzle), puzzle, fresh));
     setWon(false);
@@ -556,7 +644,32 @@ export function Board({ puzzle, settings, nextId, allDone, onBack, onNext, onSol
         </div>
       </section>
 
-      {/* fila / seats */}
+      {/* alternador de visão: lista (fila) × grade (matriz). Oculto no tutorial guiado. */}
+      {!(isTutorial && tut >= 0) && (
+        <div className="viewtoggle" role="tablist" aria-label="Visão do tabuleiro">
+          <button role="tab" aria-selected={view === "list"} className={view === "list" ? "on" : ""} onClick={() => setView("list")}>
+            Lista
+          </button>
+          <button role="tab" aria-selected={view === "grid"} className={view === "grid" ? "on" : ""} onClick={() => setView("grid")}>
+            Grade
+          </button>
+        </div>
+      )}
+
+      {view === "grid" ? (
+        <section className={"gridwrap" + (shake ? " shake" : "")}>
+          <GridBoard
+            puzzle={puzzle}
+            board={board}
+            notes={notes}
+            cross={cross}
+            valIndex={valIndex}
+            onSuspect={gridSuspect}
+            onCross={gridCross}
+          />
+        </section>
+      ) : (
+      /* fila / seats */
       <section className={"queue" + (puzzle.spine.ordered ? " ordered" : "") + (shake ? " shake" : "")}>
         {Array.from({ length: puzzle.size }, (_, p) => (
           <div key={p} className={"seat" + (seatSolved(p) ? " solved" : "")}>
@@ -608,6 +721,7 @@ export function Board({ puzzle, settings, nextId, allDone, onBack, onNext, onSol
           </div>
         ))}
       </section>
+      )}
 
       {/* barra de ação: Limpar · Verificar · Ajuda (contador) */}
       <div className="bar">

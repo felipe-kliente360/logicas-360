@@ -2018,3 +2018,86 @@ button.act {
 @media (prefers-reduced-motion: reduce) {
   .cc-eyebrow, .culprit-card, .tarja, .conviction { animation: none; }
 }
+
+/* ============================================================
+   Visão em GRADE (matriz triangular, estilo revistinha)
+   ============================================================ */
+:root { --mx-label: 108px; --mx-cell: 38px; }
+
+.viewtoggle {
+  display: flex; width: fit-content; margin: 10px auto 4px;
+  background: var(--card); border: 1px solid var(--line);
+  border-radius: 999px; padding: 3px; gap: 2px;
+}
+.viewtoggle button {
+  border: 0; background: transparent; color: var(--ink-faint);
+  font: 600 13px/1 inherit; padding: 8px 20px; border-radius: 999px; cursor: pointer;
+}
+.viewtoggle button.on { background: var(--glow); color: #fff; }
+
+.gridwrap { margin: 4px 0 6px; }
+.gridwrap.shake { animation: shake .4s; }
+
+.matrix-scroll {
+  overflow: auto; -webkit-overflow-scrolling: touch;
+  border: 1px solid var(--line); border-radius: 12px;
+  background: var(--card); max-height: 72vh;
+}
+.matrix { display: grid; width: max-content; position: relative; color: var(--ink); }
+
+/* canto — fixo nos dois eixos */
+.mx-corner {
+  position: sticky; top: 0; left: 0; z-index: 3; background: var(--card2);
+  border-right: 1px solid var(--line); border-bottom: 1px solid var(--line);
+}
+
+/* cabeçalho de colunas — fixo no topo (scroll vertical) */
+.mx-chead {
+  position: sticky; top: 0; z-index: 2; background: var(--card2);
+  display: flex; flex-direction: column; align-items: center; justify-content: flex-end;
+  gap: 3px; padding: 5px 3px; min-height: 54px; border-bottom: 1px solid var(--line);
+}
+.mx-hlabel {
+  font-size: 9px; line-height: 1.05; text-align: center; color: var(--ink-dim);
+  max-width: calc(var(--mx-cell) + 4px); overflow-wrap: anywhere;
+}
+
+/* rótulos de linha — coluna congelada à esquerda (scroll lateral) */
+.mx-rhead {
+  position: sticky; left: 0; z-index: 2; background: var(--card2);
+  display: flex; align-items: center; gap: 7px; padding: 4px 9px;
+  min-height: 36px; border-right: 1px solid var(--line);
+}
+.mx-rlabel {
+  font-size: 11px; color: var(--ink-dim); white-space: nowrap;
+  overflow: hidden; text-overflow: ellipsis;
+}
+.mx-ava {
+  width: 24px; height: 29px; border-radius: 5px; overflow: hidden;
+  flex: 0 0 auto; border: 1px solid var(--line); line-height: 0;
+}
+.mx-ava svg { width: 100%; height: 100%; }
+.mx-dot { flex: 0 0 auto; line-height: 0; }
+
+/* células */
+.mx-cell {
+  border: 0; border-right: 1px solid var(--line); border-bottom: 1px solid var(--line);
+  background: transparent; cursor: pointer; color: var(--ink);
+  display: flex; align-items: center; justify-content: center;
+  min-height: 36px; min-width: var(--mx-cell);
+}
+.mx-cell:active { background: color-mix(in srgb, var(--glow) 16%, transparent); }
+.mx-cell.yes { color: var(--glow); }
+.mx-cell.no { color: var(--ink-faint); }
+
+/* separadores de sub-grid */
+.mx-cell.bandL, .mx-chead.band { border-left: 2px solid var(--line); }
+.mx-cell.bandT, .mx-rhead.band { border-top: 2px solid var(--line); }
+
+/* paisagem — usa a largura toda: células maiores, rótulos inteiros, menos scroll */
+@media (orientation: landscape) {
+  :root { --mx-label: 140px; --mx-cell: 48px; }
+  .matrix-scroll { max-height: 86vh; }
+  .mx-hlabel { font-size: 10px; }
+  .mx-rlabel { font-size: 12px; }
+}

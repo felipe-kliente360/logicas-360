@@ -128,6 +128,8 @@ export interface InProgress {
   elapsedMs: number;
   notes?: string[]; // anotações "não é aqui" — chaves "cat:pos:valor"
   accusations?: number; // acusações já feitas neste caso (whodunit)
+  // marcas da matriz (visão em grade) entre categorias — chave "catA|valA|catB|valB"
+  cross?: Record<string, "yes" | "no">;
 }
 const INPROGRESS_KEY = "logicas360.inprogress.v1";
 
