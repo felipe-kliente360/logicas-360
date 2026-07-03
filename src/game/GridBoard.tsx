@@ -61,8 +61,14 @@ export function GridBoard({
   // colunas = atributos 1..K-1 (nunca o Suspeito); linhas = atributos 0..K-2
   const colAttrs = attrs.slice(1);
   const rowAttrs = attrs.slice(0, -1);
+  // exibe as colunas em ordem INVERTIDA (maior índice primeiro): assim a coluna que
+  // cruza com TODAS as linhas fica à esquerda (completa) e a de um sub-grid só à direita.
   const colDefs = useMemo(
-    () => colAttrs.flatMap((a, aj) => a.values.map((v, vi) => ({ attr: a, attrIdx: aj + 1, v, first: vi === 0 }))),
+    () =>
+      colAttrs
+        .map((a, aj) => ({ a, idx: aj + 1 }))
+        .reverse()
+        .flatMap(({ a, idx }) => a.values.map((v, vi) => ({ attr: a, attrIdx: idx, v, first: vi === 0 }))),
     [attrs]
   );
   const rowDefs = useMemo(
