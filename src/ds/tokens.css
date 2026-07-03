@@ -2094,12 +2094,22 @@ button.act {
 .mx-cell.bandL, .mx-chead.band { border-left: 2px solid var(--line); }
 .mx-cell.bandT, .mx-rhead.band { border-top: 2px solid var(--line); }
 
-/* paisagem — usa a largura toda: células maiores, rótulos inteiros, menos scroll */
+/* paisagem — a grade escapa da coluna de 460px e usa a LARGURA TODA da tela */
 @media (orientation: landscape) {
-  :root { --mx-label: 140px; --mx-cell: 48px; }
-  .matrix-scroll { max-height: 86vh; }
+  :root { --mx-label: 138px; --mx-cell: 44px; }
+  /* full-bleed: estende .gridwrap à largura do viewport, mesmo dentro do .app centrado */
+  .gridwrap {
+    width: 100vw;
+    margin-inline: calc(50% - 50vw);
+    padding-inline: 14px;
+    box-sizing: border-box;
+  }
+  /* preenche a largura disponível: colunas 1fr esticam; se não couber, rola */
+  .matrix { width: 100%; }
+  .matrix-scroll { max-height: 88vh; }
   .mx-hlabel { font-size: 10px; }
   .mx-rlabel { font-size: 12px; }
+  .mx-cell { min-height: 40px; }
 }
 
 /* Selo "Especial" no card de fase (canto, sem reflow do conteúdo) */
