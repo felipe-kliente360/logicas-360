@@ -112,9 +112,8 @@ export function Board({ puzzle, settings, nextId, allDone, onBack, onNext, onSol
 
   const [board, setBoard] = useState<Board>(() => applyLocks(restoreBoard(puzzle, saved), puzzle, savedHints.cells));
   const [notes, setNotes] = useState<Set<string>>(() => new Set(saved?.notes ?? [])); // "não é aqui"
-  const [cross, setCross] = useState<Record<string, "yes" | "no">>(() => saved?.cross ?? {}); // matriz: marcas categoria×categoria
+  const [cross, setCross] = useState<Record<string, "yes" | "no" | "auto">>(() => saved?.cross ?? {}); // matriz: marcas categoria×categoria
   const [view, setView] = useState<"list" | "grid">("list");
-  const crossAutoRef = useRef<Map<string, string[]>>(new Map()); // ✗ gerados por auto-fill (p/ desfazer)
   const [openStory, setOpenStory] = useState(true);
   const [openClues, setOpenClues] = useState(true);
   const [litClue, setLitClue] = useState<string | null>(null);
@@ -365,40 +364,33 @@ export function Board({ puzzle, settings, nextId, allDone, onBack, onNext, onSol
   }
 
   // ——— grade: célula categoria×categoria (anotação exclusiva da grade, estado `cross`) ———
-  // ciclo: vazio → ✗ → ✓ → (toque no ✓) auto-preenche linha/coluna do sub-grid com ✗
-  //        → (novo toque) limpa a célula e desfaz os ✗ automáticos (os manuais ficam).
+  // ciclo: vazio → ✗ manual → ✓ → (toque no ✓) auto-preenche os VAZIOS da linha/coluna
+  //        do sub-grid com ✗ "auto" → (novo toque) limpa a célula e SÓ os ✗ "auto"
+  //        (os ✗ marcados à mão — "no" — permanecem). Sem propagação entre sub-grids.
   function gridCross(aId: string, va: string, bId: string, vb: string) {
     const key = crossKey(aId, va, bId, vb);
     const cur = cross[key];
     const next = { ...cross };
-    const auto = crossAutoRef.current;
+    // vizinhos = resto da linha e da coluna DESTE sub-grid
+    const rowVals = puzzle.categories.find((c) => c.id === aId)?.values ?? [];
+    const colVals = puzzle.categories.find((c) => c.id === bId)?.values ?? [];
+    const neighbors: string[] = [];
+    for (const rv of rowVals) if (rv.id !== va) neighbors.push(crossKey(aId, rv.id, bId, vb));
+    for (const cv of colVals) if (cv.id !== vb) neighbors.push(crossKey(aId, va, bId, cv.id));
+
     if (!cur) {
-      next[key] = "no";
+      next[key] = "no"; // 1º toque: ✗ manual
       typeTick(settings.som);
-    } else if (cur === "no") {
-      next[key] = "yes";
+    } else if (cur === "no" || cur === "auto") {
+      next[key] = "yes"; // 2º toque: ✓
       fileClick(settings.som);
-    } else if (!auto.has(key)) {
-      // ✓ sem auto ainda → crava ✗ nas células vazias da mesma linha/coluna do sub-grid
-      const rowVals = puzzle.categories.find((c) => c.id === aId)?.values ?? [];
-      const colVals = puzzle.categories.find((c) => c.id === bId)?.values ?? [];
-      const filled: string[] = [];
-      for (const rv of rowVals)
-        if (rv.id !== va) {
-          const k = crossKey(aId, rv.id, bId, vb);
-          if (!next[k]) { next[k] = "no"; filled.push(k); }
-        }
-      for (const cv of colVals)
-        if (cv.id !== vb) {
-          const k = crossKey(aId, va, bId, cv.id);
-          if (!next[k]) { next[k] = "no"; filled.push(k); }
-        }
-      auto.set(key, filled);
+    } else if (neighbors.some((k) => !next[k])) {
+      // 3º toque no ✓: crava ✗ "auto" só nas células AINDA vazias da linha/coluna
+      for (const k of neighbors) if (!next[k]) next[k] = "auto";
       fileClick(settings.som);
     } else {
-      // já auto-preenchido → limpa a célula e desfaz os ✗ automáticos ainda presentes
-      for (const k of auto.get(key) ?? []) if (next[k] === "no") delete next[k];
-      auto.delete(key);
+      // 4º toque: limpa a célula atual e SÓ os ✗ "auto" da linha/coluna; "no" manuais ficam
+      for (const k of neighbors) if (next[k] === "auto") delete next[k];
       delete next[key];
       typeTick(settings.som);
     }
@@ -535,7 +527,6 @@ export function Board({ puzzle, settings, nextId, allDone, onBack, onNext, onSol
     }
     setNotes(new Set());
     setCross({});
-    crossAutoRef.current.clear();
     setAccusations(0);
     setBoard(applyLocks(emptyBoard(puzzle), puzzle, fresh));
     setWon(false);

@@ -9,7 +9,7 @@ import { Swatch } from "../ds/components/Swatch";
 import { SuspectAvatar } from "../ds/components/Avatar";
 import { IconCheck, IconX } from "../ds/components/icons";
 
-type Cross = Record<string, "yes" | "no">;
+type Cross = Record<string, "yes" | "no" | "auto">; // "auto" = ✗ do auto-preenchimento
 type CellState = "yes" | "no" | "empty";
 
 export const crossKey = (a: string, va: string, b: string, vb: string) => `${a}|${va}|${b}|${vb}`;
@@ -82,7 +82,8 @@ export function GridBoard({
       if (notes.has(noteKey(c, i, cv.id))) return "no";
       return "empty";
     }
-    return (cross[crossKey(rAttr.id, rv.id, cAttr.id, cv.id)] as CellState) ?? "empty";
+    const raw = cross[crossKey(rAttr.id, rv.id, cAttr.id, cv.id)];
+    return raw === "auto" ? "no" : (raw ?? "empty"); // ✗ auto e manual renderizam igual
   }
 
   const gridStyle = {
