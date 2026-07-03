@@ -44,6 +44,7 @@ import { puzzle as redacaoDeJornal } from "./redacao-de-jornal";
 import { puzzle as estacaoEspacial } from "./estacao-espacial";
 // --- lote go-forward (curva de redundância + prosa com red herring) ---
 import { puzzle as jardimBotanico } from "./jardim-botanico";
+import { puzzle as balnearioCaxambu } from "./balneario-caxambu";
 
 export const WHODUNIT: Puzzle[] = [
   crimeSetCinema,
@@ -67,6 +68,7 @@ export const WHODUNIT: Puzzle[] = [
   redacaoDeJornal,
   estacaoEspacial,
   jardimBotanico,
+  balnearioCaxambu,
   sumicoPadaria,
   rouboMuseu,
   crimeMansao,
