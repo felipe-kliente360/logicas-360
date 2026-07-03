@@ -7,12 +7,13 @@ import { IconGear, IconFolder, IconChevronRight, IconSearch } from "../ds/compon
 
 const diffWord = (d: number) => (d <= 2 ? "Fácil" : d <= 6 ? "Médio" : d <= 8 ? "Difícil" : "Expert");
 
-const BANDS = [
-  { id: "facil", label: "Fácil", test: (d: number) => d <= 2 },
-  { id: "medio", label: "Médio", test: (d: number) => d >= 3 && d <= 6 },
-  { id: "dificil", label: "Difícil", test: (d: number) => d >= 7 && d <= 8 },
-  { id: "expert", label: "Expert", test: (d: number) => d >= 9 },
-] as const;
+const FILTERS: { id: string; label: string; test: (p: Puzzle) => boolean }[] = [
+  { id: "facil", label: "Fácil", test: (p) => p.difficulty <= 2 },
+  { id: "medio", label: "Médio", test: (p) => p.difficulty >= 3 && p.difficulty <= 6 },
+  { id: "dificil", label: "Difícil", test: (p) => p.difficulty >= 7 && p.difficulty <= 8 },
+  { id: "expert", label: "Expert", test: (p) => p.difficulty >= 9 },
+  { id: "especial", label: "Especial", test: (p) => !!p.special },
+];
 
 export function Home({
   puzzles,
@@ -39,11 +40,11 @@ export function Home({
     () =>
       selected.size === 0
         ? puzzles
-        : puzzles.filter((p) => BANDS.some((b) => selected.has(b.id) && b.test(p.difficulty))),
+        : puzzles.filter((p) => FILTERS.some((f) => selected.has(f.id) && f.test(p))),
     [puzzles, selected]
   );
   const counts = useMemo(
-    () => BANDS.map((b) => ({ b, n: puzzles.filter((p) => b.test(p.difficulty)).length })),
+    () => FILTERS.map((f) => ({ b: f, n: puzzles.filter((p) => f.test(p)).length })),
     [puzzles]
   );
   const numberOf = useMemo(() => new Map(puzzles.map((p, i) => [p.id, i + 1])), [puzzles]);
@@ -109,7 +110,8 @@ export function Home({
           const caseRec = getCaseRecord(p.id);
           const inProgress = !done && hasInProgress(p.id);
           return (
-            <button key={p.id} className={"level-card case" + (done ? " done" : "")} onClick={() => onPick(p.id)}>
+            <button key={p.id} className={"level-card case" + (done ? " done" : "") + (p.special ? " special" : "")} onClick={() => onPick(p.id)}>
+              {p.special && <span className="seal">★ Especial</span>}
               <div className="level-num"><IconFolder size={22} /></div>
               <div className="level-body">
                 <h3>

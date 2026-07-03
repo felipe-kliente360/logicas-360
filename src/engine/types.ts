@@ -91,6 +91,8 @@ export interface Puzzle {
   kind?: "grid" | "whodunit";
   /** Dados do crime (só para kind="whodunit"). */
   crime?: Crime;
+  /** Coleção "Especial" (casos curados de locais reais) — marcado no carregamento. */
+  special?: boolean;
   /** Índice do culpado na spine — DERIVADO no carregamento (solução + evidências). */
   culprit?: number;
 }

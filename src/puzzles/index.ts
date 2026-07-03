@@ -24,6 +24,15 @@ function levelFromRaw(r: number): number {
 // corroboração, que facilita a dedução, não infle o nível.
 const raw = new Map(RAW.map((p) => [p.id, p.baseRaw ?? difficultyRaw(p)]));
 
+// Coleção "Especial": casos ambientados em locais reais (Circuito das Águas / Sul de MG).
+const SPECIAL = new Set([
+  "balneario-caxambu",
+  "baependi-romaria",
+  "sao-lourenco-lago",
+  "cruzilia-mangalarga",
+  "sao-tome-vigilia",
+]);
+
 function hydrate(p: Puzzle): Puzzle {
   const hasSolution = p.solution && Object.keys(p.solution).length > 0;
   const solution = hasSolution ? p.solution : (solve(p) as Record<string, string[]> | null);
@@ -51,7 +60,7 @@ function hydrate(p: Puzzle): Puzzle {
           }),
         }))
       : p.categories;
-  return { ...p, categories, solution: solution ?? {}, difficulty: levelFromRaw(raw.get(p.id)!), culprit };
+  return { ...p, categories, solution: solution ?? {}, difficulty: levelFromRaw(raw.get(p.id)!), culprit, special: SPECIAL.has(p.id) };
 }
 
 export const PUZZLES: Puzzle[] = RAW.map(hydrate).sort(
