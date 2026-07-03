@@ -45,6 +45,11 @@ import { puzzle as estacaoEspacial } from "./estacao-espacial";
 // --- lote go-forward (curva de redundância + prosa com red herring) ---
 import { puzzle as jardimBotanico } from "./jardim-botanico";
 import { puzzle as balnearioCaxambu } from "./balneario-caxambu";
+// --- lote Circuito das Águas / Sul de Minas ---
+import { puzzle as baependiRomaria } from "./baependi-romaria";
+import { puzzle as saoLourencoLago } from "./sao-lourenco-lago";
+import { puzzle as cruziliaMangalarga } from "./cruzilia-mangalarga";
+import { puzzle as saoTomeVigilia } from "./sao-tome-vigilia";
 
 export const WHODUNIT: Puzzle[] = [
   crimeSetCinema,
@@ -69,6 +74,10 @@ export const WHODUNIT: Puzzle[] = [
   estacaoEspacial,
   jardimBotanico,
   balnearioCaxambu,
+  baependiRomaria,
+  saoLourencoLago,
+  cruziliaMangalarga,
+  saoTomeVigilia,
   sumicoPadaria,
   rouboMuseu,
   crimeMansao,
