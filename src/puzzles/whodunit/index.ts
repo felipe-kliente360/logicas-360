@@ -50,6 +50,12 @@ import { puzzle as baependiRomaria } from "./baependi-romaria";
 import { puzzle as saoLourencoLago } from "./sao-lourenco-lago";
 import { puzzle as cruziliaMangalarga } from "./cruzilia-mangalarga";
 import { puzzle as saoTomeVigilia } from "./sao-tome-vigilia";
+// --- coleção Cibernéticos (incidentes Salesforce) ---
+import { puzzle as cyberRelatorioMentiroso } from "./cyber-relatorio-mentiroso";
+import { puzzle as cyberDeployFatal } from "./cyber-deploy-fatal";
+import { puzzle as cyberPermissaoIndevida } from "./cyber-permissao-indevida";
+import { puzzle as cyberLimiteEstourado } from "./cyber-limite-estourado";
+import { puzzle as cyberIntegracaoTraicoeira } from "./cyber-integracao-traicoeira";
 
 export const WHODUNIT: Puzzle[] = [
   crimeSetCinema,
@@ -78,6 +84,11 @@ export const WHODUNIT: Puzzle[] = [
   saoLourencoLago,
   cruziliaMangalarga,
   saoTomeVigilia,
+  cyberRelatorioMentiroso,
+  cyberDeployFatal,
+  cyberPermissaoIndevida,
+  cyberLimiteEstourado,
+  cyberIntegracaoTraicoeira,
   sumicoPadaria,
   rouboMuseu,
   crimeMansao,
