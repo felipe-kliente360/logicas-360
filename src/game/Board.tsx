@@ -364,9 +364,9 @@ export function Board({ puzzle, settings, nextId, allDone, onBack, onNext, onSol
   }
 
   // ——— grade: célula categoria×categoria (anotação exclusiva da grade, estado `cross`) ———
-  // ciclo: vazio → ✗ manual → ✓ → (toque no ✓) auto-preenche os VAZIOS da linha/coluna
-  //        do sub-grid com ✗ "auto" → (novo toque) limpa a célula e SÓ os ✗ "auto"
-  //        (os ✗ marcados à mão — "no" — permanecem). Sem propagação entre sub-grids.
+  // ciclo (igual ao Suspeito×categoria): vazio → ✗ manual → ✓ JÁ preenchendo os vazios
+  //   da linha/coluna do sub-grid com ✗ "auto" → (novo toque) limpa a célula e SÓ os ✗
+  //   "auto" (os ✗ marcados à mão — "no" — permanecem). Sem propagação entre sub-grids.
   function gridCross(aId: string, va: string, bId: string, vb: string) {
     const key = crossKey(aId, va, bId, vb);
     const cur = cross[key];
@@ -382,14 +382,12 @@ export function Board({ puzzle, settings, nextId, allDone, onBack, onNext, onSol
       next[key] = "no"; // 1º toque: ✗ manual
       typeTick(settings.som);
     } else if (cur === "no" || cur === "auto") {
-      next[key] = "yes"; // 2º toque: ✓
-      fileClick(settings.som);
-    } else if (neighbors.some((k) => !next[k])) {
-      // 3º toque no ✓: crava ✗ "auto" só nas células AINDA vazias da linha/coluna
+      // 2º toque: ✓ e JÁ crava ✗ "auto" nas células ainda vazias da linha/coluna
+      next[key] = "yes";
       for (const k of neighbors) if (!next[k]) next[k] = "auto";
       fileClick(settings.som);
     } else {
-      // 4º toque: limpa a célula atual e SÓ os ✗ "auto" da linha/coluna; "no" manuais ficam
+      // 3º toque: limpa a célula atual e SÓ os ✗ "auto" da linha/coluna; "no" manuais ficam
       for (const k of neighbors) if (next[k] === "auto") delete next[k];
       delete next[key];
       typeTick(settings.som);
