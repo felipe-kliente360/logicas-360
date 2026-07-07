@@ -93,6 +93,8 @@ export interface Puzzle {
   crime?: Crime;
   /** Coleção "Especial" (casos curados de locais reais) — marcado no carregamento. */
   special?: boolean;
+  /** Coleção "Cibernéticos" (incidentes de plataforma Salesforce) — marcado no carregamento. */
+  cyber?: boolean;
   /** Índice do culpado na spine — DERIVADO no carregamento (solução + evidências). */
   culprit?: number;
 }

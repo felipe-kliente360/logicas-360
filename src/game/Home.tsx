@@ -7,13 +7,6 @@ import { IconGear, IconFolder, IconChevronRight, IconSearch } from "../ds/compon
 
 const diffWord = (d: number) => (d <= 2 ? "Fácil" : d <= 6 ? "Médio" : d <= 8 ? "Difícil" : "Expert");
 
-const FILTERS: { id: string; label: string; test: (p: Puzzle) => boolean }[] = [
-  { id: "facil", label: "Fácil", test: (p) => p.difficulty <= 2 },
-  { id: "medio", label: "Médio", test: (p) => p.difficulty >= 3 && p.difficulty <= 6 },
-  { id: "dificil", label: "Difícil", test: (p) => p.difficulty >= 7 && p.difficulty <= 8 },
-  { id: "expert", label: "Expert", test: (p) => p.difficulty >= 9 },
-  { id: "especial", label: "Especial", test: (p) => !!p.special },
-];
 
 export function Home({
   puzzles,
@@ -36,16 +29,32 @@ export function Home({
       return next;
     });
 
+  // filtros por ESTADO (continuar / não iniciado) e por COLEÇÃO (especial / cibernéticos)
+  const doneSet = useMemo(() => new Set(progress.completed), [progress.completed]);
+  const startedSet = useMemo(
+    () => new Set(puzzles.filter((p) => !doneSet.has(p.id) && hasInProgress(p.id)).map((p) => p.id)),
+    [puzzles, doneSet]
+  );
+  const FILTERS = useMemo(
+    () => [
+      { id: "continuar", label: "Continuar", test: (p: Puzzle) => startedSet.has(p.id) },
+      { id: "novos", label: "Não iniciado", test: (p: Puzzle) => !doneSet.has(p.id) && !startedSet.has(p.id) },
+      { id: "especial", label: "Especial", test: (p: Puzzle) => !!p.special },
+      { id: "cyber", label: "Cibernéticos", test: (p: Puzzle) => !!p.cyber },
+    ],
+    [doneSet, startedSet]
+  );
+
   const visible = useMemo(
     () =>
       selected.size === 0
         ? puzzles
         : puzzles.filter((p) => FILTERS.some((f) => selected.has(f.id) && f.test(p))),
-    [puzzles, selected]
+    [puzzles, selected, FILTERS]
   );
   const counts = useMemo(
     () => FILTERS.map((f) => ({ b: f, n: puzzles.filter((p) => f.test(p)).length })),
-    [puzzles]
+    [puzzles, FILTERS]
   );
   const numberOf = useMemo(() => new Map(puzzles.map((p, i) => [p.id, i + 1])), [puzzles]);
 
@@ -110,8 +119,9 @@ export function Home({
           const caseRec = getCaseRecord(p.id);
           const inProgress = !done && hasInProgress(p.id);
           return (
-            <button key={p.id} className={"level-card case" + (done ? " done" : "") + (p.special ? " special" : "")} onClick={() => onPick(p.id)}>
+            <button key={p.id} className={"level-card case" + (done ? " done" : "") + (p.special ? " special" : "") + (p.cyber ? " cyber" : "")} onClick={() => onPick(p.id)}>
               {p.special && <span className="seal">★ Especial</span>}
+              {p.cyber && <span className="seal sf">☁ Salesforce</span>}
               <div className="level-num"><IconFolder size={22} /></div>
               <div className="level-body">
                 <h3>

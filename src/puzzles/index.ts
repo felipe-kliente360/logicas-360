@@ -33,6 +33,15 @@ const SPECIAL = new Set([
   "sao-tome-vigilia",
 ]);
 
+// Coleção "Cibernéticos": incidentes de produção na plataforma Salesforce (selo Salesforce).
+const CYBER = new Set([
+  "cyber-relatorio-mentiroso",
+  "cyber-deploy-fatal",
+  "cyber-permissao-indevida",
+  "cyber-limite-estourado",
+  "cyber-integracao-traicoeira",
+]);
+
 function hydrate(p: Puzzle): Puzzle {
   const hasSolution = p.solution && Object.keys(p.solution).length > 0;
   const solution = hasSolution ? p.solution : (solve(p) as Record<string, string[]> | null);
@@ -60,7 +69,7 @@ function hydrate(p: Puzzle): Puzzle {
           }),
         }))
       : p.categories;
-  return { ...p, categories, solution: solution ?? {}, difficulty: levelFromRaw(raw.get(p.id)!), culprit, special: SPECIAL.has(p.id) };
+  return { ...p, categories, solution: solution ?? {}, difficulty: levelFromRaw(raw.get(p.id)!), culprit, special: SPECIAL.has(p.id), cyber: CYBER.has(p.id) };
 }
 
 export const PUZZLES: Puzzle[] = RAW.map(hydrate).sort(
